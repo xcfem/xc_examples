@@ -83,7 +83,7 @@ lPatterns.currentTimeSeries= "ts" #Time series to use for the new load patterns.
 lp0= lPatterns.newLoadPattern("default","0") #New load pattern named 0
 lp0.newNodalLoad(pt1.tag,xc.Vector([0.0,9.0e6,0.0,0.0,0.0,0.0]))
 #We add the load case to domain.
-lPatterns.addToDomain("0")
+lPatterns.addToDomain(lp0.name)
 
 # Convenience set (all the nodes, all the elements, all the points,
 # all the surfaces,...).
