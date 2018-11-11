@@ -93,6 +93,6 @@ xcTotalSet= preprocessor.getSets.getSet("total")
 analisis= predefined_solutions.simple_static_linear(feProblem)
 result= analisis.analyze(1)
 
-deltaY= pt1.getNode().getDisp[1] #y displacement of node 2.
+deltaY= pt1.getNode().getDisp[1] #y displacement of node at point pt1.
 
 print 'deltaY= ', deltaY
