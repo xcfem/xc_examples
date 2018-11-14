@@ -58,7 +58,7 @@ beamSection= sectionGeometry.defElasticShearSection3d(preprocessor,EL)
 lin= modelSpace.newLinearCrdTransf("lin",xc.Vector([1,0,0]))
 
 seedElemHandler= preprocessor.getElementHandler.seedElemHandler
-seedElemHandler.defaultTransformation= lin.name #Orientation of the element axis.
+seedElemHandler.defaultTransformation= lin.getName()  # Orientation of the element axis.
 seedElemHandler.defaultMaterial= beamSection.name #Material name.
 beam3d= seedElemHandler.newElement("ElasticBeam3d",xc.ID([0,0]));
 
@@ -83,7 +83,7 @@ lPatterns.currentTimeSeries= "ts" #Time series to use for the new load patterns.
 lp0= lPatterns.newLoadPattern("default","0") #New load pattern named 0
 lp0.newNodalLoad(pt1.tag,xc.Vector([0.0,9.0e6,0.0,0.0,0.0,0.0]))
 #We add the load case to domain.
-lPatterns.addToDomain(lp0.name)
+lPatterns.addToDomain(lp0.getName())
 
 # Convenience set (all the nodes, all the elements, all the points,
 # all the surfaces,...).
