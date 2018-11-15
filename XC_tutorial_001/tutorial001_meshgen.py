@@ -48,7 +48,7 @@ print('N = ', N)
 # -*- coding: utf-8 -*-
 '''
 tutorial 1 from www.xcengineering.xyz
-to fit with the line numbers of the tutorial no comments are added an the file header is at fil end
+to fit with the line numbers of the tutorial no comments are added and the file header is at file end
 '''
 
 __author__= "Luis C. Pérez Tato (LCPT) and Ana Ortega (AOO)"
