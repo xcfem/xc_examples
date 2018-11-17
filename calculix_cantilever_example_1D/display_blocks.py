@@ -6,5 +6,5 @@ defDisplay= vtk_CAD_graphic.RecordDefDisplayCAD()
 defDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
 defDisplay.cameraParameters.viewUpVc= [0,1,0]
 defDisplay.cameraParameters.posCVc= [-100,100,100]
-setDisp= xcTotalSet
-defDisplay.displayBlocks(setDisp,caption= setDisp.name+' set')
+setToDisplay= xcTotalSet
+defDisplay.displayBlocks(setToDisplay,caption= setToDisplay.name+' set')
