@@ -58,7 +58,7 @@ beamSection= sectionGeometry.defElasticShearSection3d(preprocessor,EL)
 lin= modelSpace.newLinearCrdTransf("lin",xc.Vector([1,0,0]))
 
 seedElemHandler= preprocessor.getElementHandler.seedElemHandler
-seedElemHandler.defaultTransformation= lin.name #Orientation of the element axis.
+seedElemHandler.defaultTransformation= lin.getName() #Orientation of the element axis.
 seedElemHandler.defaultMaterial= beamSection.name #Material name.
 beam3d= seedElemHandler.newElement("ElasticBeam3d",xc.ID([0,0]));
 
