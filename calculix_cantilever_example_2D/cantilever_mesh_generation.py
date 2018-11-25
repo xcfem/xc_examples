@@ -28,11 +28,19 @@ modelSpace = predefined_spaces.StructuralMechanics3D(preprocessor.getNodeHandler
 
 
 # *********geometry*********
+L= 8.0
+inPlane= False
 points = preprocessor.getMultiBlockTopology.getPoints  # Point container.
-pt0 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0)) 
-pt1 = points.newPntFromPos3d(geom.Pos3d(1.0,0.0,0.0)) 
-pt2 = points.newPntFromPos3d(geom.Pos3d(1.0,0.0,8.0)) 
-pt3 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,8.0))  # Right end
+if(inPlane):
+  pt0 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0)) 
+  pt1 = points.newPntFromPos3d(geom.Pos3d(0.0,1.0,0.0)) 
+  pt2 = points.newPntFromPos3d(geom.Pos3d(0.0,1.0,L)) 
+  pt3 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,L))  # Right end
+else:
+  pt0 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0)) 
+  pt1 = points.newPntFromPos3d(geom.Pos3d(1.0,0.0,0.0)) 
+  pt2 = points.newPntFromPos3d(geom.Pos3d(1.0,0.0,L)) 
+  pt3 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,L))  # Right end
 
 surfaces = preprocessor.getMultiBlockTopology.getSurfaces  # Face container.
 surfaces.defaultTag = 1
@@ -41,7 +49,7 @@ face0.setElemSizeIJ(0.5,0.25) #Element size in (pt0->pt1,pt1->pt2) directions
 
 # Ascii art:
 #
-#    ^ y
+#    ^ y (inPlane==True) or x (inPlane==False)
 #    |
 #    |
 #
@@ -58,7 +66,9 @@ face0.setElemSizeIJ(0.5,0.25) #Element size in (pt0->pt1,pt1->pt2) directions
 
 # *********Material*********
 width_cantilever = 1.0
-canti_mat = typical_materials.defElasticMembranePlateSection(preprocessor, "canti_mat", 210000.0e6, 0.3, 0.0, width_cantilever)
+E= 210000.0e6
+I= 1/12.0*width_cantilever**4
+canti_mat = typical_materials.defElasticMembranePlateSection(preprocessor, "canti_mat", E, 0.3, 0.0, width_cantilever)
 
 
 # *********Elements*********
@@ -73,7 +83,8 @@ f1.genMesh(xc.meshDir.I)
 
 
 # *********Boundary conditions*********
-# Fix all the 3 displacement DOF of the nodes pt0 and pt1, better would be all nodes on the line ln0 (TODO)
+# Fix all the 6 displacement and rotation DOFs
+# for all the nodes on the line between pt0 and pt1.
 #   We ask for the line to fix:
 lineToFix= preprocessor.getMultiBlockTopology.getLineWithEndPoints(pt0.tag,pt1.tag)
 #   We ask for the nodes on this line
@@ -96,7 +107,8 @@ lp0 = lPatterns.newLoadPattern("default","0")  # New load pattern named 0
 lineToLoad= preprocessor.getMultiBlockTopology.getLineWithEndPoints(pt3.tag,pt2.tag)
 #   We ask for the nodes on this line
 nodesToLoad= lineToLoad.getNodes()
-loadForEachNode= 9.0e6/len(nodesToLoad)
+P= 9e6
+loadForEachNode= P/len(nodesToLoad)
 #   We load them
 for n in nodesToLoad:
     lp0.newNodalLoad(n.tag,xc.Vector([0.0,loadForEachNode,0.0,0.0,0.0,0.0]))
@@ -115,8 +127,12 @@ xcTotalSet = preprocessor.getSets.getSet("total")
 analysis = predefined_solutions.simple_static_linear(feProblem)
 result = analysis.analyze(1)
 
+f= P*L**3/3.0/E/I 
+
 deltaYpt2 = pt2.getNode().getDisp[1]  # y displacement of node at point pt2.
 deltaYpt3 = pt3.getNode().getDisp[1]  # y displacement of node at point pt3.
 
-print 'deltaYpt2= ', deltaYpt2
-print 'deltaYpt3= ', deltaYpt3
+error= ((deltaYpt2+deltaYpt3)/2.0-f)/f
+print 'deltaYpt2= ', deltaYpt2, f
+print 'deltaYpt3= ', deltaYpt3, f
+print 'error= ', error*100, ' %'
