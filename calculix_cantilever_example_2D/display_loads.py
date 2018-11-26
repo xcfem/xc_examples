@@ -22,4 +22,4 @@ for lc in loadCasesToDisplay:
     for st in lc.setsToDispLoads:
 #        capt=lc.loadCaseDescr + ', ' + st.genDescr + ', '  + lc.unitsLoads
         capt=lc.loadCaseDescr + ', '  + lc.unitsLoads
-        qg.displayLoad(preprocessor,setToDisplay=st,loadCaseNm=lc.loadCaseName,unitsScale=lc.unitsScaleLoads,vectorScale=lc.vectorScaleLoads, multByElemArea=lc.multByElemAreaLoads,viewDef= lc.cameraParameters, caption= capt,fileName=None,defFScale=1.0)
+        qg.display_load(preprocessor,setToDisplay=st,loadCaseNm=lc.loadCaseName,unitsScale=lc.unitsScaleLoads,vectorScale=lc.vectorScaleLoads, multByElemArea=lc.multByElemAreaLoads,viewDef= lc.cameraParameters, caption= capt,fileName=None,defFScale=1.0)
