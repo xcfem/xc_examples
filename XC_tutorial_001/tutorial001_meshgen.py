@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+'''
+tutorial 1 from www.xcengineering.xyz
+to fit with the line numbers of the tutorial no comments are added and the file header is at file end
+'''
+
+__author__= "Luis C. Pérez Tato (LCPT) and Ana Ortega (AOO)"
+__copyright__= "Copyright 2015, LCPT and AOO"
+__license__= "GPL"
+__version__= "3.0"
+__email__= "l.pereztato@gmail.com"
+
 import xc_base
 import geom
 import xc
@@ -44,16 +56,4 @@ elem1.getResistingForce()
 N = elem1.getN()
 print('N = ', N)
 
-
-# -*- coding: utf-8 -*-
-'''
-tutorial 1 from www.xcengineering.xyz
-to fit with the line numbers of the tutorial no comments are added and the file header is at file end
-'''
-
-__author__= "Luis C. Pérez Tato (LCPT) and Ana Ortega (AOO)"
-__copyright__= "Copyright 2015, LCPT and AOO"
-__license__= "GPL"
-__version__= "3.0"
-__email__= "l.pereztato@gmail.com"
 
