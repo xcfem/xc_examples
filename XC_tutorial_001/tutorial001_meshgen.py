@@ -31,7 +31,6 @@ elast = typical_materials.defElasticMaterial(preprocessor, "elast", E)
 elements = preprocessor.getElementHandler
 elements.defaultMaterial = "elast"
 elements.dimElem = 2  # Dimension of element space
-elements.defaultTag = 1  # Tag for the next element.
 truss = elements.newElement("Truss", xc.ID([nod1.tag, nod2.tag]))
 truss.area = A
 constraints = preprocessor.getBoundaryCondHandler
@@ -45,13 +44,13 @@ ts = lPatterns.newTimeSeries("linear_ts", "ts")
 lPatterns.currentTimeSeries = "ts"
 lp0 = lPatterns.newLoadPattern("default", "0")
 eleLoad = lp0.newElementalLoad("truss_temp_load")
-eleLoad.elementTags = xc.ID([1])
+eleLoad.elementTags = xc.ID([truss.tag])
 eleLoad.eps1 = alpha * AT
 eleLoad.eps2 = alpha * AT
 lPatterns.addToDomain("0")
 analisis = predefined_solutions.simple_static_linear(feProblem)
 result = analisis.analyze(1)
-elem1 = elements.getElement(1)
+elem1 = elements.getElement(truss.tag)
 elem1.getResistingForce()
 N = elem1.getN()
 print('N = ', N)
