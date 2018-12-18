@@ -28,8 +28,8 @@ modelSpace = predefined_spaces.StructuralMechanics3D(preprocessor.getNodeHandler
 
 
 # *********geometry*********
-L= 8.0
-inPlane= False
+L= 8.0 #8.0
+inPlane= True #False
 points = preprocessor.getMultiBlockTopology.getPoints  # Point container.
 if(inPlane):
   pt0 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0)) 
@@ -43,9 +43,9 @@ else:
   pt3 = points.newPntFromPos3d(geom.Pos3d(0.0,0.0,L))  # Right end
 
 surfaces = preprocessor.getMultiBlockTopology.getSurfaces  # Face container.
-surfaces.defaultTag = 1
 face0 = surfaces.newQuadSurfacePts(pt0.tag, pt1.tag, pt2.tag, pt3.tag)
-face0.setElemSizeIJ(0.5,0.25) #Element size in (pt0->pt1,pt1->pt2) directions 
+#face0.setElemSizeIJ(0.5,0.25) #Element size in (pt0->pt1,pt1->pt2) directions 
+face0.setElemSizeIJ(0.5,0.5) #Element size in (pt0->pt1,pt1->pt2) directions 
 
 # Ascii art:
 #
@@ -71,14 +71,26 @@ I= 1/12.0*width_cantilever**4
 canti_mat = typical_materials.defElasticMembranePlateSection(preprocessor, "canti_mat", E, 0.3, 0.0, width_cantilever)
 
 
-# *********Elements*********
+# *********Elements: MITC9 *********
+# Nine node element (quadratic interpolation):
+#
+#   4      7      3
+#    +-----+-----+
+#    |           |
+#    |           |
+#  8 +   9 +     + 6
+#    |           |
+#    |           |
+#    +-----+-----+
+#   1      5      2
+#
 seedElemHandler = preprocessor.getElementHandler.seedElemHandler
 seedElemHandler.defaultMaterial = "canti_mat"
-elem = seedElemHandler.newElement("ShellMITC4", xc.ID([0,0,0,0]))
+elem = seedElemHandler.newElement("ShellMITC9", xc.ID([0,0,0,0,0,0,0,0,0]))
 
 
 # *********Mesh*********
-f1 = preprocessor.getSets.getSet("f1")
+f1 = preprocessor.getSets.getSet(face0.name)
 f1.genMesh(xc.meshDir.I)
 
 
@@ -121,7 +133,6 @@ lPatterns.addToDomain(lp0.getName())
 # Convenience set (all the nodes, all the elements, all the points,
 # all the surfaces,...).
 xcTotalSet = preprocessor.getSets.getSet("total")
-
 
 # *********Solution*********
 analysis = predefined_solutions.simple_static_linear(feProblem)
