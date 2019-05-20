@@ -11,5 +11,5 @@ cameraParams.viewUpVc= [0,1,0]
 cameraParams.posCVc= [-100,100,100]
 setToDisplay= xcTotalSet #impactOnBody #totalSet
 
-defDisplay.FEmeshGraphic(xcSet= setToDisplay,caption='',cameraParameters= cameraParams)
+defDisplay.FEmeshGraphic(xcSet= setToDisplay,caption='mesh',cameraParameters= cameraParams)
 
