@@ -10,6 +10,6 @@ cameraParams.viewUpVc= [0,1,0]
 cameraParams.posCVc= [-100,100,100]
 setToDisplay= xcTotalSet #impactOnBody #totalSet
 
-defDisplay.displayLocalAxes(xcSet= xcTotalSet,cameraParameters= cameraParams,caption= 'local axes',vectorScale=0.3)
+defDisplay.displayLocalAxes(xcSet= xcTotalSet,caption= 'local axes',vectorScale=0.3)
 
 

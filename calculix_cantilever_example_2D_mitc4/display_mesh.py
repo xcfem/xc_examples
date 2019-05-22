@@ -9,7 +9,7 @@ defDisplay= vtk_FE_graphic.RecordDefDisplayEF()
 cameraParams= vtk_graphic_base.CameraParameters('Custom')
 cameraParams.viewUpVc= [0,1,0]
 cameraParams.posCVc= [-100,100,100]
-setToDisplay= xcTotalSet #impactOnBody #totalSet
+setToDisplay= xcTotalSet #totalSet
 
 defDisplay.FEmeshGraphic(xcSet= setToDisplay,caption='mesh',cameraParameters= cameraParams)
 

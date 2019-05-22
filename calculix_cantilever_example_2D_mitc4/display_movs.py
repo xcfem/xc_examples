@@ -2,7 +2,6 @@
 
 from postprocess.reports import graphical_reports as gr
 from postprocess.xcVtk import vtk_graphic_base
-from postprocess.xcVtk.FE_model import quick_graphics as qg
 
 execfile('./cantilever_mesh_generation.py')
 
@@ -19,13 +18,4 @@ loadCasesToDisplay=[rlcd]
 #End data
 
 for lc in loadCasesToDisplay:
-    lcs=qg.QuickGraphics(feProblem)
-    for st in lc.setsToDispDspRot:
-        for arg in lc.listDspRot:
-            if arg[0]=='u':
-                fcUn=lc.unitsScaleDispl
-                unDesc=lc.unitsDispl
-            else:
-                fcUn=1.0
-                unDesc=''
-            lcs.displayDispRot(itemToDisp=arg,setToDisplay=st,fConvUnits=fcUn,unitDescription=unDesc,viewDef= lc.cameraParameters,fileName=None)
+    lc.displayDispRot(fName=None)
