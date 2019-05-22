@@ -9,7 +9,7 @@ defDisplay= vtk_FE_graphic.RecordDefDisplayEF()
 defDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
 defDisplay.cameraParameters.viewUpVc= [0,1,0]
 defDisplay.cameraParameters.posCVc= [-100,100,100]
-setToDisplay= None #xcTotalSet
+setToDisplay= xcTotalSet
 
-defDisplay.displayStrongWeakAxis(xcSet= setToDisplay,caption= 'strong and weak axis',cameraParameters= defDisplay.cameraParameters)
+defDisplay.displayStrongWeakAxis(xcSet= setToDisplay,caption= setToDisplay.name + ' set, strong and weak axis')
 

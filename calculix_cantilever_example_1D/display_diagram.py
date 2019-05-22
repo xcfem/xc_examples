@@ -10,6 +10,8 @@ from postprocess.xcVtk.FE_model import quick_graphics as qg
 lcs= qg.QuickGraphics(feProblem)
 
 loadCaseToDisplay= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
+loadCaseToDisplay.unitsForc='[kN]'
+loadCaseToDisplay.unitsMom='[kN.m]'
 loadCaseToDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
 loadCaseToDisplay.cameraParameters.viewUpVc= [0,1,0]
 loadCaseToDisplay.cameraParameters.posCVc= [-100,100,100]
@@ -20,5 +22,5 @@ loadCaseToDisplay.cameraParameters.posCVc= [-100,100,100]
 lcs.solve(loadCaseName=loadCaseToDisplay.loadCaseName,loadCaseExpr=loadCaseToDisplay.loadCaseExpr)
 
 #lcs.displayIntForcDiag('N',xcTotalSet,1e-3,1,'(kN)',loadCaseToDisplay.cameraParameters)
-lcs.displayIntForcDiag('Mz',xcTotalSet,1e-3,-1.0,'(kN m)',loadCaseToDisplay.cameraParameters)
+loadCaseToDisplay.displayIntForcDiag('Mz',setToDisplay= xcTotalSet)
 #lcs.displayIntForcDiag('Qy',xcTotalSet,1e-3,1,'(kN)',loadCaseToDisplay.cameraParameters)
