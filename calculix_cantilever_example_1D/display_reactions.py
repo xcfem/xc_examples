@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+
+from postprocess.reports import graphical_reports as gr
+from postprocess.xcVtk import vtk_graphic_base
+from postprocess.xcVtk.FE_model import quick_graphics as qg
+
+execfile('./cantilever_mesh_generation.py')
+
+#available components: 'axialComponent', 'transComponent', 'transYComponent',
+#                      'transZComponent'
+
+rlcd= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
+rlcd.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
+rlcd.cameraParameters.viewUpVc= [0,1,0]
+rlcd.cameraParameters.posCVc= [-100,100,100]
+rlcd.setsToDispLoads=[xcTotalSet]
+rlcd.setsToDispBeamLoads=[xcTotalSet]
+
+loadCasesToDisplay=[rlcd]
+
+#End data
+
+print('Work in progress...')
+constraints= feProblem.getDomain.getConstraints
+single_point_constraints= list()
+spIter= constraints.getSPs
+sp= spIter.next()
+while not(sp is None):
+  single_point_constraints.append(sp)
+  print "tag= ", sp.tag
+  sp= spIter.next()
+
+# for lc in loadCasesToDisplay:
+#     lc.displayLoadOnSets()
