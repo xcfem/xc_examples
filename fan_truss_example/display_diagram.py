@@ -6,6 +6,7 @@ from postprocess.xcVtk import vtk_graphic_base
 from postprocess.reports import graphical_reports as gr
 
 loadCaseToDisplay= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
+loadCaseToDisplay.setsToDispIntForc=[xcTotalSet]
 loadCaseToDisplay.unitsForc='[kN]'
 loadCaseToDisplay.unitsMom='[kN.m]'
 loadCaseToDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
@@ -16,6 +17,4 @@ loadCaseToDisplay.cameraParameters.posCVc= [0,-100,0]
 #Define the diagram to display:
 # scaleFactor, unitConversionFactor, element sets and magnitude to display.
 
-#lcs.displayIntForcDiag('N',xcTotalSet,1e-3,1,'(kN)',loadCaseToDisplay.cameraParameters)
-loadCaseToDisplay.displayIntForcDiag(itemToDisp='N',setToDisplay= xcTotalSet)
-#lcs.displayIntForcDiag('Qy',xcTotalSet,1e-3,1,'(kN)',loadCaseToDisplay.cameraParameters)
+loadCaseToDisplay.displayIntForcDiag(itemToDisp='N')
