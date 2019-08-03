@@ -37,7 +37,9 @@ span= feetToMeter*31.0+5*inchToMeter
 
 #########################################################
 # Mesh generation.
-truss= truss_generators.FanTruss(trussRise= depth, trussModule= panelSize, trussSpan= span)
+lowerChordAxis= geom.Segment3d(geom.Pos3d(0.0,0.0,0.0),geom.Pos3d(span,0.0,0.0))
+upperChordAxis= geom.Segment3d(geom.Pos3d(0.0,0.0,depth),geom.Pos3d(span,0.0,depth))
+truss= truss_generators.FanTruss(lowerChordAxis, upperChordAxis, trussModule= panelSize)
 truss.lowerChordMaterial= chordsSection
 truss.upperChordMaterial= chordsSection
 truss.diagonalMaterial= diagonalsMaterial
@@ -78,13 +80,13 @@ creepFactorLiveLoad= 1.0
 uniformLiveLoad= (creepFactorDeadLoad*10.0+creepFactorLiveLoad*40.0)*centerSpacing*psfTokNm2*1e3
 print('load: ', uniformLiveLoad)
 loadVector=xc.Vector([0,0,-uniformLiveLoad,0,0,0])
-for e in truss.upperChordSet.getElements:
+for e in truss.upperChordSet.elements:
     e.vector3dUniformLoadGlobal(loadVector)
 #Lower chord loads
 uniformLiveLoad= (creepFactorDeadLoad*5.0)*centerSpacing*psfTokNm2*1e3
 print('load: ', uniformLiveLoad)
 loadVector=xc.Vector([0,0,-uniformLiveLoad,0,0,0])
-for e in truss.lowerChordSet.getElements:
+for e in truss.lowerChordSet.elements:
     e.vector3dUniformLoadGlobal(loadVector)
 
 # We add the load case to domain.
@@ -97,8 +99,8 @@ xcTotalSet= preprocessor.getSets.getSet("total")
 analysis= predefined_solutions.simple_static_linear(feProblem)
 result= analysis.analyze(1)
 
-lowerChordCentroid= truss.lowerChordSet.getNodes.getCentroid(1.0)
-lowerChordCenterNode= truss.lowerChordSet.getNodes.getNearestNode(lowerChordCentroid)
+lowerChordCentroid= truss.lowerChordSet.nodes.getCentroid(1.0)
+lowerChordCenterNode= truss.lowerChordSet.nodes.getNearestNode(lowerChordCentroid)
 print(lowerChordCentroid)
 print(lowerChordCenterNode.getInitialPos3d)
 globalCreepFactor= 1.5
