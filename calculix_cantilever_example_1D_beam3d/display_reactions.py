@@ -20,15 +20,6 @@ loadCasesToDisplay=[rlcd]
 
 #End data
 
-print('Work in progress...')
-constraints= feProblem.getDomain.getConstraints
-single_point_constraints= list()
-spIter= constraints.getSPs
-sp= spIter.next()
-while not(sp is None):
-  single_point_constraints.append(sp)
-  print "tag= ", sp.tag
-  sp= spIter.next()
-
-# for lc in loadCasesToDisplay:
-#     lc.displayLoadOnSets()
+lcs=qg.LoadCaseResults(feProblem=feProblem,loadCaseName='lp0',loadCaseExpr='1.2*lp0')
+lcs.solve()
+lcs.displayReactions(setToDisplay=xcTotalSet,fConvUnits=1.0,scaleFactor=1.0,unitDescription= '[m,kN]',viewDef= rlcd.cameraParameters,fileName=None,defFScale=0.0)

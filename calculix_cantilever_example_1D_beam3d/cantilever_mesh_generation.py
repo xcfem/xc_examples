@@ -86,7 +86,7 @@ lPatterns= preprocessor.getLoadHandler.getLoadPatterns  # Load pattern container
 ts= lPatterns.newTimeSeries("constant_ts","ts")  # Constant load, no variation.
 lPatterns.currentTimeSeries= "ts"  # Time series to use for the new load patterns.
 # Load pattern definition
-lp0= lPatterns.newLoadPattern("default","0") #New load pattern named 0
+lp0= lPatterns.newLoadPattern("default","lp0") #New load pattern named 0
 lp0.newNodalLoad(pt1.getNode().tag,xc.Vector([0.0,9.0e6,0.0,0.0,0.0,0.0]))
 # We add the load case to domain.
 lPatterns.addToDomain(lp0.getName())
