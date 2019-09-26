@@ -7,7 +7,6 @@ from postprocess.xcVtk import vtk_internal_force_diagram as gde
 from postprocess.reports import graphical_reports as gr
 from postprocess.xcVtk.FE_model import quick_graphics as qg
 
-lcs= qg.QuickGraphics(feProblem)
 
 loadCaseToDisplay= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
 loadCaseToDisplay.setsToDispIntForc=[xcTotalSet]
@@ -17,10 +16,11 @@ loadCaseToDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
 loadCaseToDisplay.cameraParameters.viewUpVc= [0,1,0]
 loadCaseToDisplay.cameraParameters.posCVc= [-100,100,100]
 
+lcs= qg.LoadCaseResults(feProblem,loadCaseName=loadCaseToDisplay.loadCaseName,loadCaseExpr=loadCaseToDisplay.loadCaseExpr)
  
 #Define the diagram to display:
 # scaleFactor, unitConversionFactor, element sets and magnitude to display.
-lcs.solve(loadCaseName=loadCaseToDisplay.loadCaseName,loadCaseExpr=loadCaseToDisplay.loadCaseExpr)
+lcs.solve()
 
 loadCaseToDisplay.displayIntForcDiag('Mz')
 
