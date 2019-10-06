@@ -10,8 +10,8 @@ execfile('./cantilever_mesh_generation.py')
 
 rlcd= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
 rlcd.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
-rlcd.cameraParameters.viewUpVc= [0,1,0]
-rlcd.cameraParameters.posCVc= [-100,100,100]
+rlcd.cameraParameters.viewUpVc= [1,0,0]
+rlcd.cameraParameters.posCVc= [100,100,-100]
 rlcd.setsToDispReactions=[xcTotalSet]
 
 loadCasesToDisplay=[rlcd]

@@ -4,7 +4,7 @@ from postprocess.xcVtk.CAD_model import vtk_CAD_graphic
 
 defDisplay= vtk_CAD_graphic.RecordDefDisplayCAD()
 defDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
-defDisplay.cameraParameters.viewUpVc= [0,1,0]
-defDisplay.cameraParameters.posCVc= [-100,100,100]
+defDisplay.cameraParameters.viewUpVc= [1,0,0]
+defDisplay.cameraParameters.posCVc= [100,100,-100]
 setToDisplay= xcTotalSet
 defDisplay.displayBlocks(setToDisplay,caption= setToDisplay.name+' set; blocks')
