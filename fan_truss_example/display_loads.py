@@ -9,9 +9,7 @@ execfile('./xc_model.py')
 #                      'transZComponent'
 
 rlcd= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
-rlcd.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
-rlcd.cameraParameters.viewUpVc= [0,0,1]
-rlcd.cameraParameters.posCVc= [0,-100,0]
+rlcd.cameraParameters= modelSpace.cameraParameters
 rlcd.setsToDispLoads=[xcTotalSet]
 rlcd.setsToDispBeamLoads=[xcTotalSet]
 
