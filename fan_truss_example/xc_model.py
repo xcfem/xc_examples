@@ -10,6 +10,7 @@ from model.geometry import truss_generators
 from materials import typical_materials
 from materials.sections import section_properties
 from solution import predefined_solutions
+from postprocess.xcVtk import vtk_graphic_base
 
 inchToMeter= 2.54/100.0
 feetToMeter= 0.3048
@@ -113,3 +114,9 @@ print('deltaY= ', deltaY*1e3, ' mm')
 print('deltaYTeor= ', deltaYTeor*1e3, ' mm')
 print('diff= ', diff*1e3, ' mm')
 print('ratio= ', ratio)
+
+#########################################################
+# Graphic stuff.
+modelSpace.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
+modelSpace.cameraParameters.viewUpVc= [0,0,1]
+modelSpace.cameraParameters.posCVc= [0,-100,0]

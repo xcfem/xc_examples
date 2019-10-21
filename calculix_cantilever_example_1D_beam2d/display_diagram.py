@@ -13,9 +13,7 @@ loadCaseToDisplay= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
 loadCaseToDisplay.setsToDispIntForc=[xcTotalSet]
 loadCaseToDisplay.unitsForc='[kN]'
 loadCaseToDisplay.unitsMom='[kN.m]'
-loadCaseToDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
-loadCaseToDisplay.cameraParameters.viewUpVc= [1,0,0]
-loadCaseToDisplay.cameraParameters.posCVc= [100,100,-100]
+loadCaseToDisplay.cameraParameters= modelSpace.cameraParameters
 
 lcs= qg.LoadCaseResults(feProblem,loadCaseName=loadCaseToDisplay.loadCaseName,loadCaseExpr=loadCaseToDisplay.loadCaseExpr)
  

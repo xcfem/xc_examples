@@ -19,7 +19,7 @@ from model import predefined_spaces
 from model.mesh import finit_el_model
 from materials import typical_materials
 from materials.sections import section_properties
-
+from postprocess.xcVtk import vtk_graphic_base
 
 # *********Problem definition*********
 feProblem = xc.FEProblem()
@@ -147,3 +147,9 @@ error= ((deltaYpt2+deltaYpt3)/2.0-f)/f
 print 'deltaYpt2= ', deltaYpt2, f
 print 'deltaYpt3= ', deltaYpt3, f
 print 'error= ', error*100, ' %'
+
+#########################################################
+# Graphic stuff.
+modelSpace.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
+modelSpace.cameraParameters.viewUpVc= [0,1,0]
+modelSpace.cameraParameters.posCVc= [-100,100,100]

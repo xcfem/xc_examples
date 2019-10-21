@@ -9,9 +9,7 @@ loadCaseToDisplay= gr.getRecordLoadCaseDispFromLoadPattern(lp0)
 loadCaseToDisplay.setsToDispIntForc=[xcTotalSet]
 loadCaseToDisplay.unitsForc='[kN]'
 loadCaseToDisplay.unitsMom='[kN.m]'
-loadCaseToDisplay.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
-loadCaseToDisplay.cameraParameters.viewUpVc= [0,0,1]
-loadCaseToDisplay.cameraParameters.posCVc= [0,-100,0]
+loadCaseToDisplay.cameraParameters= modelSpace.cameraParameters
 
  
 #Define the diagram to display:

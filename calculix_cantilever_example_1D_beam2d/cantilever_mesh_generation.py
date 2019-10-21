@@ -14,6 +14,7 @@ from solution import predefined_solutions
 from model import predefined_spaces
 from materials import typical_materials
 from materials.sections import section_properties
+from postprocess.xcVtk import vtk_graphic_base
 
 
 #########################################################
@@ -106,3 +107,9 @@ result= analysis.analyze(1)
 deltaX= pt1.getNode().getDisp[0]  # x displacement of node at point pt1.
 
 print 'deltaX= ', deltaX
+
+#########################################################
+# Graphic stuff.
+modelSpace.cameraParameters= vtk_graphic_base.CameraParameters('Custom')
+modelSpace.cameraParameters.viewUpVc= [1,0,0]
+modelSpace.cameraParameters.posCVc= [100,100,-100]
