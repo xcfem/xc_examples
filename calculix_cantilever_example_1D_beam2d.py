@@ -135,6 +135,6 @@ oh.outputStyle.cameraParameters.posCVc= [100,100,-100]
 ## Uncomment to display the reactions
 #oh.displayIntForcDiag('Mz')
 
-## Uncomment to display the reactions
+## Uncomment to display the loads
 oh.displayLoads()
 
