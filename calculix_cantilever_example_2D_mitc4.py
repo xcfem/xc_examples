@@ -126,9 +126,7 @@ for n in nodesToLoad:
     lp0.newNodalLoad(n.tag,xc.Vector([0.0,loadForEachNode,0.0,0.0,0.0,0.0]))
 
 # We add the load case to domain.
-print('here A')
 lPatterns.addToDomain(lp0.getName())
-print('here B')
 
 # *********xcTotalSet*********
 # Convenience set (all the nodes, all the elements, all the points,
