@@ -68,7 +68,6 @@ face0.setElemSizeIJ(0.5,0.25) #Element size in (pt0->pt1,pt1->pt2) directions
 # *********Material*********
 width_cantilever = 1.0
 E= 210000.0e6
-I= 1/12.0*width_cantilever**4
 canti_mat = typical_materials.defElasticMembranePlateSection(preprocessor, "canti_mat", E, 0.3, 0.0, width_cantilever)
 
 
@@ -138,6 +137,7 @@ xcTotalSet = preprocessor.getSets.getSet("total")
 analysis = predefined_solutions.simple_static_linear(feProblem)
 result = analysis.analyze(1)
 
+I= 1/12.0*width_cantilever**4
 f= P*L**3/3.0/E/I 
 
 deltaYpt2 = pt2.getNode().getDisp[1]  # y displacement of node at point pt2.
@@ -170,8 +170,8 @@ oh.outputStyle.cameraParameters.posCVc= [-100,100,100]
 ## Uncomment to display the reactions
 #oh.displayReactions()
 
-## Uncomment to display the reactions
+## Uncomment to display the internal forces
 #oh.displayIntForc('M2')
 
-## Uncomment to display the reactions
+## Uncomment to display the loads
 oh.displayLoads()
