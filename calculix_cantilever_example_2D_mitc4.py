@@ -107,20 +107,20 @@ for n in nodesToFix:
 
 # *********Load*********
 lPatterns = preprocessor.getLoadHandler.getLoadPatterns  # Load pattern container.
-# Variation of load with time.
+## Variation of load with time.
 ts = lPatterns.newTimeSeries("constant_ts","ts")  # Constant load, no variation.
 lPatterns.currentTimeSeries= "ts"  # Time series to use for the new load patterns.
-# Load pattern definition
+## Load pattern definition
 lp0 = lPatterns.newLoadPattern("default","0")  # New load pattern named 0
 
-# Nodes to load.
-#   We ask for the line to load:
+## Nodes to load.
+###   We ask for the line to load:
 lineToLoad= preprocessor.getMultiBlockTopology.getLineWithEndPoints(pt3.tag,pt2.tag)
-#   We ask for the nodes on this line
+###   We ask for the nodes on this line
 nodesToLoad= lineToLoad.nodes
 P= 9e6
 loadForEachNode= P/len(nodesToLoad)
-#   We load them
+### We load them
 for n in nodesToLoad:
     lp0.newNodalLoad(n.tag,xc.Vector([0.0,loadForEachNode,0.0,0.0,0.0,0.0]))
 
