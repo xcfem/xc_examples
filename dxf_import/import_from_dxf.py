@@ -2,8 +2,8 @@
 from __future__ import division
 from __future__ import print_function
 
-from import_export import DxfReader
-from import_export import NeutralMeshDescription as nmd
+from import_export import dxf_reader
+from import_export import neutral_mesh_description as nmd
 
 #layerNamesToImport= ['3rd_floor_truss_II.*']
 layerNamesToImport= ['2nd_floor']
@@ -15,7 +15,7 @@ def getRelativeCoo(pt):
 fileName= 'dxf_model_rev01.dxf'
 #fileName= '2nd_floor_ramp_area.dxf'
 #fileName= 'pp.dxf'
-dxfImport= DxfReader.DXFImport(fileName, layerNamesToImport,getRelativeCoo, threshold= 0.1,importLines= False, polylinesAsSurfaces= True, tolerance= .25)
+dxfImport= dxf_reader.DXFImport(fileName, layerNamesToImport,getRelativeCoo, threshold= 0.1,importLines= False, polylinesAsSurfaces= True, tolerance= .25)
 
 #Block topology
 blocks= dxfImport.exportBlockTopology('test')
