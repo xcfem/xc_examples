@@ -10,7 +10,6 @@ __email__= "l.pereztato@gmail.com"
 import xc_base
 import geom
 import xc
-from solution import predefined_solutions
 from model import predefined_spaces
 from materials import typical_materials
 from materials.sections import section_properties
@@ -102,8 +101,7 @@ xcTotalSet= preprocessor.getSets.getSet("total")
 
 #########################################################
 # Solution
-analysis= predefined_solutions.simple_static_linear(feProblem)
-result= analysis.analyze(1)
+result= modelSpace.analyze(calculateNodalReactions= True)
 
 deltaX= pt1.getNode().getDisp[0]  # x displacement of node at point pt1.
 

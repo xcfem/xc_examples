@@ -14,7 +14,6 @@ __email__= "bernd@bimstatik.org"
 import xc_base
 import geom
 import xc
-from solution import predefined_solutions
 from model import predefined_spaces
 from model.mesh import finit_el_model
 from materials import typical_materials
@@ -134,8 +133,7 @@ xcTotalSet = preprocessor.getSets.getSet("total")
 
 
 # *********Solution*********
-analysis = predefined_solutions.simple_static_linear(feProblem)
-result = analysis.analyze(1)
+result= modelSpace.analyze(calculateNodalReactions= False)
 
 I= 1/12.0*width_cantilever**4
 f= P*L**3/3.0/E/I 
