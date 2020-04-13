@@ -15,14 +15,19 @@ import geom
 import xc
 from model import predefined_spaces
 from materials import typical_materials
-from solution import predefined_solutions
+
+# Data
 L = 1.0  # Bar length (m)
 E = 210e9  # Elastic modulus (Pa)
 alpha = 1.2e-5  # Thermal expansion coefficient of the steel
 A = 4e-4  # bar area expressed in square meters
 AT = 10  # Temperature increment (Celsius degrees)
+
+# Finite element problem
 feProblem = xc.FEProblem ()
 preprocessor = feProblem.getPreprocessor
+
+## Mesh
 nodes = preprocessor.getNodeHandler
 modelSpace = predefined_spaces.SolidMechanics2D(nodes)
 nod1 = nodes.newNodeXY(0.0 ,0.0)
@@ -33,11 +38,15 @@ elements.defaultMaterial = "elast"
 elements.dimElem = 2  # Dimension of element space
 truss = elements.newElement("Truss", xc.ID([nod1.tag, nod2.tag]))
 truss.sectionArea= A
+
+## Constraints
 constraints = preprocessor.getBoundaryCondHandler
 spc1 = constraints.newSPConstraint(nod1.tag, 0, 0.0)
 spc2 = constraints.newSPConstraint(nod1.tag, 1, 0.0)
 spc3 = constraints.newSPConstraint(nod2.tag, 0, 0.0)
 spc4 = constraints.newSPConstraint(nod2.tag, 1, 0.0)
+
+## Loads
 loadHandler = preprocessor.getLoadHandler
 lPatterns = loadHandler.getLoadPatterns
 ts = lPatterns.newTimeSeries("linear_ts", "ts")
@@ -48,8 +57,11 @@ eleLoad.elementTags = xc.ID([truss.tag])
 eleLoad.eps1 = alpha * AT
 eleLoad.eps2 = alpha * AT
 lPatterns.addToDomain("0")
-analisis = predefined_solutions.simple_static_linear(feProblem)
-result = analisis.analyze(1)
+
+# Solution
+result= modelSpace.analyze(calculateNodalReactions= False)
+
+# Results
 elem1 = elements.getElement(truss.tag)
 elem1.getResistingForce()
 N = elem1.getN()

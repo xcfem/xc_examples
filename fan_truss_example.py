@@ -98,8 +98,7 @@ xcTotalSet= preprocessor.getSets.getSet("total")
 
 #########################################################
 # Solution
-analysis= predefined_solutions.simple_static_linear(feProblem)
-result= analysis.analyze(1)
+result= modelSpace.analyze(calculateNodalReactions= False)
 
 lowerChordCentroid= truss.lowerChordSet.nodes.getCentroid(1.0)
 lowerChordCenterNode= truss.lowerChordSet.nodes.getNearestNode(lowerChordCentroid)
