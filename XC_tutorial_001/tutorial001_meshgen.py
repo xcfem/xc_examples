@@ -4,6 +4,9 @@ tutorial 1 from www.xcengineering.xyz
 to fit with the line numbers of the tutorial no comments are added and the file header is at file end
 '''
 
+from __future__ import print_function
+from __future__ import division
+
 __author__= "Luis C. Pérez Tato (LCPT) and Ana Ortega (AOO)"
 __copyright__= "Copyright 2015, LCPT and AOO"
 __license__= "GPL"
@@ -52,7 +55,7 @@ lPatterns = loadHandler.getLoadPatterns
 ts = lPatterns.newTimeSeries("linear_ts", "ts")
 lPatterns.currentTimeSeries = "ts"
 lp0 = lPatterns.newLoadPattern("default", "0")
-eleLoad = lp0.newElementalLoad("truss_temp_load")
+eleLoad = lp0.newElementalLoad("truss_strain_load")
 eleLoad.elementTags = xc.ID([truss.tag])
 eleLoad.eps1 = alpha * AT
 eleLoad.eps2 = alpha * AT
@@ -65,6 +68,6 @@ result= modelSpace.analyze(calculateNodalReactions= False)
 elem1 = elements.getElement(truss.tag)
 elem1.getResistingForce()
 N = elem1.getN()
-print('N = ', N)
+print('N= '+str(N))
 
 
