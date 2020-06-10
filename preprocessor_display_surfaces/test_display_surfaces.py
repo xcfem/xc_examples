@@ -43,6 +43,6 @@ s2= surfaces.newQuadSurfacePts(pt2.tag,pt3.tag,pt6.tag,pt5.tag)
 
 # Display surfaces.
 from postprocess.xcVtk.CAD_model import vtk_CAD_graphic
-defDisplay= vtk_CAD_graphic.RecordDefDisplayCAD()
+displaySettings= vtk_CAD_graphic.DisplaySettingsBlockTopo()
 setDisp= feProblem.getPreprocessor.getSets['total']
-defDisplay.displayBlocks(setDisp,caption= setDisp.name+' set')
+displaySettings.displayBlocks(setDisp,caption= setDisp.name+' set')
