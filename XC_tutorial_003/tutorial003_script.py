@@ -145,7 +145,7 @@ lpatt.addToDomain("0")           #reads load pattern "0" and adds it to the doma
 # Solve
 solution=  predefined_solutions.SolutionProcedure()
 solution.convergenceTestTol= 1e-7
-analysis= solution.simpleStaticModifiedNewton(feProblem)
+analysis= solution.plainStaticModifiedNewton(feProblem)
 analOk= analysis.analyze(1)
 
 
