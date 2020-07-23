@@ -49,8 +49,8 @@ ln= lines.newLine(pt0.tag,pt1.tag)  # From pt0 to pt1.
 EL= typical_materials.MaterialData(name= 'EL',E=210000.0e6,nu=0.3,rho=0.0)
 
 # Cross section properties (1x1 m square section)
-sectionGeometry= section_properties.RectangularSection("SQ_1x1",b=1.0,h=1.0)
-beamSection= sectionGeometry.defElasticShearSection3d(preprocessor,EL)
+crossSection= section_properties.RectangularSection("SQ_1x1",b=1.0,h=1.0)
+beamSection= crossSection.defElasticShearSection3d(preprocessor,EL)
 
 
 #########################################################
