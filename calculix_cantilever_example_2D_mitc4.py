@@ -162,6 +162,9 @@ oh.outputStyle.cameraParameters.posCVc= [-100,100,100]
 ## Uncomment to display the mesh
 #oh.displayFEMesh()
 
+## Uncomment to display the loads
+oh.displayLoads()
+
 ## Uncomment to display the vertical displacement
 #oh.displayDispRot(itemToDisp='uY')
 
@@ -169,7 +172,5 @@ oh.outputStyle.cameraParameters.posCVc= [-100,100,100]
 #oh.displayReactions()
 
 ## Uncomment to display the internal forces
-#oh.displayIntForc('M2')
+# oh.displayIntForc('M2')
 
-## Uncomment to display the loads
-oh.displayLoads()
