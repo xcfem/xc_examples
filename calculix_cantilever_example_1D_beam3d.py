@@ -82,15 +82,11 @@ modelSpace.fixNode000_000(pt0.getNode().tag)  # Fix all the 6 DOF of the node
 
 #########################################################
 # Load
-lPatterns= preprocessor.getLoadHandler.getLoadPatterns  # Load pattern container.
-# Variation of load with time.
-ts= lPatterns.newTimeSeries("constant_ts","ts")  # Constant load, no variation.
-lPatterns.currentTimeSeries= "ts"  # Time series to use for the new load patterns.
-# Load pattern definition
-lp0= lPatterns.newLoadPattern("default","lp0") #New load pattern named 0
+lp0= modelSpace.newLoadPattern(name= '0')
 lp0.newNodalLoad(pt1.getNode().tag,xc.Vector([0.0,9.0e6,0.0,0.0,0.0,0.0]))
 # We add the load case to domain.
-lPatterns.addToDomain(lp0.getName())
+modelSpace.addLoadCaseToDomain(lp0.getName())
+
 
 
 #########################################################

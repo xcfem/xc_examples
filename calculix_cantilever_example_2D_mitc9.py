@@ -107,12 +107,8 @@ for n in nodesToFix:
 
 
 # *********Load*********
-lPatterns = preprocessor.getLoadHandler.getLoadPatterns  # Load pattern container.
-# Variation of load with time.
-ts = lPatterns.newTimeSeries("constant_ts","ts")  # Constant load, no variation.
-lPatterns.currentTimeSeries= "ts"  # Time series to use for the new load patterns.
 # Load pattern definition
-lp0 = lPatterns.newLoadPattern("default","0")  # New load pattern named 0
+lp0= modelSpace.newLoadPattern(name= '0')
 
 # Nodes to load.
 #   We ask for the line to load:
@@ -126,7 +122,7 @@ for n in nodesToLoad:
     lp0.newNodalLoad(n.tag,xc.Vector([0.0,loadForEachNode,0.0,0.0,0.0,0.0]))
 
 # We add the load case to domain.
-lPatterns.addToDomain(lp0.getName())
+modelSpace.addLoadCaseToDomain(lp0.getName())
 
 
 # *********xcTotalSet*********
