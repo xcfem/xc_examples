@@ -101,24 +101,26 @@ for n in l23.nodes:
 modelSpace.addLoadCaseToDomain(lp0.name)
 
 
+
 # Solution
 result=list()
+modelSpace.analysis= predefined_solutions.plain_krylov_newton(modelSpace.preprocessor.getProblem,mxNumIter=300, convergenceTestTol=1e-12,printFlag=2)
+
 for i in range(7):
     lp0.gammaF= 0.1*(i+1)
     ## Solve
-    modelSpace.analysis= predefined_solutions.plain_krylov_newton(modelSpace.preprocessor.getProblem,mxNumIter=300, convergenceTestTol=1e-12,printFlag=0)
     analOK= modelSpace.analyze(calculateNodalReactions= True)
     dispX=0
     for n in l23.nodes:
         dispX+=n.getDisp[0]
-    F=round(maxLoad*lp0.gammaF/kip2N,1)
-    uX=round(dispX/nnod/in2m,4)
+    F= round(maxLoad*lp0.gammaF/kip2N,1)
+    uX= round(dispX/nnod/in2m,4)
     print('F=',F, ' kips , uX=',uX , ' in')
     result.append((F,uX))
+    
 for i in range(5):
     lp0.gammaF= 0.6+(i*0.025)
     ## Solve
-    modelSpace.analysis= predefined_solutions.plain_krylov_newton(modelSpace.preprocessor.getProblem,mxNumIter=300, convergenceTestTol=1e-12,printFlag=0)
     analOK= modelSpace.analyze(calculateNodalReactions= True)
     dispX=0
     for n in l23.nodes:
