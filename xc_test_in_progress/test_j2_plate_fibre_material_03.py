@@ -22,14 +22,9 @@ from model import predefined_spaces
 from materials import typical_materials
 
 # Data
-# Units
-in2m=0.0254       # inches to m
+## Units
 ksi2Pa=6.89476e6  # ksi to Pa
 kip2N=4448.2216   # kips to N
-
-width=1*in2m   # Rod width (m)
-thickness=1*in2m   # Rod thickness (m)
-L= 50*in2m # Length of the rod (m)
 
 E= 29000*ksi2Pa # Young’s modulus (Pa)
 nu= 0.3 # Poisson’s ratio
@@ -47,6 +42,7 @@ modelSpace= predefined_spaces.StructuralMechanics3D(nodes)
 j2plate= typical_materials.defJ2PlateFibre(preprocessor, "j2plate",E,nu,fy= sg_yield, alpha=alpha,rho= 7850.0)
 
 
+# Test
 eps_yield= sg_yield/E
 strainData= [3e-4, 7e-4, 1e-3, 2e-3, eps_yield, 2.05e-3, 2.1e-3, 2.25e-3, 2.5e-3, 3e-3, 4e-3, 5e-3, 6e-3, 7e-3]
 stressData= list()
