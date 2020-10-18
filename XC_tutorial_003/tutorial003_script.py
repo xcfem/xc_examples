@@ -143,10 +143,8 @@ lp0.newNodalLoad(nodB.tag,pointLoad)    #applies the point load on node B
 lpatt.addToDomain("0")           #reads load pattern "0" and adds it to the domain
 
 # Solve
-solution=  predefined_solutions.SolutionProcedure()
-solution.convergenceTestTol= 1e-7
-analysis= solution.plainStaticModifiedNewton(feProblem)
-analOk= analysis.analyze(1)
+solProc= predefined_solutions.PlainStaticModifiedNewton(feProblem, convergenceTestTol= 1e-7)
+analOk= solProc.analysis.analyze(1)
 
 
 nodes.calculateNodalReactions(True,1e-7)
