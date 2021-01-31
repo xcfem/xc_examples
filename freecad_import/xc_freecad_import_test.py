@@ -16,7 +16,6 @@ def getRelativeCoo(pt):
 groupsToImport= ['.*']
 
 baseName= './freecad_import_test'
-#baseName= './tablero'
 freeCADFileName= baseName+'.FCStd'
 freeCADImport= freecad_reader.FreeCADImport(freeCADFileName, groupsToImport, getRelativeCoo, threshold= 0.001)
 
@@ -31,11 +30,33 @@ ieData.blockData= blocks
 ieData.writeToXCFile()
 FEcase= xc.FEProblem()
 FEcase.title= 'Test'
-execfile(ieData.getXCFileName())
+exec(open(ieData.getXCFileName())).read())
 # Problem type
 preprocessor=FEcase.getPreprocessor
 nodes= preprocessor.getNodeHandler
 modelSpace= predefined_spaces.StructuralMechanics3D(nodes) 
+
+xcTotalSet= modelSpace.getTotalSet()
+
+numberOfSurfaces= len(xcTotalSet.surfaces)
+numberOfPoints= len(xcTotalSet.points)
+numberOfLines= len(xcTotalSet.lines)
+
+error= (numberOfSurfaces-2)**2+(numberOfPoints-9)**2+(numberOfLines-9)**2
+
+'''
+print('number of surfaces: ', numberOfSurfaces)
+print('number of points: ', numberOfPoints)
+print('number of lines: ', numberOfLines)
+'''
+
+import os
+from misc_utils import log_messages as lmsg
+fname= os.path.basename(__file__)
+if(error==0):
+  print("test "+fname+": ok.")
+else:
+  lmsg.error(fname+' ERROR.')
 
 # Graphic stuff.
 oh= output_handler.OutputHandler(modelSpace)

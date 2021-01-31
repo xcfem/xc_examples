@@ -5,7 +5,7 @@ import geom
 import xc
 
 test= xc.FEProblem()
-execfile('./xc_model_blocks.py')
+exec(open('./xc_model_blocks.py')).read())
 
 xcTotalSet= preprocessor.getSets.getSet('total')
 
