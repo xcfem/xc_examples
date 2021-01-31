@@ -68,7 +68,6 @@ err= math.sqrt(err)
 print('err= ', err)
 print(stressData)
 print('sg_yield= ', sg_yield/1e6, ' MPa')
-
 import matplotlib.pyplot as plt
 plt.plot(strainData, stressData)
 plt.ylabel('stress-strain')
@@ -82,4 +81,3 @@ if(err<1e-12):
   print("test ",fname,": ok.")
 else:
   lmsg.error(fname+' ERROR.')
-
