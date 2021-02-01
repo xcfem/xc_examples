@@ -101,7 +101,7 @@ result= modelSpace.analyze(calculateNodalReactions= False)
 
 deltaY= pt1.getNode().getDisp[1]  # y displacement of node at point pt1.
 
-print 'deltaY= ', deltaY
+print('deltaY= ', deltaY)
 #########################################################
 # Graphic stuff.
 oh= output_handler.OutputHandler(modelSpace)

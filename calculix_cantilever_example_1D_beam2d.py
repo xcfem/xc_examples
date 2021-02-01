@@ -100,7 +100,7 @@ result= modelSpace.analyze(calculateNodalReactions= True)
 
 deltaX= pt1.getNode().getDisp[0]  # x displacement of node at point pt1.
 
-print 'deltaX= ', deltaX
+print('deltaX= ', deltaX)
 
 #########################################################
 # Graphic stuff.

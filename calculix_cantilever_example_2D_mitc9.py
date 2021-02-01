@@ -139,9 +139,9 @@ deltaYpt2 = pt2.getNode().getDisp[1]  # y displacement of node at point pt2.
 deltaYpt3 = pt3.getNode().getDisp[1]  # y displacement of node at point pt3.
 
 error= ((deltaYpt2+deltaYpt3)/2.0-f)/f
-print 'deltaYpt2= ', deltaYpt2, f
-print 'deltaYpt3= ', deltaYpt3, f
-print 'error= ', error*100, ' %'
+print('deltaYpt2= ', deltaYpt2, f)
+print('deltaYpt3= ', deltaYpt3, f)
+print('error= ', error*100, ' %')
 
 #########################################################
 # Graphic stuff.
