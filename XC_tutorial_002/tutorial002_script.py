@@ -2,6 +2,8 @@
 ''' Reference: Thomson, Ref 9: Vibration Theory and Applications, pg. 264, clause 8.2.
    '''
 from __future__ import division
+from __future__ import print_function
+
 import math
 import xc_base
 import geom
@@ -61,32 +63,32 @@ predefined_spaces.ConstraintsForLineInteriorNodes(l,modelSpace.fixNodeFF0)
 solProc=feProblem.getSoluProc
 solCtrl= solProc.getSoluControl
 solModels= solCtrl.getModelWrapperContainer
-analAggrContainer= solCtrl.getAnalysisAggregationContainer
+analAggrContainer= solCtrl.getSolutionStrategyContainer
 #static analysis
 sm= solModels.newModelWrapper("sm")
 cHandler= sm.newConstraintHandler("plain_handler")
 numberer= sm.newNumberer("default_numberer")
 numberer.useAlgorithm("simple")
-analysisAggregation= analAggrContainer.newAnalysisAggregation("analysisAggregation","sm")
-solAlgo= analysisAggregation.newSolutionAlgorithm("newton_raphson_soln_algo")
-ctest= analysisAggregation.newConvergenceTest("norm_unbalance_conv_test")
+solutionStrategy= analAggrContainer.newSolutionStrategy("solutionStrategy","sm")
+solAlgo= solutionStrategy.newSolutionAlgorithm("newton_raphson_soln_algo")
+ctest= solutionStrategy.newConvergenceTest("norm_unbalance_conv_test")
 ctest.tol= 1e-8
 ctest.maxNumIter= 100
-integ= analysisAggregation.newIntegrator("load_control_integrator",xc.Vector([]))
+integ= solutionStrategy.newIntegrator("load_control_integrator",xc.Vector([]))
 Nstep= 10  #  apply load in 10 steps
 DInc= 1./Nstep 	#  first load increment
 integ.dLambda1= DInc
-soe= analysisAggregation.newSystemOfEqn("band_gen_lin_soe")
+soe= solutionStrategy.newSystemOfEqn("band_gen_lin_soe")
 solver= soe.newSolver("band_gen_lin_lapack_solver")
-analysis= solProc.newAnalysis("static_analysis","analysisAggregation","")
+analysis= solProc.newAnalysis("static_analysis","solutionStrategy","")
 result= analysis.analyze(Nstep)
 
 elements= preprocessor.getElementHandler
 ele1= elements.getElement(1)
 tension= ele1.getN()
 sigma= ele1.getMaterial().getStress()
-print "stress= ",sigma
-print "tension= ",tension
+print("stress= ",sigma)
+print("tension= ",tension)
 
 
 # Eigen solution procedure
@@ -94,12 +96,12 @@ sm= solModels.newModelWrapper("sm")
 cHandler= sm.newConstraintHandler("transformation_constraint_handler")
 numberer= sm.newNumberer("default_numberer")
 numberer.useAlgorithm("rcm")
-analysisAggregation= analAggrContainer.newAnalysisAggregation("analysisAggregation","sm")
-solAlgo= analysisAggregation.newSolutionAlgorithm("frequency_soln_algo")
-integ= analysisAggregation.newIntegrator("eigen_integrator",xc.Vector([]))
-soe= analysisAggregation.newSystemOfEqn("sym_band_eigen_soe")
+solutionStrategy= analAggrContainer.newSolutionStrategy("solutionStrategy","sm")
+solAlgo= solutionStrategy.newSolutionAlgorithm("frequency_soln_algo")
+integ= solutionStrategy.newIntegrator("eigen_integrator",xc.Vector([]))
+soe= solutionStrategy.newSystemOfEqn("sym_band_eigen_soe")
 solver= soe.newSolver("sym_band_eigen_solver")
-analysis= solProc.newAnalysis("eigen_analysis","analysisAggregation","")
+analysis= solProc.newAnalysis("eigen_analysis","solutionStrategy","")
 Neigen=3
 analOk= analysis.analyze(Neigen)
 
@@ -110,11 +112,11 @@ f1= math.sqrt(eig1)/(2*math.pi)
 f2= math.sqrt(eig2)/(2*math.pi)
 f3= math.sqrt(eig3)/(2*math.pi)
 
-print "eig1= ",eig1
-print "eig2= ",eig2
-print "eig3= ",eig3
-print "f1= ",math.sqrt(eig1)/(2*math.pi)
-print "f2= ",math.sqrt(eig2)/(2*math.pi)
-print "f3= ",math.sqrt(eig3)/(2*math.pi)
+print("eig1= ",eig1)
+print("eig2= ",eig2)
+print("eig3= ",eig3)
+print("f1= ",math.sqrt(eig1)/(2*math.pi))
+print("f2= ",math.sqrt(eig2)/(2*math.pi))
+print("f3= ",math.sqrt(eig3)/(2*math.pi))
 
   
