@@ -39,12 +39,13 @@ from materials.sections.fiber_section import fiber_sets
 from materials.sections.fiber_section import plot_fiber_section 
 
 #Data from the experiment
-width=0.4     #width (cross-section coordinate Y)
-depth=0.6     #depth (cross-section coordinate Z)
-cover=0.04     #cover
-A_s=2712e-6    #area of bottom reinforcement layer (6 fi 24)
-A_sp=452e-6    #area of top reinforcement layer (4 fi 12)
-M_y=-300e3      #bending moment [Nm]
+width=0.4 # width (cross-section coordinate Y)
+depth=0.6 # depth (cross-section coordinate Z)
+cover=0.04 # cover
+A_s=2712e-6 # area of bottom reinforcement layer (6 fi 24)
+A_sp=452e-6 # area of top reinforcement layer (4 fi 12)
+M_y=-300e3 # bending moment [Nm]
+
 #Other data
 nDivIJ= 20  #number of cells (fibers) in the IJ direction (cross-section coordinate Y)
 nDivJK= 20  #number of cells (fibers) in the JK direction (cross-section coordinate Z)
@@ -143,9 +144,11 @@ lp0.newNodalLoad(nodB.tag,pointLoad)    #applies the point load on node B
 lpatt.addToDomain("0")           #reads load pattern "0" and adds it to the domain
 
 # Solve
-solProc= predefined_solutions.PlainStaticModifiedNewton(feProblem, convergenceTestTol= 1e-7)
-analOk= solProc.analysis.analyze(1)
-
+solProc= predefined_solutions.PlainStaticModifiedNewton(feProblem, convergenceTestTol= 1e-9)
+analOk= solProc.solve()
+if(analOk!=0):
+    lmsg.error('Failed to solve for: '+lp0.name)
+    quit()
 
 nodes.calculateNodalReactions(True,1e-7)
 #nodB.checkReactionForce(0.5)
