@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-''' William Toggle Frame  '''
+''' Test based on the example 1.2 of the Book: Non-linear Finite Element Analysis of Solids and Structures. Volume 1: Essentials. M. A. Crisfield. April 2000.'''
 
 from __future__ import print_function
 from __future__ import division
