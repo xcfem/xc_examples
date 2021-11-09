@@ -61,3 +61,4 @@ P= -100
 lts= modelSpace.newTimeSeries(name= 'lts', tsType= 'linear_ts')
 ## Load pattern.
 lp= modelSpace.newLoadPattern(name= 'lp')
+lp.newNodalLoad(nod2.tag,xc.Vector([0.0,P,0.0]))
