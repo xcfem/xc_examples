@@ -28,12 +28,12 @@ modelSpace= predefined_spaces.SolidMechanics2D(nodes)# Model space definition
 
 # Definition of points.
 points= preprocessor.getMultiBlockTopology.getPoints
-pt1= points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0))
-pt2= points.newPntFromPos3d(geom.Pos3d(CooMaxX/2,0.0,0.0))
-pt3= points.newPntFromPos3d(geom.Pos3d(CooMaxX,0.0,0.0))
-pt4= points.newPntFromPos3d(geom.Pos3d(0.0,CooMaxY,0.0))
-pt5= points.newPntFromPos3d(geom.Pos3d(CooMaxX/2,CooMaxY,0.0))
-pt6= points.newPntFromPos3d(geom.Pos3d(CooMaxX,CooMaxY,0.0))
+pt1= points.newPoint(geom.Pos3d(0.0,0.0,0.0))
+pt2= points.newPoint(geom.Pos3d(CooMaxX/2,0.0,0.0))
+pt3= points.newPoint(geom.Pos3d(CooMaxX,0.0,0.0))
+pt4= points.newPoint(geom.Pos3d(0.0,CooMaxY,0.0))
+pt5= points.newPoint(geom.Pos3d(CooMaxX/2,CooMaxY,0.0))
+pt6= points.newPoint(geom.Pos3d(CooMaxX,CooMaxY,0.0))
 
 # Definition of quadrilateral surfaces.
 surfaces= preprocessor.getMultiBlockTopology.getSurfaces

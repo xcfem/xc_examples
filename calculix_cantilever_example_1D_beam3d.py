@@ -26,9 +26,9 @@ modelSpace= predefined_spaces.StructuralMechanics3D(preprocessor.getNodeHandler)
 # Problem geometry (only geometry, no mesh yet).
 points= preprocessor.getMultiBlockTopology.getPoints  # Point container.
 # Position of the left end of the beam:
-pt0= points.newPntFromPos3d(geom.Pos3d(0.0,0.0,0.0)) 
+pt0= points.newPoint(geom.Pos3d(0.0,0.0,0.0)) 
 # Position of the right end of the beam:
-pt1= points.newPntFromPos3d(geom.Pos3d(0.0,0.0,8.0))  # Right end
+pt1= points.newPoint(geom.Pos3d(0.0,0.0,8.0))  # Right end
 
 lines= preprocessor.getMultiBlockTopology.getLines  # Line container.
 ln= lines.newLine(pt0.tag,pt1.tag)  # From pt0 to pt1.
