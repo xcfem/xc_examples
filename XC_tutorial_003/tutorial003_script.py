@@ -112,7 +112,7 @@ materialHandler= preprocessor.getMaterialHandler
 sctFibers= materialHandler.newMaterial("fiber_section_3d","sctFibers")
 
 fiberSectionRepr= sctFibers.getFiberSectionRepr()
-fiberSectionRepr.setGeomNamed("geomSectFibers")
+fiberSectionRepr.setGeomNamed(geomSectFibers.name)
 sctFibers.setupFibers()
 
 
