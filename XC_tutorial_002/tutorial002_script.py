@@ -35,7 +35,7 @@ nodes= preprocessor.getNodeHandler
 modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
 
 # Materials definition
-typical_materials.defCableMaterial(preprocessor, "cable",E,sigmaPret,Mass)
+typical_materials.defCableMaterial(preprocessor, "cable",E,sigmaPret,ro)
 
 # Seed element definition
 seedElemHandler= preprocessor.getElementHandler.seedElemHandler
