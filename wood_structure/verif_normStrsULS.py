@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 exec(open("./xc_model.py").read()) #FE model generation
-from postprocess.config import default_config
-from postprocess import limit_state_data as lsd
 
 # Compute internal forces.
 
