@@ -239,5 +239,5 @@ for l in xcTotalSet.getLines:
     member.installULSControlRecorder(recorderType="element_prop_recorder", calcSet= ndsCalcSet)
     ndsMembers.append(member)
     
-## Setup working directory.
+# Setup working directory.
 lsd.LimitStateData.envConfig= default_config.get_temporary_env_config()
