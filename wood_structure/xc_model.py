@@ -236,7 +236,6 @@ for l in xcTotalSet.getLines:
     memberSection= l.getProp('crossSection')
     member= nds.Member(name= l.name, section= memberSection, unbracedLengthX= Lx, lstLines= [l])
     #member.setControlPoints()
-    member.installULSControlRecorder(recorderType="element_prop_recorder", calcSet= ndsCalcSet)
     ndsMembers.append(member)
     
 # Setup working directory.

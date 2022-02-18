@@ -2,6 +2,10 @@
 
 exec(open("./xc_model.py").read()) #FE model generation
 
+# Install recorder.
+for member in ndsMembers:
+    member.installULSControlRecorder(recorderType="element_prop_recorder", calcSet= ndsCalcSet)
+
 # Compute internal forces.
 
 ## Set combinations to compute.
