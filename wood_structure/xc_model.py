@@ -40,9 +40,9 @@ psf2N_m2= 0.047880258888889e3
 def getRelativeCoo(pt):
     return [pt[0]/1000.0,pt[1]/1000.0,pt[2]/1000.0]
 
-groupsToImport= ['LongLVLBeam.*', 'LVLBeam.*', 'LongJoist[0-9]*', 'Joist[0-9]*', 'Support.*', 'momentRelease.*']
+groupsToImport= ['LongLVLBeam.*', 'LVLBeam.*', 'ShortLVLBeam.*', 'LongJoist[0-9]*', 'Joist[0-9]*', 'Support.*', 'momentRelease.*']
 
-freeCADFileName= 'freecad_model.FCStd'
+freeCADFileName= 'roof_floor_joists_and_lvl_beams.FCStd'
 
 # Finite element problem.
 FEcase= xc.FEProblem()
@@ -55,18 +55,24 @@ modelSpace= predefined_spaces.StructuralMechanics3D(nodes)
 ## Import geometry from FreeCAD.
 modelSpace.importFromFreeCAD(fileName= freeCADFileName, groupsToImport= groupsToImport, getRelativeCoo= getRelativeCoo, threshold= 0.001)
 
-## Define sets
+## Split imported lines.
 xcTotalSet= modelSpace.getTotalSet()
+xcTotalSet.getEntities.splitLinesAtIntersections(1e-3)
+
+## Define sets
 joistSet= preprocessor.getSets.defSet('joistSet')
 longJoistSet= preprocessor.getSets.defSet('longJoistSet')
+shortBeamSet= preprocessor.getSets.defSet('shortBeamSet')
 beamSet= preprocessor.getSets.defSet('beamSet')
 longBeamSet= preprocessor.getSets.defSet('longBeamSet')
+skyLightLoadedSet= preprocessor.getSets.defSet('skyLightLoadedSet')
 anchorSet= preprocessor.getSets.defSet('anchorSet')
 
-meshSets= [joistSet, longJoistSet, beamSet, longBeamSet]
+
+meshSets= [joistSet, longJoistSet, shortBeamSet, beamSet, longBeamSet]
 
 ### Classify the block topology objects (points, lines, surfaces, volumes).
-setsFromLabels= [('Joist.*', joistSet),('LongJoist.*', longJoistSet), ('LongLVLBeam.*', longBeamSet), ('LVLBeam.*', beamSet), ('Support.*', anchorSet)]
+setsFromLabels= [('Joist.*', joistSet),('LongJoist.*', longJoistSet), ('LongLVLBeam.*', longBeamSet), ('LVLBeam.*', beamSet), ('ShortLVLBeam.*', shortBeamSet), ('Support.*', anchorSet)]
 modelSpace.classifyBlockTopologyObjects(setsFromLabels)
 
 ## Define element orientation (normally this must be read from the IFC file),
@@ -84,12 +90,12 @@ linCT= preprocessor.getTransfCooHandler.newLinearCrdTransf3d('linCT')
 linCT.xzVector= xc.Vector([1.0,0,0])
 
 # Materials
+shortBeamsSection= structural_panels.LVLHeaderSections['1.75x11-7/8']
 beamsSection= structural_panels.LVLHeaderSections['5.25x11-7/8']
-longBeamsSection= structural_panels.LVLHeaderSections['1.75x18']
+longBeamsSection= structural_panels.LVLHeaderSections['7x11-7/8']#'3.5x18']
 longJoistsSection= pr_400_i_joists.pr400_i_joists['PRI-20_241']
 joistsWood=  dl.SouthernPineWood(name='SouthernPine', grade= 'no_2', sub_grade= '')
-joistsSection= AWCNDS_materials.DimensionLumberSection(name= '2x6', woodMaterial= joistsWood)
-
+joistsSection= AWCNDS_materials.DimensionLumberSection(name= '2x8', woodMaterial= joistsWood)
 
 # Mesh generation.
 seedElemHandler= preprocessor.getElementHandler.seedElemHandler
@@ -108,6 +114,7 @@ def createMesh(xcSet, section):
     xcSet.fillDownwards()
     
 ## Beams.
+createMesh(shortBeamSet, shortBeamsSection)
 createMesh(beamSet, beamsSection)
 createMesh(longBeamSet, longBeamsSection)
 ## Joists.
@@ -152,17 +159,38 @@ for p in xcTotalSet.points:
             nearestMember, vertexIndex, minDist= reader_base.findConnectedMember(xcTotalSet.lines, connectedMemberLabel, p.getPos)
             modelSpace.releaseLineExtremities(nearestMember, stiffnessFactors= stiffnessFactors, extremitiesToRelease= [vertexIndex])
 
+# Check for floating nodes.
+floatingNodes= modelSpace.getFloatingNodes()
+if(len(floatingNodes)>0):
+    lmsg.error('There are '+str(len(floatingNodes))+' floating nodes. Can\'t compute solution.')
+    quit()
+    
+# Skylight loaded set.
+skyLightWidth= 1.022
+skyLightLoadedLines= ['LongLVLBeam010', 'LongLVLBeam003', 'ShortLVLBeam007']
+
+
+for l in xcTotalSet.lines:
+    #print(l.getPropNames())
+    labels= l.getProp('labels')
+    for skyLL in skyLightLoadedLines:
+        if skyLL in labels:
+            skyLightLoadedSet.lines.append(l)
+
 # Loads
 
 ## Define "spacing" property
+spacing= 24*inchToMeter
 for l in joistSet.lines:
-    l.setProp('spacing',24*inchToMeter)
+    l.setProp('spacing', spacing)
 for l in longJoistSet.lines:
-    l.setProp('spacing',24*inchToMeter)
+    l.setProp('spacing', spacing)
+for l in shortBeamSet.lines:
+    l.setProp('spacing', spacing)
 for l in beamSet.lines:
-    l.setProp('spacing',12*inchToMeter)
+    l.setProp('spacing', spacing)
 for l in longBeamSet.lines:
-    l.setProp('spacing',12*inchToMeter)
+    l.setProp('spacing', spacing)
 
 loadCaseManager= lcm.LoadCaseManager(preprocessor)
 loadCaseNames= ['deadLoad', 'liveLoad', 'windLoad', 'snowLoad']
@@ -173,6 +201,10 @@ def loadOnLines(xcSet, loadVector):
         spacing= l.getProp('spacing')
         for e in l.getElements:
             e.vector3dUniformLoadGlobal(spacing*loadVector)
+            
+def loadOnLineSets(setList, loadVector):
+    for s in setList:
+        loadOnLines(s, loadVector)
 
 ## Dead load.
 cLC= loadCaseManager.setCurrentLoadCase('deadLoad')
@@ -185,11 +217,16 @@ for e in xcTotalSet.elements:
         e.createInertiaLoad(gravityVector)
 
 ### Dead load on elements.
-deadL= 15*psf2N_m2
+deadL= (9.4+2.75+30)*psf2N_m2
 uniformLoad= xc.Vector([0.0,0.0,-deadL])
-loadOnLines(joistSet,uniformLoad)
-loadOnLines(beamSet,uniformLoad)
-loadOnLines(longBeamSet,uniformLoad)
+loadedSets= [joistSet, longJoistSet, shortBeamSet, beamSet, longBeamSet]
+loadOnLineSets(loadedSets,uniformLoad)
+#### Skylight load.
+skyLightDeadLoad= (8+30)*psf2N_m2/spacing*(skyLightWidth/2.0)
+uniformLoad= xc.Vector([0.0,0.0,-skyLightDeadLoad])
+loadedSets= [skyLightLoadedSet]
+loadOnLineSets(loadedSets,uniformLoad)
+
 
 ### Live load.
 cLC= loadCaseManager.setCurrentLoadCase('liveLoad')
@@ -197,9 +234,30 @@ cLC= loadCaseManager.setCurrentLoadCase('liveLoad')
 #### Live load on elements.
 liveL= (40.0+5.0)*psf2N_m2
 uniformLoad= xc.Vector([0.0,0.0,-liveL])
-loadOnLines(joistSet,uniformLoad)
-loadOnLines(beamSet,uniformLoad)
-loadOnLines(longBeamSet,uniformLoad)
+loadedSets= [joistSet, longJoistSet, shortBeamSet, beamSet, longBeamSet]
+loadOnLineSets(loadedSets,uniformLoad)
+#### Skylight load.
+skyLightLiveLoad= 40*psf2N_m2/spacing*(skyLightWidth/2.0)
+uniformLoad= xc.Vector([0.0,0.0,-skyLightLiveLoad])
+loadedSets= [skyLightLoadedSet]
+loadOnLineSets(loadedSets,uniformLoad)
+
+### Snow load.
+cLC= loadCaseManager.setCurrentLoadCase('snowLoad')
+
+#### Snow load on elements.
+regularSnowLoad= 0.7*1.1*1*1*40.0*psf2N_m2
+##### Sliding snow.
+slidingSnowLoad= 2*2.5*0.4*regularSnowLoad/3.788
+snowL= regularSnowLoad+slidingSnowLoad
+uniformLoad= xc.Vector([0.0,0.0,-snowL])
+loadedSets= [joistSet, longJoistSet, shortBeamSet, beamSet, longBeamSet]
+loadOnLineSets(loadedSets,uniformLoad)
+#### Skylight load.
+skyLightSnowLoad= 40*psf2N_m2/spacing*(skyLightWidth/2.0)
+uniformLoad= xc.Vector([0.0,0.0,-skyLightSnowLoad])
+loadedSets= [skyLightLoadedSet]
+loadOnLineSets(loadedSets,uniformLoad)
 
 # Load combination definition
 combContainer= combs.CombContainer()
@@ -216,13 +274,23 @@ ibcLoadCombinations['EQ1613']= '1.0*deadLoad+0.45*windLoad+0.75*liveLoad+0.75*sn
 ### Equation 16-14-> doesn't apply
 ibcLoadCombinations['EQ1615']= '0.6*deadLoad+0.6*windLoad' # Equation 16-15
 ### Equation 16-16 -> doesn't apply
-### LIVE load only.
-ibcLoadCombinations['LIVE']= '1.0*liveLoad'
+
+### load combinations for deflection.
+deflectionLoadCombinations= dict()
+deflectionLoadCombinations['dflEQ1609']= '1.0*deadLoad+1.0*liveLoad'
+deflectionLoadCombinations['dflEQ1610']= '1.0*snowLoad'
+deflectionLoadCombinations['dflEQ1611']= '0.75*liveLoad+0.75*snowLoad'
+deflectionLoadCombinations['dflEQ1612']= '0.6*windLoad'
+deflectionLoadCombinations['dflEQ1613']= '0.45*windLoad+0.75*liveLoad+0.75*snowLoad'
 
 ## Serviceability limit states.
+for lcKey in deflectionLoadCombinations:
+    lc= deflectionLoadCombinations[lcKey]
+    combContainer.SLS.qp.add('SLS'+lcKey, lc)
+    
+## Ultimate limit states.
 for lcKey in ibcLoadCombinations:
     lc= ibcLoadCombinations[lcKey]
-    combContainer.SLS.qp.add('SLS'+lcKey, lc)
     combContainer.ULS.perm.add('ULS'+lcKey, lc)
 
 combContainer.dumpCombinations(preprocessor)

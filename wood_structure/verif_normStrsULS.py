@@ -36,3 +36,4 @@ oh= output_handler.OutputHandler(modelSpace)
 #oh.displayElementValueDiagram('chiLT', setToDisplay= ndsCalcSet)
 
 oh.displayBeamResult(attributeName=lsd.normalStressesResistance.label, itemToDisp='CF', beamSetDispRes=ndsCalcSet, setToDisplay=xcTotalSet)
+#oh.displayBeamResult(attributeName=lsd.normalStressesResistance.label, itemToDisp='CF', beamSetDispRes=longBeamSet, setToDisplay=longBeamSet)
