@@ -55,9 +55,10 @@ modelSpace= predefined_spaces.StructuralMechanics3D(nodes)
 ## Import geometry from FreeCAD.
 modelSpace.importFromFreeCAD(fileName= freeCADFileName, groupsToImport= groupsToImport, getRelativeCoo= getRelativeCoo, threshold= 0.001)
 
-## Split imported lines.
+## *********** SPLIT IMPORTED LINES. ***************
 xcTotalSet= modelSpace.getTotalSet()
 xcTotalSet.getEntities.splitLinesAtIntersections(1e-3)
+## *********** SPLITTED! ***************
 
 ## Define sets
 joistSet= preprocessor.getSets.defSet('joistSet')
