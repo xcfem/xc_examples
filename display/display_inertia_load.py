@@ -78,8 +78,8 @@ err= math.sqrt(err)
 
 # # Graphic stuff.
 oh= output_handler.OutputHandler(modelSpace)
-#oh.displayLoads()
-oh.displayLoadVectors()
+oh.displayLoads()
+# oh.displayLoadVectors()
 # #oh.displayFEMesh()
 # #oh.displayLocalAxes()
 oh.displayReactions()
@@ -99,7 +99,7 @@ modelSpace.addLoadCaseToDomain(lp1.name)
 # Solution
 result= modelSpace.analyze(calculateNodalReactions= True)
 
-oh.displayLoadVectors()
+oh.displayLoads()
 oh.displayReactions()
 
 '''
