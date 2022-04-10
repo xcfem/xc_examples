@@ -10,7 +10,7 @@ __version__= "3.0"
 __email__= "l.pereztato@ciccp.es, ana.ortega@ciccp.es "
 
 import math
-import xc_base
+import yaml
 import geom
 import xc
 from materials.sections import section_properties
@@ -78,25 +78,33 @@ def getLoadCombDurationFactor(loadComb):
     wl= ('windLoad' in loadComb)
     return AWCNDS_materials.getLoadCombinationDurationFactor(deadLoad= dl, liveLoad= ll, snowLoad= sl, windLoad= wl)
 
+# Read data.
+fName= './bearing_wall_data.yaml'
+with open(fName) as file:
+    try:
+        wallData= yaml.safe_load(file)
+    except yaml.YAMLError as exception:
+        print(exception)
+
 # Geometry
-wallHeight= 11*units_utils.footToMeter-22*units_utils.inchToMeter
-studSpacing= 8.0*units_utils.inchToMeter
+wallHeight= eval(wallData['wallHeight'])
+studSpacing= eval(wallData['studSpacing'])
+
 # Materials
-# Spruce-pine-fir No. 2 
-wood= dimensional_lumber.SprucePineFirWood(grade= 'stud')
-studSection= AWCNDS_materials.DimensionLumberSection(name= '2x6', woodMaterial= wood)
+wood= eval(wallData['wood'])
+studSection= AWCNDS_materials.DimensionLumberSection(name= wallData['studSection'], woodMaterial= wood)
 
 #Loads
 ## Wind loads
-windWallPressure= 852.0 # Pa
+windWallPressure= wallData['windWallPressure'] 
 windStudPressure= windWallPressure*studSpacing # N/m
 
 print('wind load:', windStudPressure/1e3, ' kN/m')
 
-title= '1st floor facade stud.'
+title= wallData['title']
 # Actions
 ## Reduction in uniform live loads.
-liveLoadReductionFactor= 1.0 # No reduction.
+liveLoadReductionFactor= wallData['liveLoadReductionFactor'] 
 print('Live load reduction factor: ', liveLoadReductionFactor)
 
 ## Load definition (values from truss_AB_reactions.ods)
@@ -107,28 +115,10 @@ windLoad= xc.Vector([windStudPressure,-7.13e3]) # kN/m
 
 # Load combination definition
 combContainer= combs.CombContainer()
-
-## Serviceability limit states.
-
-### Equation 16-8
-combContainer.SLS.qp.add('EQ1608', '1.0*deadLoad')
-### Equation 16-9
-combContainer.SLS.qp.add('EQ1609', '1.0*deadLoad+1.0*liveLoad')
-### Equation 16-10
-combContainer.SLS.qp.add('EQ1610', '1.0*deadLoad+1.0*snowLoad')
-### Equation 16-11
-combContainer.SLS.qp.add('EQ1611', '1.0*deadLoad+0.75*liveLoad+0.75*snowLoad')
-### Equation 16-12
-combContainer.SLS.qp.add('EQ1612', '1.0*deadLoad+0.6*windLoad')
-### Equation 16-13
-combContainer.SLS.qp.add('EQ1613', '1.0*deadLoad+0.45*windLoad+0.75*liveLoad+0.75*snowLoad')
-### Equation 16-14-> doesn't apply
-### Equation 16-15
-combContainer.SLS.qp.add('EQ1615', '0.6*deadLoad+0.6*windLoad')
-### Equation 16-16 -> doesn't apply
-### LIVE load only.
-combContainer.SLS.qp.add('LIVE', '1.0*liveLoad')
-
+combData= wallData['loadCombinations']        
+for combName in combData:
+    combExpr= combData[combName]
+    combContainer.SLS.qp.add(combName,combExpr)
 
 studObj= StudArrangement(name= title, studSection= studSection, studSpacing= studSpacing, wallHeight= wallHeight, loadCombDurationFactorFunction= getLoadCombDurationFactor);
 
