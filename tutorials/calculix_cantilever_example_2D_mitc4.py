@@ -11,7 +11,6 @@ __version__= "3.0"
 __email__= "bernd@bimstatik.org"
 
 
-import xc_base
 import geom
 import xc
 from model import predefined_spaces

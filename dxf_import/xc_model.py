@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import math
-import xc_base
 import geom
 import xc
 

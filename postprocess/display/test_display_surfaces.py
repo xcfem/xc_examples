@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ''' Tiny example to show how to define two simple surfaces and display them.'''
 
-import xc_base
 import geom
 import xc
 import math
