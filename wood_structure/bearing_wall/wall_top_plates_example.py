@@ -108,11 +108,9 @@ liveLoadReductionFactor= wallData['liveLoadReductionFactor']
 
 # Actions
 ## Load definition (values from truss_AB_reactions.ods)
-deadLoad= 4.65e3 # kN/truss
-liveLoad= liveLoadReductionFactor*7.98e3 # kN/truss
-snowLoad= 3.44e3 # kN/truss
-windLoad= -2.17e3 # kN/truss
-loadDict= {'deadLoad':deadLoad, 'liveLoad':liveLoad, 'snowLoad':snowLoad, 'windLoad':windLoad}
+loadDict= wallData['loads']['topPlate']
+for key in loadDict:
+    loadDict[key]= eval(loadDict[key])
 
 # Load combination definition
 combContainer= combs.CombContainer()

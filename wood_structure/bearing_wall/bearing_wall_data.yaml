@@ -8,6 +8,17 @@
  plateSection: '2x6'
  windWallPressure: 852.0 # Pa
  liveLoadReductionFactor: 1.0
+ loads:
+  topPlate: # Top plate loads.
+   deadLoad: 4.65e3 # kN/truss
+   liveLoad: 'liveLoadReductionFactor*7.98e3' # kN/truss
+   snowLoad: 3.44e3 # kN/truss
+   windLoad: -2.17e3 # kN/truss
+  studs: # Load on studs.
+   deadLoad: 'xc.Vector([0.0,15.25e3])' # kN/m
+   liveLoad: 'liveLoadReductionFactor*xc.Vector([0.0,26.17e3])' # kN/m
+   snowLoad: 'xc.Vector([0.0,11.28e3])' # kN/m
+   windLoad: 'xc.Vector([windStudPressure,-7.13e3])' # kN/m
  loadCombinations:
   EQ1608: 1.0*deadLoad
   EQ1609: 1.0*deadLoad+1.0*liveLoad

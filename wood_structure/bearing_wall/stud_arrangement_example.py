@@ -108,10 +108,9 @@ liveLoadReductionFactor= wallData['liveLoadReductionFactor']
 print('Live load reduction factor: ', liveLoadReductionFactor)
 
 ## Load definition (values from truss_AB_reactions.ods)
-deadLoad= xc.Vector([0.0,15.25e3]) # kN/m
-liveLoad= liveLoadReductionFactor*xc.Vector([0.0,26.17e3]) # kN/m
-snowLoad= xc.Vector([0.0,11.28e3]) # kN/m
-windLoad= xc.Vector([windStudPressure,-7.13e3]) # kN/m
+loadDict= wallData['loads']['studs']
+for key in loadDict:
+    loadDict[key]= eval(loadDict[key])
 
 # Load combination definition
 combContainer= combs.CombContainer()
@@ -122,6 +121,6 @@ for combName in combData:
 
 studObj= StudArrangement(name= title, studSection= studSection, studSpacing= studSpacing, wallHeight= wallHeight, loadCombDurationFactorFunction= getLoadCombDurationFactor);
 
-results, worstCase= studObj.check(deadLoad, liveLoad, snowLoad, windLoad, loadCombinations= combContainer.SLS.qp)
+results, worstCase= studObj.check(loadDict, loadCombinations= combContainer.SLS.qp)
 
 studObj.printReport(results= results, worstCase= worstCase)
