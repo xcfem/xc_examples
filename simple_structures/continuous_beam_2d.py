@@ -28,9 +28,11 @@ modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
 # Geometry
 spans= [3.0,3.0,3.0]
 
-# Materials.
+## Cross-section geometry.
 b= 1.0 # section width.
 h= 0.15 # section depth.
+
+# Materials.
 E= 2.0e10 # Young modulus.
 
 A= b*h # Beam cross-section area.
