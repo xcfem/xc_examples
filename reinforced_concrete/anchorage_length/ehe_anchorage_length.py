@@ -35,8 +35,8 @@ rows= list([[u'Hormigón', u'Diámetro', u'Separación', 'LsI', 'LsII', 'LnI', '
 for c in concreteList:
     for diam in diameters:
         for s in spacing:
-            lsI= rebarControllerPosI.getOverlapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
-            lsII= rebarControllerPosII.getOverlapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
+            lsI= rebarControllerPosI.getLapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
+            lsII= rebarControllerPosII.getLapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
             lbI= rebarControllerPosI.getNetAnchorageLength(c, diam, steel, beta= 1.0, efficiency= 1.0)
             lbII= rebarControllerPosII.getNetAnchorageLength(c, diam, steel, beta= 1.0, efficiency= 1.0)
             prevRow= rows[-1]
