@@ -79,7 +79,7 @@ beam2d.h= h
 xcTotalSet= preprocessor.getSets.getSet("total")
 xcTotalSet.genMesh(xc.meshDir.I)
 
-# Constraints
+## Constraints
 constraints= preprocessor.getBoundaryCondHandler
 for p in beamPoints:
     n= p.getNode()

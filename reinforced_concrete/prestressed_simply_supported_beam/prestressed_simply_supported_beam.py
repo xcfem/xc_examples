@@ -196,7 +196,7 @@ print('    depth: ', crossSectionHeight, 'm')
 print('    area: ', crossSectionArea, ' m2')
 print('    inertia: ', crossSectionInertia, ' m4')
 print('    effective width of flange: ', flangeEffectiveWidth, ' m')
-print('  Section geometry.')
+print('  Beam geometry.')
 print('    span: ', beam.l, ' m')
 print('    slenderness: 1/', beam.l/crossSectionHeight)
 

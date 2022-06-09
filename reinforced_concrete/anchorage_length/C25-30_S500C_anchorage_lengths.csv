@@ -1,0 +1,7 @@
+bar,bond,concrete,steel,"Reinforcement in tension, bar diameter (mm)",,,,,,,
+type,condition,type,type,8,10,12,16,20,25,32,40
+,,,,,,,,,,,
+straight,good,C25-30,S500C,230,320,410,600,780,1010,1300,1760
+straight,poor,C25-30,S500C,330,450,580,850,1110,1450,1850,2510
+bent,good,C25-30,S500C,320,410,490,650,810,1010,1300,1760
+bent,poor,C25-30,S500C,460,580,700,930,1160,1450,1850,2510
