@@ -20,7 +20,7 @@ import numpy as np
 # Section geometry.
 webWidth= 0.31
 chamferSide= 0.05
-webHeight= 0.65
+webHeight= 0.60
 flangeWidth= 1.0
 flangeThickness= 0.15
 crossSectionGeometry= section_properties.TSection(name= '', webWidth= webWidth, webHeight= webHeight, flangeWidth= flangeWidth, flangeThickness= flangeThickness, chamferSide= chamferSide)
@@ -29,6 +29,8 @@ centroidPos= crossSectionPlg.getCenterOfMass()
 crossSectionHeight= webHeight+chamferSide+flangeThickness
 crossSectionArea= crossSectionPlg.getArea()
 crossSectionInertia= crossSectionPlg.getIx()
+crossSectionTop= crossSectionPlg.getYMax
+crossSectionBottom= crossSectionPlg.getYMin
 
 # Materials.
 concrete= EC2_materials.C40
@@ -50,7 +52,7 @@ Asw= webStirrupsNumberOfLegs*webStirrupsArea # cross-sectional area of the shear
 ## Flange transverse reinforcement.
 flangeStirrupsSpacing= webStirrupsSpacing
 flangeStirrupsSteel= webStirrupsSteel
-flangeStirrups= EC2_materials.rebarsEC2['fi10'] # rebar diameter
+flangeStirrups= EC2_materials.rebarsEC2['fi08'] # rebar diameter
 flangeStirrupsArea= flangeStirrups['area'] # rebar area
 flangeStirrupsNumberOfLegs= 2
 Asf= flangeStirrupsNumberOfLegs*flangeStirrupsArea # cross-sectional area of the shear reinforcement
@@ -65,13 +67,14 @@ flangeEffectiveWidth= min(webWidth+0.2*(flangeWidth-webWidth)+0.1*beam.l, flange
 
 # Cable geometry
 prestressingCover= 0.1
-#eccentricity= centroidPos.y-prestressingCover
-eccentricity= -crossSectionGeometry.yMin()-prestressingCover
+ductEccentricity= -crossSectionGeometry.yMin()-prestressingCover
+strandEccentricity= ductEccentricity-16e-3 # VSL catalog tendon properties.
 p0= geom.Pos2d(0.0, centroidPos.y)
-p1= geom.Pos2d(beam.l/2.0, -eccentricity)
+p1Cable= geom.Pos2d(beam.l/2.0, -strandEccentricity)
+p1Duct= geom.Pos2d(beam.l/2.0, -ductEccentricity)
 p2= geom.Pos2d(beam.l, centroidPos.y)
-cableAxis= pb.Parabola(p0, p1, p2)
-
+cableAxis= pb.Parabola(p0, p1Cable, p2)
+ductAxis= pb.Parabola(p0, p1Duct, p2)
                
 # Actions
 ## Permanent actions.
@@ -91,7 +94,7 @@ uniformLiveLoad= 4.31e3*flangeWidth # N/m (uniform live load).
 
 # Prestressing
 loadToCompensate= 0.80*permanentLoad
-midSpanPrestressingForce= loadToCompensate*beam.l**2/8.0/eccentricity
+midSpanPrestressingForce= loadToCompensate*beam.l**2/8.0/ductEccentricity
 losses= .2
 initialPrestressingForce= midSpanPrestressingForce/(1-losses)
 prestressingStress= 0.75*strand.fmax
@@ -107,25 +110,33 @@ spiralReinforcementCover= (webWidth-spiralReinforcementExtDiameter)/2.0 # Catál
 prestressingCompression= -midSpanPrestressingForce/crossSectionPlg.getArea()
 
 # Design for initial condition
-prestressingMidSpanBendingMoment= midSpanPrestressingForce*eccentricity
-initialCondBendingMoment= prestressingMidSpanBendingMoment-selfWeight*beam.l**2/8.0
-initialCondMaxStress= prestressingCompression+initialCondBendingMoment/crossSectionPlg.getIx()*(crossSectionHeight-centroidPos.y)
-initialCondMinStress= prestressingCompression-initialCondBendingMoment/crossSectionPlg.getIx()*centroidPos.y
-allowableCompression= 0.45*concrete.fck
+prestressingMidSpanBendingMoment= midSpanPrestressingForce*strandEccentricity
+selfWeightBendingMoment= selfWeight*beam.l**2/8.0
+initialCondBendingMoment= selfWeightBendingMoment-prestressingMidSpanBendingMoment
+initialCondTopStress= prestressingCompression-initialCondBendingMoment/crossSectionPlg.getIx()*crossSectionTop
+initialCondBottomStress= prestressingCompression-initialCondBendingMoment/crossSectionPlg.getIx()*crossSectionBottom
+initialCondMaxStress= max(initialCondTopStress, initialCondBottomStress)
+initialCondMinStress= min(initialCondTopStress, initialCondBottomStress)
+ageFactor= 0.63 # 3 days concrete strength.
+initialFck= ageFactor*concrete.fck
+initialConcreteStrength= ageFactor*concrete.getFctm()
+allowableCompression= 0.45*initialFck
 
 # Design under frequent load
 ## Stresses
 frequentLoad= permanentLoad+0.4*uniformLiveLoad
-frequentLoadBendingMoment= prestressingMidSpanBendingMoment-(frequentLoad)*beam.l**2/8.0
-frequentLoadMinStress= prestressingCompression+frequentLoadBendingMoment/crossSectionPlg.getIx()*(crossSectionHeight-centroidPos.y)
-frequentLoadMaxStress= prestressingCompression-frequentLoadBendingMoment/crossSectionPlg.getIx()*centroidPos.y
+frequentLoadBendingMoment= (frequentLoad)*beam.l**2/8.0-prestressingMidSpanBendingMoment
+frequentLoadTopStress= prestressingCompression-frequentLoadBendingMoment/crossSectionPlg.getIx()*crossSectionTop
+frequentLoadBottomStress= prestressingCompression-frequentLoadBendingMoment/crossSectionPlg.getIx()*crossSectionBottom
+frequentLoadMinStress= min(frequentLoadTopStress, frequentLoadBottomStress)
+frequentLoadMaxStress= max(frequentLoadTopStress, frequentLoadBottomStress)
 
 ## Deflection
 ### Bending moment.
 def MfrequentLoad(x):
     '''Bending moment law.'''
-    eccentricity= centroidPos.y-cableAxis.y(x)
-    retval= -midSpanPrestressingForce*eccentricity
+    localEccentricity= centroidPos.y-cableAxis.y(x)
+    retval= -midSpanPrestressingForce*localEccentricity
     retval+= beam.getBendingMomentUnderUniformLoad(q= -frequentLoad, x= x)
     return retval
 
@@ -143,10 +154,11 @@ prestressingBendingMoment= Fp*0.9*(crossSectionHeight-prestressingCover)
 reqAs= (ulsBendingMoment-prestressingBendingMoment)/(0.9*reinfSteel.fyd()*(crossSectionHeight-passiveReinfCover))
 numberOfMainRebars= math.ceil(reqAs/mainReinfRebarArea)
 passiveReinfArea= numberOfMainRebars*mainReinfRebarArea
+
 def Muls(x):
     '''Bending moment law.'''
-    eccentricity= centroidPos.y-cableAxis.y(x)
-    retval= -midSpanPrestressingForce*eccentricity
+    localEccentricity= centroidPos.y-cableAxis.y(x)
+    retval= -midSpanPrestressingForce*localEccentricity
     retval+= beam.getBendingMomentUnderUniformLoad(q= -ulsLoad, x= x)
     return retval
 
@@ -193,28 +205,39 @@ print('Geometry.')
 print('  Section geometry.')
 print('    centroid: ', centroidPos)
 print('    depth: ', crossSectionHeight, 'm')
+print('    top: ', crossSectionTop, 'm')
+print('    bottom: ', crossSectionBottom, 'm')
 print('    area: ', crossSectionArea, ' m2')
 print('    inertia: ', crossSectionInertia, ' m4')
 print('    effective width of flange: ', flangeEffectiveWidth, ' m')
-print('  Beam geometry.')
+print('  Section geometry.')
 print('    span: ', beam.l, ' m')
 print('    slenderness: 1/', beam.l/crossSectionHeight)
 
 print('Loads.')
 print('  self weight: ',  selfWeight/1e3, 'kN/m')
 print('  dead load: ',  deadLoad/1e3, 'kN/m')
+print('  uniform live load: ',  uniformLiveLoad/1e3, 'kN/m')
 print('  initial prestressing force P0= ',  initialPrestressingForce/1e3, 'kN')
 
 print('Presstressing.')
 print('  Design for initial condition:')
+print('    prestressing mid-span bending moment: ', prestressingMidSpanBendingMoment/1e3, 'kN.m')
+print('    self weight bending moment: ', selfWeightBendingMoment/1e3, 'kN.m')
 print('    initial condition bending moment: ', initialCondBendingMoment/1e3, 'kN.m')
+print('    prestressing compression: ', prestressingCompression/1e6, 'MPa')
+print('    initial condition top stress: ', initialCondTopStress/1e6, 'MPa')
+print('    initial condition bottom stress: ', initialCondBottomStress/1e6, 'MPa')
 print('    initial condition maximum stress: ', initialCondMaxStress/1e6, 'MPa')
-print('    concrete tension strength: ', concrete.getFctm()/1e6, 'MPa')
+print('    concrete tension initial strength: ', initialConcreteStrength/1e6, 'MPa')
 print('    initial condition minimum stress: ', initialCondMinStress/1e6, 'MPa')
 print('    allowable compression: ', allowableCompression/1e6, 'MPa')
 
 print('  Design under frequent load.')
 print('    frequent load bending moment: ', frequentLoadBendingMoment/1e3, 'kN.m')
+print('    prestressing compression: ', prestressingCompression/1e6, 'MPa')
+print('    top stress under frequent load: ', frequentLoadTopStress/1e6, 'MPa')
+print('    bottom stress under frequent load: ', frequentLoadBottomStress/1e6, 'MPa')
 print('    maximum stress under frequent load: ', frequentLoadMaxStress/1e6, 'MPa')
 print('    concrete tension strength: ', concrete.getFctm()/1e6, 'MPa')
 print('    frequent load minimum stress: ', frequentLoadMinStress/1e6, 'MPa')
@@ -271,13 +294,13 @@ print('    maximum shear due to the strength of the transverse reinforcement: VR
       
 import matplotlib.pyplot as plt
 
-def plotCableAxis(h, span, beamOffset, cableAxis, step):
-    ''' Draw the axis of the cable.
+def plotAxis(h, span, beamOffset, axis, step):
+    ''' Draw the axis argument.
 
     :param h: cross-section depth.
     :param span: beam span.
     :param beamOffset: lenght of the beam outside its span.
-    :param cableAxis: function that represent the geometry of the cable.
+    :param axis: function that represent the geometry of the axis.
     :param step: distance between axis points.
     '''
     xi= list()
@@ -292,7 +315,7 @@ def plotCableAxis(h, span, beamOffset, cableAxis, step):
     xi= np.add.accumulate(xi)
     yi= list()
     for x in xi:
-        y= cableAxis.y(x)
+        y= axis.y(x)
         yi.append(y)
         retval.append((x,y))
     plt.plot(xi, yi, '-')
@@ -305,8 +328,11 @@ def plotCableAxis(h, span, beamOffset, cableAxis, step):
 crossSectionGeometry.draw()
 
 # Draw cable axis.
-cablePoints= plotCableAxis(h= crossSectionHeight, span= beam.l, beamOffset= beamOffset, cableAxis= cableAxis, step= 1.0)
-beamContourPoints= [(-beamOffset/2.0, 0.0), (beam.l+beamOffset/2.0, 0.0), (beam.l+beamOffset/2.0, crossSectionHeight), (-beamOffset/2.0, crossSectionHeight), (-beamOffset/2.0, 0.0)]
+cablePoints= plotAxis(h= crossSectionHeight, span= beam.l, beamOffset= beamOffset, axis= cableAxis, step= 1.0)
+ductPoints= plotAxis(h= crossSectionHeight, span= beam.l, beamOffset= beamOffset, axis= ductAxis, step= 1.0)
+beamBottom= crossSectionGeometry.yMin()
+beamTop= crossSectionHeight+beamBottom
+beamContourPoints= [(-beamOffset/2.0, beamBottom), (beam.l+beamOffset/2.0, beamBottom), (beam.l+beamOffset/2.0, beamTop), (-beamOffset/2.0, beamTop), (-beamOffset/2.0, beamBottom)]
 
 import ezdxf
 import logging
@@ -317,23 +343,24 @@ doc = ezdxf.new("R2000")
 msp = doc.modelspace()
 
 msp.add_lwpolyline(cablePoints, dxfattribs={"layer": 'cable_axis'})
+msp.add_lwpolyline(ductPoints, dxfattribs={"layer": 'duct_axis'})
 msp.add_lwpolyline(beamContourPoints, dxfattribs={"layer": 'beam'})
 textOffset= .05
-for iD, p in enumerate(cablePoints):
+for iD, p in enumerate(ductPoints):
     (x,y)= p
     xText= '{:+.3f}'.format(x)
-    yText= '{:+.3f}'.format(y)
+    yText= '{:+.3f}'.format(y-beamBottom)
     idText= str(iD)
     attribs= dxfattribs={"layer": "TEXTLAYER", 'height': 0.1, 'rotation': 90}
     msp.add_text(
         xText, 
-        dxfattribs= attribs).set_pos((x-textOffset, -2.0), align="CENTER")
+        dxfattribs= attribs).set_pos((x-textOffset, -2.5), align="CENTER")
     msp.add_text(
         yText, 
-        dxfattribs= attribs).set_pos((x-textOffset, -1.0), align="CENTER")
+        dxfattribs= attribs).set_pos((x-textOffset, -1.5), align="CENTER")
     msp.add_text(
         idText, 
-        dxfattribs= attribs).set_pos((x-textOffset, -3.0), align="CENTER")
-    msp.add_line((x, -3), (x, -.1), dxfattribs={"color": 1})
+        dxfattribs= attribs).set_pos((x-textOffset, -3.5), align="CENTER")
+    msp.add_line((x, -3.5), (x, -.6), dxfattribs={"color": 1})
 
 doc.saveas("prestressed_beam.dxf")
