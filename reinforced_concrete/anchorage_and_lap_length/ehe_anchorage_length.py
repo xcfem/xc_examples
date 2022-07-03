@@ -23,11 +23,11 @@ concreteList= [EHE_materials.HA30, EHE_materials.HP50]
 steel= EHE_materials.B500S
 diameters= [8e-3, 10e-3, 12e-3, 16e-3, 20e-3, 25e-3]
 spacing= [0.1,0.2]
-cCover= .05
+cCover= .025
 
 # Rebar controller.
-rebarControllerPosI= EHE_limit_state_checking.RebarController(concreteCover= cCover, pos= 'I')
-rebarControllerPosII= EHE_limit_state_checking.RebarController(concreteCover= cCover, pos= 'II')
+rebarControllerPosI= EHE_limit_state_checking.RebarController(concreteCover= cCover, pos= 'I', compression= False)
+rebarControllerPosII= EHE_limit_state_checking.RebarController(concreteCover= cCover, pos= 'II', compression= False)
 
 rows= list([[u'Hormigón', u'Diámetro', u'Separación', 'LsI', 'LsII', 'LnI', 'LnII'], ['','(mm)', '(cm)', '(cm)', '(cm)', '(cm)', '(cm)']])
 
@@ -35,10 +35,10 @@ rows= list([[u'Hormigón', u'Diámetro', u'Separación', 'LsI', 'LsII', 'LnI', '
 for c in concreteList:
     for diam in diameters:
         for s in spacing:
-            lsI= rebarControllerPosI.getLapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
-            lsII= rebarControllerPosII.getLapLength(c,diam,steel, distBetweenNearestSplices= s, beta= 1.0, efficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
-            lbI= rebarControllerPosI.getNetAnchorageLength(c, diam, steel, beta= 1.0, efficiency= 1.0)
-            lbII= rebarControllerPosII.getNetAnchorageLength(c, diam, steel, beta= 1.0, efficiency= 1.0)
+            lsI= rebarControllerPosI.getLapLength(c,diam,steel, distBetweenNearestSplices= s, steelEfficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
+            lsII= rebarControllerPosII.getLapLength(c,diam,steel, distBetweenNearestSplices= s, steelEfficiency= 1.0, ratioOfOverlapedTensionBars= 1.0)
+            lbI= rebarControllerPosI.getNetAnchorageLength(c, diam, steel, steelEfficiency= 1.0, barShape= 'straight')
+            lbII= rebarControllerPosII.getNetAnchorageLength(c, diam, steel, steelEfficiency= 1.0, barShape= 'straight')
             prevRow= rows[-1]
             row= [str(c), diam*1e3, s*100, lsI*100.0, lsII*100.0, lbI*100.0, lbII*100.0]
             if((row[3]!= prevRow[3]) or (row[4]!= prevRow[4]) or (row[5]!= prevRow[5]) or (row[6]!= prevRow[6])):
@@ -51,5 +51,5 @@ for c in concreteList:
 
 data= OrderedDict()
 data.update({'sheet1':rows})
-save_data('anchorage_overlap_lengths.ods', data)
+save_data('ehe_anchorage_overlap_lengths.ods', data)
 
