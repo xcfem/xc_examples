@@ -127,7 +127,7 @@ oh.outputStyle.cameraParameters.posCVc= [-100,100,100]
 #oh.displayReactions()
 
 ## Uncomment to display the reactions
-#oh.displayIntForcDiag('Mz')
+oh.displayIntForcDiag('Mz')
 
 ## Uncomment to display the reactions
 oh.displayLoads()
