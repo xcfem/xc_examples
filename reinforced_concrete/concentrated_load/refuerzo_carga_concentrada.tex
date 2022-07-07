@@ -1,0 +1,66 @@
+\documentclass[spanish, twoside, a4paper,11pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{aeguill}
+\usepackage{pythontex} 
+%% Cálculo de armadura de refuerzo bajo una carga concentrada según artículo 61 de la EHE-08
+% Datos:
+% Rdv: %carga vertical de diseño
+% a1: dimensión del aparato de apoyo en sentido longitudinal
+% b1: dimensión del aparato de apoyo en sentido transversal
+% a, b: dimensiones de la superficie de hormigón (pila, estribo,..) concéntrica con la anterior.
+\begin{document}
+
+\begin{pycode}
+import math
+Rvd= 4990400
+hipotesis='1.5G+'
+a1= 0.583
+b1= 0.583 
+a= 1
+b= 1
+fcd=40e6/1.5
+fyd=min(500e6/1.15, 400e6)
+Ac1= round(a1*b1,4)
+Ac= round(a*b,4)
+f3cd1=round(math.sqrt(Ac/Ac1)*fcd,0)
+f3cd2=round(3.3*fcd,0)
+f3cd=round(min(f3cd1,f3cd2),0)
+Ndmax=round(Ac1*f3cd,0)
+Tad=round(0.25*Rvd*(a-a1)/a,0)
+Asa=Tad/fyd 
+Tbd=round(0.25*Rvd*(b-b1)/b,0)
+Asb=Tbd/fyd 
+\end{pycode}
+
+Máxima reacción vertical en el apoyo: $N_d = \py{Rvd} \ N$, en la hipótesis \py{hipotesis}. \\
+
+Dimensiones del aparato de apoyo($a_1 \times b_1 =  \py{a1} \times \py{b1}\ m^2$  (longitudinal x trasversal) \\
+
+Dimensiones de la superficie de hormigón concéntrica y homotética $a \times b = \py{a} \times \py{b}\ m^2$ (longitudinal x trasversal) \\
+
+Materiales: $f_{cd}$ = \py{round(fcd*1e-6,2)} MPa ; $f_{yd}$ = \py{round(fyd*1e-6,2)} MPa. \\
+
+Área de la superficie de aplicación de la carga concentrada:
+$$A_{c1} = \py{a1} \times \py{b1} = \py{Ac1} \ m^2$$
+Área de la superficie de hormigón concéntrica y homotética con la anterior:
+$$A_c = \py{a} \times \py{b} = \py{Ac} \ m^2$$
+La fuerza máxima de compresión que puede actuar sobre la superficie de hormigón:
+$$N_{d,max} = A_{c1} f_{3cd}$$
+siendo,
+$$f_{3cd} = min\left(\sqrt{\frac{A_c}{A_{c1}}}f_{cd}, 3,3 f_{cd}\right) = min(\py{f3cd1},\py{f3cd2}) = \py{f3cd}\ N/m^2 = \py{round(f3cd*1e-6,1)}\ MPa $$
+con lo que:
+$$N_{d_max} = \py{Ac} \times \py{f3cd} = \py{Ndmax} \ N = \py{round(Ndmax*1e-3,1)} \ kN > R_{vd} = \py{round(Rvd*1e-3,1)} \ kN \rightarrow OK$$
+
+
+La armadura transversal se dimensiona para las siguientes tracciones de cálculo:
+\begin{itemize}
+\item en sentido longitudinal:
+  $$T_{ad} = 0,25 N_d \left(\frac{a - a_1}{a} \right) = \py{Tad}\ N = A_sf_{yd} \rightarrow A_s = \py{round(Asa*1e4,2)}\ cm^2$$  
+\item en sentido transversal:
+  $$T_{bd} = 0,25 N_d \left(\frac{b - b_1}{b} \right) = \py{Tbd}\ N = A_sf_{yd} \rightarrow A_s = \py{round(Asb*1e4,2)}\ cm^2$$  
+\end{itemize}
+
+
+\end{document}
