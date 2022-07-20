@@ -51,7 +51,9 @@ echo "$BLEU" "Reinforced concrete examples." "$NORMAL"
 python ./reinforced_concrete/normal_stresses/ec2_bending_example.py silent
 python ./reinforced_concrete/anchorage_and_lap_length/ec2_anchorage_lenght.py silent
 python ./reinforced_concrete/anchorage_and_lap_length/ec2_lap_length.py silent
-
+echo "$BLEU" "Simple structures." "$NORMAL"
+echo "$BLEU" "  Earth retaining simple structures." "$NORMAL"
+python ./simple_structures/earth_retaining/sheet_pile_example.py silent
 
 
 
