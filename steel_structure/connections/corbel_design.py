@@ -69,12 +69,12 @@ as specified in the figure on the EAE standard and in the reference book
  
 cTeor= (0.208*math.sqrt(2)/2)
 ratio1= ((c-cTeor)/cTeor)
-lambdaTeor= 0.5355634494000999
+lambdaTeor= 0.5357790133857673
 ratio2= ((lmbd-lambdaTeor)/lambdaTeor)
-ratio3= ((CE-1.7671030583085594)/1.7671030583085594)
+ratio3= ((CE-1.7669047368430766)/1.7669047368430766)
 MplRdTeor= 11.897600000000006e3
 ratio4= ((MplRdTeor-MplRd)/MplRdTeor)
-VRd2Teor= 105.12142673265963e3
+VRd2Teor= 105.109628985321e3
 ratio5= ((VRd2Teor-VRd2)/VRd2Teor)
 
 if not silent:
