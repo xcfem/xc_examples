@@ -46,6 +46,7 @@ START=$(date +%s.%N)
 echo "$BLEU" "Steel connections examples." "$NORMAL"
 python steel_structure/connections/bolted_flange_plate_connection_predim.py silent
 python steel_structure/connections/bolted_shear_tab_connection_predim.py silent
+python steel_structure/connections/corbel_design.py silent
 
 echo "$BLEU" "Reinforced concrete examples." "$NORMAL"
 python ./reinforced_concrete/normal_stresses/ec2_bending_example.py silent
