@@ -26,7 +26,7 @@ L1= 2.0 # m
 L2= 3.0 # m
 
 # Sheet-pile object.
-sheetPile= sheet_pile.CantileverSheetPileWall(soil= soil, waterTableDepth= L1, excavationDepth= L1+L2)
+sheetPile= sheet_pile.CantileverSheetPileWall(title= 'Test', soil= soil, waterTableDepth= L1, excavationDepth= L1+L2)
     
 # Theoretical depth
 D= sheetPile.getDepth(depthSafetyFactor= 1.0)
