@@ -85,7 +85,6 @@ section1.latexReport(latexOutputFile)
 latexOutputFile.close()
 
 # DXF output
-# Don't bother with warnings.
 doc = ezdxf.new("R2000")
 msp = doc.modelspace()
 section1.writeDXF(msp)
