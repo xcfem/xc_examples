@@ -50,8 +50,12 @@ python steel_structure/connections/corbel_design.py silent
 
 echo "$BLEU" "Reinforced concrete examples." "$NORMAL"
 python ./reinforced_concrete/normal_stresses/ec2_bending_example.py silent
+echo "$BLEU" "  Anchorage and lap length." "$NORMAL"
 python ./reinforced_concrete/anchorage_and_lap_length/ec2_anchorage_lenght.py silent
 python ./reinforced_concrete/anchorage_and_lap_length/ec2_lap_length.py silent
+echo "$BLEU" "  Section properties report." "$NORMAL"
+python ./reinforced_concrete/section_report/circular_section_report_example.py silent
+python ./reinforced_concrete/section_report/rectangular_section_report_example.py silent
 echo "$BLEU" "Simple structures." "$NORMAL"
 echo "$BLEU" "  Earth retaining simple structures." "$NORMAL"
 python ./simple_structures/earth_retaining/sheet_pile_example.py silent
