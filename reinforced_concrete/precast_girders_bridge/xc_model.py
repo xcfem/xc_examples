@@ -11,18 +11,22 @@ import xc
 
 from misc_utils import log_messages as lmsg
 from model import predefined_spaces
-from postprocess import output_handler
-from postprocess.config import default_config
-from actions import load_cases as lcm
-from actions import combinations as combs
-from actions.load_combination_utils import utils
+# Materials
 from materials.ehe import EHE_materials
+from materials.prestressing import pre_tensioned_tendons
+from materials import bridge_bearings as bb
 from postprocess import element_section_map
 from materials.sections.fiber_section import def_simple_RC_section
 from postprocess import RC_material_distribution
-from materials.prestressing import pre_tensioned_tendons
-from materials import bridge_bearings as bb
+# Loads
+from actions import load_cases as lcm
+from actions import combinations as combs
+from actions.load_combination_utils import utils
+# Solution
 from solution import predefined_solutions
+# Postprocess
+from postprocess import output_handler
+from postprocess.config import default_config
 
 deckWidth= 11.2 # Deck width.
 girdersDepth= 1.4 # Girders depth.
@@ -86,7 +90,7 @@ for s in xcTotalSet.surfaces:
     s.setElemSizeIJ(0.5,0.5) # Set element size
     label= s.getProp('labels')[0]
     attributes= s.getProp('attributes')
-    for sk in setKeys:
+    for sk in setKeys: # set keys defined at the top of this file
         regExp= sk[0]
         if(re.match(regExp, label)):
             setName= sk[1]
@@ -130,12 +134,12 @@ for l in xcTotalSet.lines:
             upperTendonSet.lines.append(l)
 
 ## Define material for shell elements.
-reductionFactor= 1.0
-#reductionFactor= 6.0
+stiffnessReductionFactor= 1.0 # Stiffness reduction due to concrete cracking.
+#stiffnessReductionFactor= 6.0
 shellMaterialDict= dict()
 for key in rcSectionDict:
     rcSection= rcSectionDict[key]
-    shellMaterial= rcSection.getElasticMembranePlateSection(preprocessor, reductionFactor)
+    shellMaterial= rcSection.getElasticMembranePlateSection(preprocessor, stiffnessReductionFactor)
     shellMaterialDict[key]= shellMaterial
 
 # Create mesh

@@ -2,7 +2,7 @@
 import re
 from actions import loads
 
-# Loads
+# Loads cases.
 loadCaseManager= lcm.LoadCaseManager(preprocessor)
 loadCaseNames= list()
 
@@ -33,9 +33,10 @@ loadCaseNames.append('LTPh2') # Load test phase 2.
 
 loadCaseManager.defineSimpleLoadCases(loadCaseNames) 
 
+# Load values.
 gravityVector= xc.Vector([0.0,0.0,9.81])
 
-### Self weight
+## Self weight
 cLC= loadCaseManager.setCurrentLoadCase('G1A')
 cLC.description= 'Peso propio vigas prefabricadas.'
 modelSpace.createSelfWeightLoad(girderSet,gravityVector)
@@ -44,7 +45,7 @@ cLC= loadCaseManager.setCurrentLoadCase('G1B')
 cLC.description= 'Peso propio losa.'
 modelSpace.createSelfWeightLoad(bridgeDeckSet,gravityVector)
 
-### Shrinkage
+## Shrinkage
 
 def setStrainLoad(elementSet, strainValues):
     ''' Define a strain load.
@@ -62,16 +63,16 @@ def setStrainLoad(elementSet, strainValues):
             eleLoad.setStrainComp(gp,c,strainValues[c]) #(id of Gauss point, id of component, value)
     
 
-#### Girder shrinkage
+### Girder shrinkage
 totalGirderShrinkage= 1.01e-4 # Shrinkage on girders.
 
-##### Initial girder shrinkage (before the deck slab is cast).
+#### Initial girder shrinkage (before the deck slab is cast).
 initialGirderShrinkage= 2/3*totalGirderShrinkage
 cLC= loadCaseManager.setCurrentLoadCase('G3SHRA')
 cLC.description= 'Girder initial shrinkage.'
 setStrainLoad(girderSet, [initialGirderShrinkage,initialGirderShrinkage])
 
-##### Girder and deck shrinkage (after the deck slab is cast).
+#### Girder and deck shrinkage (after the deck slab is cast).
 girderShrinkage= totalGirderShrinkage-initialGirderShrinkage
 cLC= loadCaseManager.setCurrentLoadCase('G3SHRB')
 cLC.description= 'Shrinkage.'
@@ -79,7 +80,7 @@ setStrainLoad(girderSet, [girderShrinkage,girderShrinkage])
 deckShrinkage= 2.93e-4 # Shrinkage on girders.
 setStrainLoad(bridgeDeckSet, [deckShrinkage,deckShrinkage])
 
-### Creep
+## Creep
 def setCreepLoad(setList, concreteAge, concreteAgeAtLoading):
     ''' Define the creep load for the elements of the set.
 
@@ -106,33 +107,6 @@ def setCreepLoad(setList, concreteAge, concreteAgeAtLoading):
                 for c in [0,1]: # for each component.
                     eleLoad.setStrainComp(gp,c,strainValues[c]) #(id of Gauss point, id of component, value)
 
-def pickElementsInZone(zone, resultSet, originSet):
-    ''' Return a set containing the elements that lie
-        inside the zone argument.
-
-    :param zone: surface representing the zone to load.
-    :param resultSet: set that will be populated with the elements.
-    :param originSet: set that contains the elements to check.
-    '''
-    plg= zone.getPolygon()
-    pln= plg.getPlane()
-    for e in originSet.elements:
-        pos= pln.getProjection(e.getPosCentroid(True))
-        if(plg.In(pos,1e-2)):
-            resultSet.elements.append(e)
-
-def pickNodeOnPoint(pt, resultSet, originSet):
-    ''' Append to resultSet the nearest node to the point argument
-        from those in originSet.
-
-    :param pt: point to load.
-    :param resultSet: set that will be populated with the nodes.
-    :param originSet: set that contains the nodes to check.
-    '''
-    pos= pt.getPos
-    n= originSet.getNearestNode(pos)
-    resultSet.nodes.append(n)
-
 deckLength= 24.76 # Length of the deck edge.
 
 # Loaded zones.
@@ -145,17 +119,17 @@ notionalLane2Set= modelSpace.defSet('notionalLane2Set')
 notionalLaneRSet= modelSpace.defSet('notionalLaneRSet')
 for s in xcTotalSet.surfaces:
     if 'IFCWalkway1' in s.getProp('labels'):
-        pickElementsInZone(s, walkway1Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), walkway1Set, bridgeDeckSet)
     if 'IFCWalkway2' in s.getProp('labels'):
-        pickElementsInZone(s, walkway2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), walkway2Set, bridgeDeckSet)
     if 'IFCNotionalLane1' in s.getProp('labels'):
-        pickElementsInZone(s, notionalLane1Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane1Set, bridgeDeckSet)
     if 'IFCNotionalLane2a' in s.getProp('labels'):
-        pickElementsInZone(s, notionalLane2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane2Set, bridgeDeckSet)
     if 'IFCNotionalLane2b' in s.getProp('labels'):
-        pickElementsInZone(s, notionalLane2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane2Set, bridgeDeckSet)
     if 'IFCNotionalLaneR' in s.getProp('labels'):
-        pickElementsInZone(s, notionalLaneRSet, bridgeDeckSet)
+        modelSpace.pickElementsInZone(s.getPolygon(), notionalLaneRSet, bridgeDeckSet)
 
 notionalLanes= [notionalLane1Set, notionalLane2Set, notionalLaneRSet]
 
@@ -198,37 +172,37 @@ TS2Pos1Set= modelSpace.defSet('TS2Pos1Set')
 TS2Pos2Set= modelSpace.defSet('TS2Pos2Set')
 for p in xcTotalSet.points:
     if 'IFCTS1Pos1a' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
     if 'IFCTS1Pos1b' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
     if 'IFCTS1Pos1c' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
     if 'IFCTS1Pos1d' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
     if 'IFCTS1Pos2a' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
     if 'IFCTS1Pos2b' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
     if 'IFCTS1Pos2c' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
     if 'IFCTS1Pos2d' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
     if 'IFCTS2Pos1a' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
     if 'IFCTS2Pos1b' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
     if 'IFCTS2Pos1c' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
     if 'IFCTS2Pos1d' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
     if 'IFCTS2Pos2a' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
     if 'IFCTS2Pos2b' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
     if 'IFCTS2Pos2c' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
     if 'IFCTS2Pos2d' in p.getProp('labels'):
-        pickNodeOnPoint(p, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
 
 ### Q1a1
 cLC= loadCaseManager.setCurrentLoadCase('Q1a1')
