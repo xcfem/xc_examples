@@ -3,7 +3,9 @@
 
 # Reinforcement row scheme:
 #
-#    |  o    o    o    o    o    o    o    o    o    o  |
+#    ----------------------------------------------------   ^
+#    |                                                  |   | cover
+#    |  o    o    o    o    o    o    o    o    o    o  |   v
 #    <->           <-->                               <-> 
 #    lateral      spacing                           lateral
 #     cover                                          cover
@@ -16,7 +18,7 @@
 cover= 40e-3 # Concrete cover
 bridgeDeckTransverseTopReinf= def_simple_RC_section.ReinfRow(rebarsDiam= 16e-3, rebarsSpacing= 0.1, width= 1.0, nominalCover= cover+8e-3, nominalLatCover= 0.0)
 
-### Londitudinal top reinforcement.
+### Longitudinal top reinforcement.
 cover+= bridgeDeckTransverseTopReinf.rebarsDiam
 bridgeDeckLongitudinalTopReinf= def_simple_RC_section.ReinfRow(rebarsDiam= 12e-3, rebarsSpacing= 0.2, width= 1.0, nominalCover= cover+6e-3, nominalLatCover= 0.0)
 ### Transverse bottom reinforcement.
