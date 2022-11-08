@@ -119,17 +119,17 @@ notionalLane2Set= modelSpace.defSet('notionalLane2Set')
 notionalLaneRSet= modelSpace.defSet('notionalLaneRSet')
 for s in xcTotalSet.surfaces:
     if 'IFCWalkway1' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), walkway1Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= walkway1Set, originSet= bridgeDeckSet)
     if 'IFCWalkway2' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), walkway2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= walkway2Set, originSet= bridgeDeckSet)
     if 'IFCNotionalLane1' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane1Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= notionalLane1Set, originSet= bridgeDeckSet)
     if 'IFCNotionalLane2a' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= notionalLane2Set, originSet= bridgeDeckSet)
     if 'IFCNotionalLane2b' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), notionalLane2Set, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= notionalLane2Set, originSet= bridgeDeckSet)
     if 'IFCNotionalLaneR' in s.getProp('labels'):
-        modelSpace.pickElementsInZone(s.getPolygon(), notionalLaneRSet, bridgeDeckSet)
+        modelSpace.pickElementsInZone(zone= s.getPolygon(), resultSet= notionalLaneRSet, originSet= bridgeDeckSet)
 
 notionalLanes= [notionalLane1Set, notionalLane2Set, notionalLaneRSet]
 
@@ -172,37 +172,37 @@ TS2Pos1Set= modelSpace.defSet('TS2Pos1Set')
 TS2Pos2Set= modelSpace.defSet('TS2Pos2Set')
 for p in xcTotalSet.points:
     if 'IFCTS1Pos1a' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos1b' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos1c' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos1d' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos2a' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos2b' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos2c' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS1Pos2d' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS1Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS1Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos1a' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos1b' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos1c' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos1d' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos1Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos1Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos2a' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos2b' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos2c' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos2Set, originSet= bridgeDeckSet)
     if 'IFCTS2Pos2d' in p.getProp('labels'):
-        modelSpace.pickNodeOnPoint(p.getPos, TS2Pos2Set, bridgeDeckSet)
+        modelSpace.pickNodeOnPoint(pt= p.getPos, resultSet= TS2Pos2Set, originSet= bridgeDeckSet)
 
 ### Q1a1
 cLC= loadCaseManager.setCurrentLoadCase('Q1a1')
