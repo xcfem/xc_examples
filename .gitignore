@@ -105,3 +105,4 @@ venv.bak/
 
 #back-up files
 *~
+*.bak
