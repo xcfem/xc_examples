@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 exec(open("./xc_model.py").read()) #FE model generation
-from serviceability_limit_states import ibc_2018_sls
+from postprocess.serviceability_limit_states import ibc_2018_sls
 from colorama import Fore
 from colorama import Style
 

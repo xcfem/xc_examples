@@ -126,9 +126,10 @@ rigidDummySpring= typical_materials.defElastNoTensMaterial(preprocessor, "rigidD
 # P-Y Springs Left Side of Beam
 
 #### User-Defined --- Imported from LPile Program --- Must start from 2001 (ground surface) ---- Number of elements should be the same as "Num_Springs"
-#### At the ground surface, do not use 0.0 force values. Use very small number such as 0.0001 lbf instead. For example "uniaxialMaterial MultiLinear	1001	0.02	0.0001	0.04	0.0001	0.08	0.0001	0.25	0.0001"
+#### At the ground surface, do not use 0.0 force values. Use very small number such as 0.0001 lbf instead.
+#### For example "uniaxialMaterial MultiLinear	1001	0.02	0.0001	0.04	0.0001	0.08	0.0001	0.25	0.0001"
 leftSpringsMaterials= dict()
-leftSpringsMaterials[1001]= typical_materials.defMultiLinearMaterial(preprocessor, name="1001",points= [(0.02, 0.0001), (0.05, 0.0001), (0.1, 0.0001), (0.270833333, 0.0001)	])
+leftSpringsMaterials[1001]= typical_materials.defMultiLinearMaterial(preprocessor, name="1001",points= [(0.02, 0.0001), (0.05, 0.0001), (0.1, 0.0001), (0.270833333, 0.0001)])
 leftSpringsMaterials[1002]= typical_materials.defMultiLinearMaterial(preprocessor, name="1002",points= [(0.02, 3923), (0.05, 5377), (0.1, 5598), (0.270833333, 5597.920139)])
 leftSpringsMaterials[1003]= typical_materials.defMultiLinearMaterial(preprocessor, name="1003",points= [(0.02, 7977), (0.05, 11064), (0.1, 11612), (0.270833333, 11611.62039)])
 leftSpringsMaterials[1004]= typical_materials.defMultiLinearMaterial(preprocessor, name="1004",points= [(0.02, 11426), (0.05, 15200), (0.1, 15698), (0.270833333, 15698.39805)])

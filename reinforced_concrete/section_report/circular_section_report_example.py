@@ -12,24 +12,23 @@ __version__= "3.0"
 __email__= "l.pereztato@gmail.com"
 
 
+import sys
+import os
+import filecmp
 import geom
 import xc
-
 import math
-import shutil
 import ezdxf
-from materials import typical_materials
 from materials.ehe import EHE_materials
-from materials.ehe import EHE_limit_state_checking
 from materials.sections.fiber_section import def_simple_RC_section
 from materials.sections.fiber_section import def_column_RC_section
-from model import predefined_spaces
-from solution import predefined_solutions # Solution procedure
-from postprocess import limit_state_data
-from postprocess import RC_material_distribution
-from postprocess import element_section_map
-from postprocess.config import default_config
-from materials.sections.fiber_section import section_report 
+
+# Check if silent execution has been requested.
+argv= sys.argv
+silent= False
+if(len(argv)>1):
+    if 'silent' in argv[1:]:
+        silent= True
 
 # Materials definition
 concr= EHE_materials.HA30
@@ -43,7 +42,7 @@ nCover= 0.025+12e-3
 rebarDiam= 32e-3 # Bar diameter expressed in meters.
 cover= nCover+rebarDiam/2.0 # Concrete cover expressed in meters.
 rebarArea= math.pi*(rebarDiam/2.0)**2 # Rebar area expressed in square meters.
-section1= def_column_RC_section.RCCircularSection(name='Section 1',Rext= radius, concrType=concr, reinfSteelType= steel)
+section1= def_column_RC_section.RCCircularSection(name='CircSection 1',Rext= radius, concrType=concr, reinfSteelType= steel)
 
 # Longitudinal reinforcement
 section1.mainReinf= def_simple_RC_section.LongReinfLayers([def_simple_RC_section.ReinfRow(rebarsDiam= rebarDiam, nRebars=24, width= 2*math.pi*(radius-cover), nominalCover= nCover)])
@@ -69,25 +68,46 @@ Vd= 1090.24e3
 
 # Bending. Compute capacity factor.
 fc= diagIntsecHA.getCapacityFactor(geom.Pos3d(Nd, Md,0))
-
-print('Bending.')
-print('  reinf. layers As= ', section1.mainReinf.getAs())
-print('  As= ', section1.mainReinf.getAs())
-print("  bending capacity factor: fc= ",fc)
+ratio1= abs(fc-0.9556451619964796)/0.9556451619964796
 
 # Report
+## Get current path.
+pth= os.path.dirname(__file__)
+if(not pth):
+    pth= '.'
 ## Get valid filename from section name.
 baseOutputFileName= ''.join(x for x in section1.name if x.isalnum())
 latexOutputFileName= baseOutputFileName+'.tex'
-latexOutputFile= open('./'+latexOutputFileName, 'w')
+latexOutputPath= pth+'/'+latexOutputFileName
+latexOutputFile= open(latexOutputPath, 'w')
 ## Write report.
 section1.latexReport(latexOutputFile)
 latexOutputFile.close()
 
+# Compare with reference file.
+    
+refFile= pth+'/../../reference_files/ref_'+latexOutputFileName
+comparisonOK= filecmp.cmp(refFile, latexOutputPath, shallow=False)
+
+
+
 # DXF output
-# Don't bother with warnings.
 doc = ezdxf.new("R2000")
 msp = doc.modelspace()
 section1.writeDXF(msp)
 dxfOutputFileName= './'+baseOutputFileName+'.dxf'
 doc.saveas(dxfOutputFileName)
+
+if not silent:
+    print('Comparison OK: ', comparisonOK)
+    # print(thisFile)
+    print('Bending.')
+    print('  reinf. layers As= ', section1.mainReinf.getAs())
+    print("  bending capacity factor: fc= ",fc)
+    
+from misc_utils import log_messages as lmsg
+fname= os.path.basename(__file__)
+if comparisonOK and (ratio1<1e-6):
+   print('test '+fname+': ok.')
+else:
+    lmsg.error(fname+' ERROR.')

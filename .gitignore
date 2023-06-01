@@ -105,3 +105,36 @@ venv.bak/
 
 #back-up files
 *~
+*.bak
+
+# xc results directories
+**/annex
+**/results
+**/tmp_results
+
+#specific files
+
+## libreoffice lock files
+.~lock*
+
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+
+# Files that might appear on external disk
+.Trashes
+
+*.log
+
+# FreeCAD and Blender backup files
+*.FcStd1
+*.FcStd2
+*.fcstd1
+*.fcstd2
+*.blend1
+*.blend2
+
+# Excel temporary files
+~$*.xlsx
+
+# AutoCAD temporary files
+*.dwl*
