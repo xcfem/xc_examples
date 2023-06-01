@@ -1,0 +1,94 @@
+# -*- coding: utf-8 -*-
+
+#Load cases for graphics
+G1:
+    LCname: ' GselfWeight'
+    setName: 'overallSet'
+    description: ' G1: self weight'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q1:
+    LCname: 'Qdecks'
+    setName: 'overallSet'
+    description: 'Q1: uniform load on the decks'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q2:
+    LCname: 'QearthPressWall'
+    setName: 'overallSet'
+    description: 'Q2: earth pressure wall'
+    camera: 'XYZNeg'
+    arrowPush: True
+
+Q3:
+    LCname: 'QearthPWallStrL'
+    setName: 'overallSet'
+    description: 'Q4: earth pressure wall strip load'
+    camera: 'XYZNeg'
+    arrowPush: True
+
+Q4:
+    LCname: 'QearthPWallLinL'
+    setName: 'overallSet'
+    description: 'Q5: earth pressure wall line load'
+    camera: 'XYZNeg'
+    arrowPush: True
+
+Q5:
+    LCname: 'QearthPWallHrzL'
+    setName: 'overallSet'
+    description: 'Q6: earth pressure wall line load'
+    camera: 'XYZNeg'
+    arrowPush: True
+
+Q6:
+    LCname: 'qunifBeams'
+    setName: 'overallSet'
+    description: 'Q7: uniform load on beams'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q7:
+    LCname: 'qlinDeck'
+    setName: 'overallSet'
+    description: 'Q8: linear load on deck level '
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q8:
+    LCname: 'QpntBeams'
+    setName: 'overallSet'
+    description: 'Q9: point loads on beams'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q9:
+    LCname: 'QwheelDeck1'
+    setName: 'overallSet'
+    description: 'Q10: load of a wheel over deck level 1'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Q10:
+    LCname: 'QvehicleDeck1'
+    setName: 'overallSet'
+    description: 'Q11: load of a vehicle over deck level 1'
+    camera: 'XYZPos'
+    arrowPush: True
+
+Comb1:
+    LCname: 'LS1'
+    setName: 'overallSet'
+    description: 'Comb1: combination 1'
+    camera: 'XYZNeg'
+    arrowPush: True
+
+Comb2:
+    LCname: 'LS2'
+    setName: 'overallSet'
+    description: 'Comb2: combination 2'
+    camera: 'XYZNeg'
+    arrowPush: True
+
