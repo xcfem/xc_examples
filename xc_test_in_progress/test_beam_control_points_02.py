@@ -75,13 +75,13 @@ beamY_mat.defElasticShearSection3d(preprocessor)
 
 #                         ***FE model - MESH***
 
-beamY_mesh=fem.LinSetToMesh(linSet=beamY,matSect=beamY_mat,elemSize=eSize,vDirLAxZ=xc.Vector([1,0,0]),elemType='ElasticBeam3d',coordTransfType='linear')
+beamY_mesh= fem.LinSetToMesh(linSet=beamY,matSect=beamY_mat,elemSize=eSize,vDirLAxZ=xc.Vector([1,0,0]),elemType='ElasticBeam3d',coordTransfType='linear')
 beamY_mesh.generateMesh(preprocessor)
 
 # EC3beam definition
-lstPntBeam=gridGeom.getLstPntRange(beamY_rg)
+lstPntBeam= gridGeom.getLstPntRange(beamY_rg)
 
-lec3beam= ec3b.EC3Beam(name='ec3bm',ec3Shape=None, lstPoints=lstPntBeam)
+ec3beam= ec3b.EC3Beam(name='ec3bm', ec3Shape=None, lstPoints= lstPntBeam)
 
 ec3beam.setControlPoints()
 

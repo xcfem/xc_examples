@@ -66,6 +66,7 @@ S235JR.gammaM= 1.00
   #         UPNShape, AUShape, CHSShape
   #      (defined in materials.sections.structural_shapes.arcelor_metric_shapes)
 beamY_mat= EC3_materials.IPEShape(steel=S235JR,name='IPE_A_450')
+beamY_mat.sectionClass= beamY_mat.getClassInBending()
 beamY_mat.defElasticShearSection3d(preprocessor)
 
 #                         ***FE model - MESH***
