@@ -8,7 +8,7 @@ workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.p
 sys.path.append(workingDirectory)
 import env_config as env
 import model_gen as model
-#import steel_beams_def as sMemb # steel members
+import steel_beams_def as sMemb # steel members
 
 lsd.LimitStateData.envConfig= env.cfg
 
@@ -16,7 +16,8 @@ lsd.LimitStateData.envConfig= env.cfg
 #reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
 
 #Set of entities for which checking is going to be performed.
-setCalc= model.allConcrete
+# setCalc= model.allConcrete
+setCalc= model.overallSet
 
 loadCombinations= model.prep.getLoadHandler.getLoadCombinations
 
@@ -32,7 +33,7 @@ lsd.quasiPermanentLoadsCrackControl, # RC crack control under quasi-permanent lo
 #lsd.normalStressesResistance.woodArmerAlsoForAxialForces= True
 
 for ls in limitStates:
-    ls.saveAll(model.combContainer,setCalc)#,bucklingMembers=[])# [sMemb.col01a,sMemb.col01b,sMemb.col02a,sMemb.col02b,sMemb.col03,sMemb.beam01])
+    ls.saveAll(model.combContainer,setCalc,bucklingMembers=[sMemb.col01a,sMemb.col01b,sMemb.col02a,sMemb.col02b,sMemb.col03,sMemb.beam01])
     print('combinations for ', ls.label, ': ', loadCombinations.getKeys())
 
 
