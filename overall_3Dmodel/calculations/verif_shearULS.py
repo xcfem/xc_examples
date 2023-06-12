@@ -5,6 +5,8 @@ from materials.ehe import EHE_limit_state_checking as lschck  #Checking material
 #from materials.sia262 import SIA262_limit_state_checking as lschck  #Checking material for shear limit state according to SIA262
 from postprocess.config import default_config
 
+#   *** Verificacion of shear ULS for reinf. concrete elements ***
+
 # local modules
 import sys
 workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py

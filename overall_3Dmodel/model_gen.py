@@ -200,8 +200,10 @@ columnZconcr_mat.setupElasticShear3DSection(preprocessor=prep)
   #      (defined in materials.sections.structural_shapes.arcelor_metric_shapes)
 columnZsteel_mat= EC3_materials.HEShape(steel=dat.S235JR,name='HE_200_A')
 columnZsteel_mat.defElasticShearSection3d(prep)
+columnZsteel_mat.sectionClass=1
 beamXsteel_mat= EC3_materials.IPEShape(steel=dat.S235JR,name='IPE_A_300')
 beamXsteel_mat.defElasticShearSection3d(prep)
+beamXsteel_mat.sectionClass=1
 
 #                         ***FE model - MESH***
 # IMPORTANT: it's convenient to generate the mesh of surfaces before meshing
@@ -527,11 +529,13 @@ overallSet=modelSpace.setSum('overallSet',[beamXconcr,beamXsteel,beamY,columnZco
 overallSet.description='overall set'
 overallSet.color=env.cfg.colors['purple01']
 allConcrete=modelSpace.setSum('allConcrete',[beamXconcr,beamY,columnZconcr,wall,foot,decklv1,decklv2])
+allConcrete.description='concrete elements'
 beamX=modelSpace.setSum('beamX',[beamXconcr,beamXsteel])
 beamX.description='beams X'
 columnZ=modelSpace.setSum('columnZ',[columnZconcr,columnZsteel])
 columnZ.description='columns'
-
+allSteel=modelSpace.setSum('allSteel',[beamXsteel,columnZsteel])
+allSteel.description='steel elements'
 #sets for displaying some results
 pBase=gut.rect2DPolygon(xCent=dat.LbeamX/2.,yCent=0,Lx=dat.LbeamX,Ly=dat.LbeamY-1.0)
 

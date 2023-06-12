@@ -16,11 +16,12 @@ import model_gen as model #FE model generation
 model.modelSpace.readControlVars(inputFileName= env.cfg.projectDirTree.getVerifShearFile())
 
 #  Config
-arguments= ['CF']      #Available arguments:
+arguments= ['Vy']      #Available arguments:
                     # RC elements:'CF', 'N', 'My', 'Mz', 'Mu',
                     #             'Vy', 'Vz', 'theta', 'Vcu', 'Vsu', 'CF'
                     # steel elements: 'CF', 'Vy'
-sets2DispRes= [model.beamXconcr,model.beamY,model.columnZconcr]   #sets of linear elements to display results
+#sets2DispRes= [model.beamXconcr,model.beamY,model.columnZconcr]   #sets of linear elements to display results
+sets2DispRes=[model.allSteel]
 setDisp=model.overallSet   #set of elements (any type) to be displayed
 cameraParameters= vtk_graphic_base.CameraParameters('XYZPos')
 model.out.outputStyle.cameraParameters= cameraParameters
