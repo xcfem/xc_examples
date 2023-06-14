@@ -90,8 +90,9 @@ maxW= -0.2*E*truss.sectionArea/((L0/z)**3)# Weq_1_7(z, max_w)/P
 print(maxW)
 loadIncrement= .01*maxW
 numSteps= int(maxW/loadIncrement)
-solProc= predefined_solutions.PenaltyNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 100, convTestType= 'norm_unbalance_conv_test', numSteps= numSteps)
-
+# Use arch length integrator.
+solProc= predefined_solutions.PenaltyNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 150, convTestType= 'norm_unbalance_conv_test', numSteps= numSteps, integratorType= 'arc-length_integrator')
+solProc.setArcLengthIntegratorParameters(arcLength= 1.0, alpha= 1.0)
 solProc.solve(calculateNodalReactions= False)
 
 
