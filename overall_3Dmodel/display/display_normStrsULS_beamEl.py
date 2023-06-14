@@ -15,11 +15,12 @@ import model_gen as model #FE model generation
 model.modelSpace.readControlVars(inputFileName= env.cfg.projectDirTree.getVerifNormStrFile())
 
 #  Config
-arguments=[ 'CF' ]      #Possible arguments:
+arguments=[ 'chiLT']      #Possible arguments:
                      #RC elem: 'CF', 'N', 'My', 'Mz'
                      #steel elem: 'CF', 'N', 'My', 'Mz','Ncrd','McRdy','McRdz',
                      #            'MvRdz','MbRdz','chiLT'
-sets2DispRes= [model.beamXconcr,model.beamY,model.columnZconcr]   #sets of linear elements to display results
+#sets2DispRes= [model.beamXconcr,model.beamY,model.columnZconcr]   #sets of linear elements to display results
+sets2DispRes= [model.beamXsteel,model.columnZsteel]
 setDisp=model.overallSet   #set of elements (any type) to be displayed
 
 cameraParameters= vtk_graphic_base.CameraParameters('XYZPos')
