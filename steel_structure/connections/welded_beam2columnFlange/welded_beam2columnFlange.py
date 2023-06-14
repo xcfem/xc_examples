@@ -120,7 +120,7 @@ modelSpace.analyze()
 out.displayDispRot('uZ')
 modelSpace.removeAllLoadPatternsFromDomain()
 ULSs=['LC1']
-checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[], welds2Check=lstWelds2check, baseMetal=steelW,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, warningsFile='warnings.tex')#foundSprings=No
+checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[], welds2Check=lstWelds2check, baseMetal=steelW,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, reactionCheckTolerance=1e-3,warningsFile='warnings.tex')#foundSprings=No
 
 # Von mises
 combContainer= combs.CombContainer()

@@ -260,28 +260,8 @@ if len(loadTriples)>3:
     LC4.addLstLoads([load4])
     ULSs.append('LC4')    
 
-class PenaltyModifiedNewtonUMF(predefined_solutions.PenaltyModifiedNewtonUMF):
-    ''' Static solution procedure with a modified Newton algorithm,
-        a penalty constraint handler and a UMF
-        (Unsimmetric multi-frontal method) solver.'''
-    def __init__(self, prb, name= None, maxNumIter= 150, convergenceTestTol= 1e-9, printFlag= 1, numSteps= 1, numberingMethod= 'rcm', convTestType= 'relative_total_norm_disp_incr_conv_test'):
-        ''' Constructor.
 
-        :param prb: XC finite element problem.
-        :param name: identifier for the solution procedure.
-        :param maxNumIter: maximum number of iterations (defauts to 10)
-        :param convergenceTestTol: convergence tolerance (defaults to 1e-9)
-        :param printFlag: if not zero print convergence results on each step.
-        :param numSteps: number of steps to use in the analysis (useful only when loads are variable in time).
-        :param numberingMethod: numbering method (plain or reverse Cuthill-McKee or alterntive minimum degree).
-        :param convTestType: convergence test for non linear analysis (norm unbalance,...).
-        '''
-        super(PenaltyModifiedNewtonUMF,self).__init__(prb, name, maxNumIter, convergenceTestTol, printFlag= 1, numSteps= numSteps, numberingMethod= numberingMethod, convTestType= convTestType)
-
-#checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=lstWelds2check, baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, warningsFile='warnings.tex')#foundSprings=No
-print('XXXXXXXXXXXXXXXXX AQUI')
-checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=lstWelds2check, baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= PenaltyModifiedNewtonUMF, warningsFile='warnings.tex')#foundSprings=No
-print('XXXXXXXXXXXXXXXXX SALE')
+checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=lstWelds2check, baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF,  reactionCheckTolerance=1e-3,warningsFile='warnings.tex')#foundSprings=No
 
 # Von mises
 combContainer= combs.CombContainer()

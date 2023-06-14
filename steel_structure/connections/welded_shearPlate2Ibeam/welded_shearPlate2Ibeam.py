@@ -167,7 +167,7 @@ welds2Check=weldsPlate1+weldsPlate2
 welds2Check=weldsPlate2
 
 #Checking
-checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[], welds2Check=welds2Check, baseMetal=steel_plate,meanShearProc=True, resFile='stair_tower_grating_beams_check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, warningsFile='warnings.tex')#foundSprings=None)#found.springs)
+checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[], welds2Check=welds2Check, baseMetal=steel_plate,meanShearProc=True, resFile='stair_tower_grating_beams_check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, reactionCheckTolerance=1e-3,warningsFile='warnings.tex')#foundSprings=None)#found.springs)
 
 # Von mises verification
 
