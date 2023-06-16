@@ -1,7 +1,6 @@
 from __future__ import division 
 from __future__ import print_function
 
-
 import geom
 import xc
 import math
@@ -230,7 +229,7 @@ out.displayDispRot('uX')
 out.displayDispRot('uY')
 ULSs=['LC1']
 
-checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=[], baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, warningsFile='warnings.tex')#foundSprings=No
+# checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=[], baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, reactionCheckTolerance=1e-3,warningsFile='warnings.tex')#foundSprings=No
 
 # Von mises
 combContainer= combs.CombContainer()

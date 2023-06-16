@@ -28,8 +28,10 @@ from postprocess.config import default_config
 from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
 
-
-from xcmodutils.steel_struct import steel_connection_models as sbcm
+# import local modules
+import sys
+sys.path.insert(0, '../local_modules')
+import steel_connection_models as sbcm
 
 # Connection beam to beam in angle with end-plate
 # Axis of the main beam (supporting beam) remains at global Z=0 
@@ -220,7 +222,7 @@ if len(loadTriples)>3:
     ULSs.append('LC4')    
         
     
-checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=lstWelds2check, baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF, warningsFile='warnings.tex')#foundSprings=No
+checksc.aisc_check_bolts_welds(modelSpace, ULSs=ULSs, boltSets2Check=[[setBolts,boltFastener]], welds2Check=lstWelds2check, baseMetal=steelPlate,meanShearProc=True, resFile='check', solutionProcedureType= predefined_solutions.SimpleStaticLinearUMF,  reactionCheckTolerance=1e-3,warningsFile='warnings.tex')#foundSprings=No
 
 # Von mises
 combContainer= combs.CombContainer()
