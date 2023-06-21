@@ -59,7 +59,8 @@ python ./reinforced_concrete/section_report/rectangular_section_report_example.p
 echo "$BLEU" "Simple structures." "$NORMAL"
 echo "$BLEU" "  Earth retaining simple structures." "$NORMAL"
 python ./simple_structures/earth_retaining/sheet_pile_example.py silent
-
+echo "$BLEU" "Analysis examples." "$NORMAL"
+python analysis/curved_arch_dynamic_snap_through.py silent
 
 
 END=$(date +%s.%N)
