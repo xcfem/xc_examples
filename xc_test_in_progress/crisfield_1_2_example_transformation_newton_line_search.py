@@ -65,12 +65,14 @@ truss= elements.newElement("CorotTruss",xc.ID([nod1.tag,nod2.tag]))
 truss.sectionArea= A
 
 # Loads.
-P= -1.0
+maxW= -0.2*E*truss.sectionArea/((L0/z)**3)# Weq_1_7(z, max_w)
+arcLength= 0.0075
+print(maxW)
 ## Linear time series
 lts= modelSpace.newTimeSeries(name= 'lts', tsType= 'linear_ts')
 ## Load pattern.
 lp= modelSpace.newLoadPattern(name= 'lp')
-lp.newNodalLoad(nod2.tag,xc.Vector([0.0,P]))
+lp.newNodalLoad(nod2.tag,xc.Vector([0.0,-10]))
 ## We add the load case to domain.
 modelSpace.addLoadCaseToDomain(lp.name)
 
@@ -86,14 +88,24 @@ recWi.callbackRecord= "Wi.append(-self.getReaction[1])"
 recWi.callbackSetup= "self.getDomain.calculateNodalReactions(True,1e-4)"
 
 # Solution
-maxW= -0.2*E*truss.sectionArea/((L0/z)**3)# Weq_1_7(z, max_w)/P
-print(maxW)
-loadIncrement= .01*maxW
-numSteps= int(maxW/loadIncrement)
 # Use arch length integrator.
-solProc= predefined_solutions.PenaltyNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 150, convTestType= 'norm_unbalance_conv_test', numSteps= numSteps, integratorType= 'arc-length_integrator')
-solProc.setArcLengthIntegratorParameters(arcLength= 1.0, alpha= 1.0)
-solProc.solve(calculateNodalReactions= False)
+# SEE ArcLengt01.tcl and ArcLength02.tcl to get some light on the subject LP 2023/06/18
+solProc= predefined_solutions.TransformationNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 150, convTestType= 'norm_unbalance_conv_test', numSteps= 1, integratorType= 'arc-length_integrator')
+#solProc= predefined_solutions.TransformationNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 150, convTestType= 'norm_unbalance_conv_test', numSteps= 1, integratorType= 'arc-length1_integrator')
+solProc.setArcLengthIntegratorParameters(arcLength= arcLength, alpha= 1.0)
+#solProc= predefined_solutions.TransformationNewtonLineSearch(prb= feProblem, printFlag= 0, convergenceTestTol= 1e-7, maxNumIter= 150, convTestType= 'norm_unbalance_conv_test', numSteps= 1, integratorType= 'HS_constraint_integrator')
+solProc.setup()
+analysis= solProc.analysis
+
+maxU= -2.3*z
+currentDisp= nod2.getDisp[1]
+#while (currentDisp>maxU):
+for i in range(0,400):
+    result= analysis.analyze(1)
+    if(result!=0):
+        break;
+    currentDisp= nod2.getDisp[1]
+    print(i, '**** disp= ',-currentDisp/z, -wi[-1]/z, currentDisp-wi[-1], -maxU/z)
 
 
 # Compute theoretical value according to expression (1.7) of the book.
@@ -114,6 +126,7 @@ error= rae(np.array(WiRef),np.array(Wi))
 xi= list()
 for w in wi:
     xi.append(-w/z)
+
 yi= list()
 yyi= list()
 factor= -1.0/E/truss.sectionArea*(L0/z)**3
