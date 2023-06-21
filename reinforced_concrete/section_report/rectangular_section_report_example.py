@@ -108,6 +108,11 @@ if not silent:
     print('Bending.')
     print('  total reinforcement area As= ', section1.getMainReinforcementArea()*1e4, 'mm2')
     print("  bending capacity factor: fc= ",fc)
+else: # your garbage you clean it.
+    os.remove(dxfOutputFileName)
+    os.remove(latexOutputPath)
+    os.remove(dxfOutputFileName.replace(".dxf",".png"))
+    os.remove(dxfOutputFileName.replace(".dxf",".eps"))
     
 from misc_utils import log_messages as lmsg
 fname= os.path.basename(__file__)

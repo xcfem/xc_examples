@@ -85,7 +85,6 @@ section1.latexReport(latexOutputFile)
 latexOutputFile.close()
 
 # Compare with reference file.
-    
 refFile= pth+'/../../reference_files/ref_'+latexOutputFileName
 comparisonOK= filecmp.cmp(refFile, latexOutputPath, shallow=False)
 
@@ -104,7 +103,12 @@ if not silent:
     print('Bending.')
     print('  reinf. layers As= ', section1.mainReinf.getAs())
     print("  bending capacity factor: fc= ",fc)
-    
+else: # your garbage you clean it.
+    os.remove(dxfOutputFileName)
+    os.remove(latexOutputPath)
+    os.remove(dxfOutputFileName.replace(".dxf",".png"))
+    os.remove(dxfOutputFileName.replace(".dxf",".eps"))
+   
 from misc_utils import log_messages as lmsg
 fname= os.path.basename(__file__)
 if comparisonOK and (ratio1<1e-6):
