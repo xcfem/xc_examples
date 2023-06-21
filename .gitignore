@@ -114,6 +114,10 @@ venv.bak/
 
 #specific files
 
+## output files
+CircSection*
+RectgSection*
+
 ## libreoffice lock files
 .~lock*
 
