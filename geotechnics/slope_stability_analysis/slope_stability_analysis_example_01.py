@@ -35,7 +35,7 @@ E= 1e8 # Pa
 nu= 0.30
 phi= math.atan(math.tan(math.radians(20))/safetyFactor) # Effective internal friction angle of the soil.
 gamma= 20e3 # N/m3 soil unit weight.
-rho= gamma/g # kg/m3 doil density.
+rho= gamma/g # kg/m3 soil density.
 c= 0.05*gamma*H/safetyFactor # Effective cohesion N/m2
 soil= fcs.FrictionalCohesiveSoil(phi= phi, c= c, rho= rho, E= E, nu= nu) 
 
