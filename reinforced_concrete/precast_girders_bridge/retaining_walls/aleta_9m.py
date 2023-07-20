@@ -38,9 +38,9 @@ cover= 60e-3 # rebars cover.
 kS= 15e6 # Winkler modulus.
 phiS= 30  # internal frictional angle
 rhoS= 2000  # density (kg/m3)
-backFillDelta= math.radians(18.4)
+backfillDelta= math.radians(18.4)
 frontFillDepth= 0.5
-zGroundBackFill= -0.2 # back fill
+zGroundBackfill= -0.2 # back fill
 
 # Foundation stratified soil properties
 hi=[1,3,5,8,100]  #cuaternario (QG), QT3L, QT3G,formación  Dueñas
@@ -89,7 +89,7 @@ kX= typical_materials.defElasticMaterial(preprocessor, "kX",kS/10.0)
 kY= typical_materials.defElasticMaterial(preprocessor, "kY",kS)
 #kY= typical_materials.defElastNoTensMaterial(preprocessor, "kY",kS)
 #Backfill soil properties
-backFillSoilModel= ep.RankineSoil(phi= math.radians(phiS),rho= rhoS) #Characteristic values.
+backfillSoilModel= ep.RankineSoil(phi= math.radians(phiS),rho= rhoS) #Characteristic values.
 #Foundation stratified soil properties
 stratifiedSoil= fcs.StratifiedSoil(hi,rhoi,phii,ci)
 
@@ -112,24 +112,24 @@ selfWeight= loadCaseManager.setCurrentLoadCase('selfWeight')
 wall.createSelfWeightLoads(rho= concrete.density(),grav= gravity)
 
 # Earth pressure. (drainage ok)
-gSoil= backFillSoilModel.rho*gravity
+gSoil= backfillSoilModel.rho*gravity
 earthPress= loadCaseManager.setCurrentLoadCase('earthPress')
-wall.createDeadLoad(heelFillDepth= wall.stemHeight,toeFillDepth= frontFillDepth,rho= backFillSoilModel.rho, grav= gravity)
-Ka= backFillSoilModel.Ka()
-backFillPressureModel=  earth_pressure.EarthPressureModel(zGround= zGroundBackFill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*gravity,qUnif=0)
-wall.createBackFillPressures(backFillPressureModel, Delta= backFillDelta)
-zGroundFrontFill= zGroundBackFill-wall.stemHeight+frontFillDepth #Front fill
+wall.createDeadLoad(heelFillDepth= wall.stemHeight,toeFillDepth= frontFillDepth,rho= backfillSoilModel.rho, grav= gravity)
+Ka= backfillSoilModel.Ka()
+backfillPressureModel=  earth_pressure.EarthPressureModel(zGround= zGroundBackfill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*gravity,qUnif=0)
+wall.createBackfillPressures(backfillPressureModel, Delta= backfillDelta)
+zGroundFrontFill= zGroundBackfill-wall.stemHeight+frontFillDepth #Front fill
 frontFillPressureModel=  earth_pressure.EarthPressureModel(zGround= zGroundFrontFill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*gravity,qUnif=0)
 wall.createFrontFillPressures(frontFillPressureModel)
 
 #Accidental: earth pressure failure drainage system.
-gSoil= backFillSoilModel.rho*gravity
+gSoil= backfillSoilModel.rho*gravity
 earthPressAcc= loadCaseManager.setCurrentLoadCase('earthPressAcc')
-wall.createDeadLoad(heelFillDepth= wall.stemHeight,toeFillDepth= frontFillDepth,rho= backFillSoilModel.rho, grav= gravity)
-Ka= backFillSoilModel.Ka()
-backFillPressureModelAcc=  earth_pressure.EarthPressureModel(zGround= zGroundBackFill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater=zGroundBackFill-stemHeight+HwaterAcc, gammaWater= 1000*gravity,qUnif=0)
-wall.createBackFillPressures(backFillPressureModelAcc, Delta= backFillDelta)
-zGroundFrontFill= zGroundBackFill-wall.stemHeight+frontFillDepth #Front fill
+wall.createDeadLoad(heelFillDepth= wall.stemHeight,toeFillDepth= frontFillDepth,rho= backfillSoilModel.rho, grav= gravity)
+Ka= backfillSoilModel.Ka()
+backfillPressureModelAcc=  earth_pressure.EarthPressureModel(zGround= zGroundBackfill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater=zGroundBackfill-stemHeight+HwaterAcc, gammaWater= 1000*gravity,qUnif=0)
+wall.createBackfillPressures(backfillPressureModelAcc, Delta= backfillDelta)
+zGroundFrontFill= zGroundBackfill-wall.stemHeight+frontFillDepth #Front fill
 frontFillPressureModel=  earth_pressure.EarthPressureModel(zGround= zGroundFrontFill, zBottomSoils=[-1e3],KSoils= [Ka], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*gravity,qUnif=0)
 wall.createFrontFillPressures(frontFillPressureModel)
 
@@ -167,7 +167,7 @@ sls_results= wall.performSLSAnalysis(slsCombinations)
 wall.setSLSInternalForcesEnvelope(sls_results.internalForces)
 
 sg_adm= 0.222e6
-fill_pressure= (frontFillDepth+footingThickness)*backFillSoilModel.rho*gravity
+fill_pressure= (frontFillDepth+footingThickness)*backfillSoilModel.rho*gravity
 print('fill pressure: ', fill_pressure/1e6, 'MPa')
 print('sg_adm: ', sg_adm/1e6, 'MPa')
 sg_adm+= fill_pressure

@@ -86,7 +86,7 @@ rowA= def_simple_RC_section.ReinfRow(rebarsDiam= barDiameter, rebarsSpacing= reb
 rcSection= def_simple_RC_section.RCRectangularSection(name='ChannelRCSection', width= 1.0, depth= wallThickness, concrType= concrete, reinfSteelType= steel)
 xcSection= rcSection.defElasticShearSection2d(preprocessor)
 ## Backfill soil.
-backFillSoilModel= ep.RankineSoil(phi= math.radians(30),rho= 2e3) #Characteristic values.
+backfillSoilModel= ep.RankineSoil(phi= math.radians(30),rho= 2e3) #Characteristic values.
 
 # Generate mesh.
 ## Geometric transformations
@@ -213,17 +213,17 @@ for e in l3.elements:
 #### Earth pressure.
 cLC= loadCaseManager.setCurrentLoadCase('E')
 cLC.description= 'Empuje de tierras.'
-gSoil= backFillSoilModel.rho*g
-K0= backFillSoilModel.K0Jaky() # pressure at rest.
-backFillPressureModel= earth_pressure.EarthPressureModel(zGround= channelHeight, zBottomSoils=[-1e3], KSoils= [K0], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*g, qUnif=0)
+gSoil= backfillSoilModel.rho*g
+K0= backfillSoilModel.K0Jaky() # pressure at rest.
+backfillPressureModel= earth_pressure.EarthPressureModel(zGround= channelHeight, zBottomSoils=[-1e3], KSoils= [K0], gammaSoils= [gSoil], zWater= -1e3, gammaWater= 1000*g, qUnif=0)
 ##### On left wall.
-backFillPressureModel.vDir= xc.Vector([-1,0])
-backFillPressureModel.xcSet= l1
-backFillPressureModel.appendLoadToCurrentLoadPattern(iCoo= 1, delta= 0)
+backfillPressureModel.vDir= xc.Vector([-1,0])
+backfillPressureModel.xcSet= l1
+backfillPressureModel.appendLoadToCurrentLoadPattern(iCoo= 1, delta= 0)
 ##### On right wall.
-backFillPressureModel.vDir= xc.Vector([1,0])
-backFillPressureModel.xcSet= l3
-backFillPressureModel.appendLoadToCurrentLoadPattern(iCoo= 1, delta= 0)
+backfillPressureModel.vDir= xc.Vector([1,0])
+backfillPressureModel.xcSet= l3
+backfillPressureModel.appendLoadToCurrentLoadPattern(iCoo= 1, delta= 0)
 
 #### Traffic load.
 cLC= loadCaseManager.setCurrentLoadCase('T')
