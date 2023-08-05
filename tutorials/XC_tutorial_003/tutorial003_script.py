@@ -24,7 +24,7 @@ The properties checked include:
 - effective depth
 - effective concrete area
 
-This properties can be shown in a figure plotted using fibSectFeaturesToplot 
+This properties can be shown in a figure plotted using FibSectFeaturesToplot 
 function
 '''
 
@@ -195,7 +195,7 @@ zEffConcA=sccEl1.getEffectiveConcreteAreaLimitLine(heffmax_EC2).getParamB()
 
 #Plot
 
-fsPlot=plot_fiber_section.fibSectFeaturesToplot(fiberSection=sccEl1)
+fsPlot=plot_fiber_section.FibSectFeaturesToplot(fiberSection=sccEl1)
 fsPlot.colorNeutralAxis = 'r'
 fsPlot.colorBendingPlane='g'
 fsPlot.colorCompressionPlane='b'
