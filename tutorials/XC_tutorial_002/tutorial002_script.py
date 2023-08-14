@@ -97,10 +97,10 @@ numberer= sm.newNumberer("default_numberer")
 numberer.useAlgorithm("rcm")
 solutionStrategy= analAggrContainer.newSolutionStrategy("solutionStrategy","sm")
 solAlgo= solutionStrategy.newSolutionAlgorithm("frequency_soln_algo")
-integ= solutionStrategy.newIntegrator("eigen_integrator",xc.Vector([]))
 soe= solutionStrategy.newSystemOfEqn("sym_band_eigen_soe")
 solver= soe.newSolver("sym_band_eigen_solver")
 analysis= solProc.newAnalysis("eigen_analysis","solutionStrategy","")
+integ= solutionStrategy.newIntegrator("eigen_integrator",xc.Vector([]))
 Neigen=3
 analOk= analysis.analyze(Neigen)
 
