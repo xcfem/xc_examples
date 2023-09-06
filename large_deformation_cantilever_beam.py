@@ -143,11 +143,11 @@ ctest= solutionStrategy.newConvergenceTest('norm_disp_incr_conv_test')
 ctest.tol= 1e-3
 ctest.maxNumIter= 1000
 ctest.printFlag= 0
-integ= solutionStrategy.newIntegrator("load_control_integrator",xc.Vector([]))
-integ.dLambda1= 0.001
 soe= solutionStrategy.newSystemOfEqn("band_gen_lin_soe")
 solver= soe.newSolver("band_gen_lin_lapack_solver")
 analysis= solu.newAnalysis("static_analysis","solutionStrategy","")
+integ= solutionStrategy.newIntegrator("load_control_integrator",xc.Vector([]))
+integ.dLambda1= 0.001
 result= analysis.analyze(4000)
 
 disp= n32.getDisp
