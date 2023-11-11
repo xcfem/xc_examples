@@ -18,7 +18,6 @@ import xc
 from solution import predefined_solutions
 from model import predefined_spaces
 from materials import typical_materials
-from model.mesh import finit_el_model as fem
 
 feProblem= xc.FEProblem()
 preprocessor=  feProblem.getPreprocessor   
@@ -42,7 +41,7 @@ sry= 5/5.0 # Shear coefficient.
 Ay= A/sry
 nu= 0.3 # Poisson's ratio.
 G= E/(2.0*(1+nu))
-beam_mat= typical_materials.defElasticShearSection2d(preprocessor, "scc",A,E,G,I,alpha= Ay/A)
+scc= typical_materials.defElasticShearSection2d(preprocessor, "scc",A,E,G,I,alpha= Ay/A)
 
 
 # Loads
