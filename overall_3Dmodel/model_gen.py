@@ -19,6 +19,7 @@ from postprocess.config import default_config
 # Default configuration of environment variables.
 from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
+from misc_utils import data_struct_utils as dsu
 
 # import local modules
 import sys
@@ -44,7 +45,7 @@ modelSpace= predefined_spaces.StructuralMechanics3D(nodes) #Defines the
 out=outHndl.OutputHandler(modelSpace,sty)
 
 # coordinates in global X,Y,Z axes for the grid generation
-xList=[0,dat.LbeamX/2.0,dat.LbeamX]
+xList=[0,dat.LbeamX/2.0,dat.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xListBS)
 yList=[-dat.Wfoot/2.,0,dat.Wfoot/2.,dat.LbeamY]
 zList=[0,dat.LcolumnZ/2.0,dat.LcolumnZ]
 #auxiliary data
@@ -66,6 +67,7 @@ gridGeom.generatePoints()
 # for i in range(1,len(xList)):
 #     r= gm.IJKRange((i,0,lastZpos),(i,lastYpos,lastZpos))
 #     gridGeom.movePointsRange(r,xc.Vector([0.0,0.0,-trSlope*xList[i]]))
+#     gridGeom.slopePointsXYZrange....
 
 
 #Slope (in X direction, Y direction or both) the grid points in a range
@@ -403,7 +405,7 @@ GselfWeight.create()
 GselfWeight.addLstLoads([selfWeight])
 '''
 modelSpace.addLoadCaseToDomain("GselfWeight")
-out.displayLoadVectors()
+out.displayLoads()
 modelSpace.removeLoadCaseFromDomain("GselfWeight")
 '''
 
