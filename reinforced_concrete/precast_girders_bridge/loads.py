@@ -3,7 +3,6 @@ import re
 from actions import loads
 
 # Loads cases.
-loadCaseManager= lcm.LoadCaseManager(preprocessor)
 loadCaseNames= list()
 
 loadCaseNames.append('G1A') # Prefabricated beams self weight.
@@ -31,6 +30,7 @@ loadCaseNames.append('Q32neopr') # Thermal expansion (bearings design).
 loadCaseNames.append('LTPh1') # Load test phase 1.
 loadCaseNames.append('LTPh2') # Load test phase 2.
 
+loadCaseManager= lcm.LoadCaseManager(preprocessor)
 loadCaseManager.defineSimpleLoadCases(loadCaseNames) 
 
 # Load values.
