@@ -5,9 +5,7 @@ from postprocess.xcVtk import vtk_graphic_base
 from postprocess import output_handler
 
 # local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 import model_gen as model #FE model generation
 

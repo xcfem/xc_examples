@@ -6,8 +6,8 @@ from actions import combinations as combs
 
 #Verification of Von Mises stresses
 
-workingDirectory= default_config.findWorkingDirectory()+'/'
-exec(open(workingDirectory+'model_gen_imperf.py').read()) #FE model generation
+workingDirectory= default_config.setWorkingDirectory()
+import model_gen_imperf #FE model generation
 
 for e in tank.elements: e.setProp('yieldStress', AISI_fy)
 

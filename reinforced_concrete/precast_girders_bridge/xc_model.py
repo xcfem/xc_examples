@@ -60,8 +60,9 @@ def connectNodesToConcrete(nodes, elementSet, connectorSet):
         connectorElement= elements.newElement("ElasticBeam3d",xc.ID([n.tag,newNode.tag]))
         connectorSet.elements.append(connectorElement)
 
-workingDirectory=default_config.findWorkingDirectory()+'/'
-exec(default_config.compileCode(workingDirectory+'env_config.py'))
+workingDirectory= default_config.setWorkingDirectory()
+
+import env_config
 FEcase= xc.FEProblem()
 fname= os.path.abspath(__file__).strip('.py')
 FEcase.title= 'Test'

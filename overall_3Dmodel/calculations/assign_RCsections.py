@@ -8,9 +8,7 @@ from postprocess import element_section_map
 # Concrete of type concrete01 with no tension branch
 
 # import local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import data as dat
 import model_gen as model #FE model generation
 

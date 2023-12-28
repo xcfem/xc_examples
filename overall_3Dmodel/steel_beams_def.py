@@ -4,9 +4,7 @@ from postprocess.config import default_config
 from model.geometry import grid_model as gm
 
 # local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import model_gen as model
 
 # ** Steel beams

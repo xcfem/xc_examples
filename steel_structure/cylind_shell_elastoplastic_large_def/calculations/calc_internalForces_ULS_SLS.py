@@ -6,9 +6,7 @@ shell elements as MembranePlateFiberSection.
 from postprocess import limit_state_data as lsd
 from postprocess.config import default_config
 
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 import mesh_gen as msh
 import limit_states_def as lstts
