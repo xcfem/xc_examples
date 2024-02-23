@@ -154,3 +154,4 @@ outCfg.controller.verbose= True #False # Don't display log messages.
 feProblem.logFileName= "/tmp/erase.log" # Ignore warning messagess about computation of the interaction diagram.
 feProblem.errFileName= "/tmp/erase.err" # Ignore warning messagess about maximum
 (FEcheckedModel,meanCFs)= reinfConcreteSectionDistribution.runChecking(lsd.freqLoadsCrackControl,matDiagType="k",threeDim= True,outputCfg=outCfg)  
+
