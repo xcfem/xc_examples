@@ -36,6 +36,7 @@ from model import predefined_spaces
 from model.boundary_cond import opensees_style
 from materials import typical_materials
 from misc_utils import log_messages as lmsg
+from solution import predefined_solutions
 
 #-----------------------------------------------------------------------------
 #  0. DEFINE FE PROBLEM
@@ -1007,9 +1008,12 @@ xWgt1 = 0.00
 # body force in y-direction
 #set yWgt1  [expr -9.81*1.8]
 yWgt1 = -9.81*1.8
+print(type(soilMat))
 
 # create wrapper material for initial state analysis
 matWrapper= typical_materials.defInitialStateAnalysisWrapper(preprocessor= preprocessor, name= 'matWrapper', ndim= 2, encapsulatedMaterial= soilMat)
+print(type(matWrapper))
+quit()
 
 lmsg.log("Finished creating all soil materials...")
 #-----------------------------------------------------------------------------
@@ -3128,10 +3132,8 @@ contact1015= modelSpace.newElement('BeamContact2d', [141, 151, 139, lagrangeNode
 #element BeamContact2D 1016  141 151 158 1016  2 $thick $gapTol $forceTol
 contact1016= modelSpace.newElement('BeamContact2d', [141, 151, 158, lagrangeNodes[1016].tag]); contact1016.width= thick; contact1016.gapTolerance= gapTol; contact1016.forceTolerance= forceTol 
 #element BeamContact2D 1017  151 168 150 1017  2 $thick $gapTol $forceTol
-print('A1')
 contact1017= modelSpace.newElement('BeamContact2d', [151, 168, 150, lagrangeNodes[1017].tag]); contact1017.width= thick; contact1017.gapTolerance= gapTol; contact1017.forceTolerance= forceTol 
 #element BeamContact2D 1018  151 168 171 1018  2 $thick $gapTol $forceTol
-print('A2')
 contact1018= modelSpace.newElement('BeamContact2d', [151, 168, 171, lagrangeNodes[1018].tag]); contact1018.width= thick; contact1018.gapTolerance= gapTol; contact1018.forceTolerance= forceTol 
 #element BeamContact2D 1019  168 184 166 1019  2 $thick $gapTol $forceTol
 contact1019= modelSpace.newElement('BeamContact2d', [168, 184, 166, lagrangeNodes[1019].tag]); contact1019.width= thick; contact1019.gapTolerance= gapTol; contact1019.forceTolerance= forceTol 
@@ -3142,10 +3144,8 @@ contact1021= modelSpace.newElement('BeamContact2d', [184, 197, 182, lagrangeNode
 #element BeamContact2D 1022  184 197 200 1022  2 $thick $gapTol $forceTol
 contact1022= modelSpace.newElement('BeamContact2d', [184, 197, 200, lagrangeNodes[1022].tag]); contact1022.width= thick; contact1022.gapTolerance= gapTol; contact1022.forceTolerance= forceTol 
 #element BeamContact2D 1023  197 219 199 1023  2 $thick $gapTol $forceTol
-print('B1')
 contact1023= modelSpace.newElement('BeamContact2d', [197, 219, 199, lagrangeNodes[1023].tag]); contact1023.width= thick; contact1023.gapTolerance= gapTol; contact1023.forceTolerance= forceTol 
 #element BeamContact2D 1024  197 219 218 1024  2 $thick $gapTol $forceTol
-print('B2')
 contact1024= modelSpace.newElement('BeamContact2d', [197, 219, 218, lagrangeNodes[1024].tag]); contact1024.width= thick; contact1024.gapTolerance= gapTol; contact1024.forceTolerance= forceTol 
 #element BeamContact2D 1025  219 242 221 1025  2 $thick $gapTol $forceTol
 contact1025= modelSpace.newElement('BeamContact2d', [219, 242, 221, lagrangeNodes[1025].tag]); contact1025.width= thick; contact1025.gapTolerance= gapTol; contact1025.forceTolerance= forceTol 
@@ -3160,10 +3160,8 @@ contact1029= modelSpace.newElement('BeamContact2d', [264, 285, 267, lagrangeNode
 #element BeamContact2D 1030  264 285 281 1030  2 $thick $gapTol $forceTol
 contact1030= modelSpace.newElement('BeamContact2d', [264, 285, 281, lagrangeNodes[1030].tag]); contact1030.width= thick; contact1030.gapTolerance= gapTol; contact1030.forceTolerance= forceTol 
 #element BeamContact2D 1031  285 311 291 1031  2 $thick $gapTol $forceTol
-print('C1')
 contact1031= modelSpace.newElement('BeamContact2d', [285, 311, 291, lagrangeNodes[1031].tag]); contact1031.width= thick; contact1031.gapTolerance= gapTol; contact1031.forceTolerance= forceTol 
 #element BeamContact2D 1032  285 311 308 1032  2 $thick $gapTol $forceTol
-print('C2')
 contact1032= modelSpace.newElement('BeamContact2d', [285, 311, 308, lagrangeNodes[1032].tag]); contact1032.width= thick; contact1032.gapTolerance= gapTol; contact1032.forceTolerance= forceTol 
 #element BeamContact2D 1033  311 338 315 1033  2 $thick $gapTol $forceTol
 contact1033= modelSpace.newElement('BeamContact2d', [311, 338, 315, lagrangeNodes[1033].tag]); contact1033.width= thick; contact1033.gapTolerance= gapTol; contact1033.forceTolerance= forceTol 
@@ -3187,3 +3185,108 @@ contact1041= modelSpace.newElement('BeamContact2d', [417, 435, 421, lagrangeNode
 contact1042= modelSpace.newElement('BeamContact2d', [417, 435, 430, lagrangeNodes[1042].tag]); contact1042.width= thick; contact1042.gapTolerance= gapTol; contact1042.forceTolerance= forceTol 
 #puts "Finished creating all beam-contact elements..."
 lmsg.log("Finished creating all beam-contact elements...")#
+
+# create list of permanent beam contact elements with connectivities for post-process
+beamContactInfo= list()
+#puts $beamContactInfo "1001  100  99  88 1001  "
+beamContactInfo.append(contact1001)
+#puts $beamContactInfo "1002  100  99 109 1002  "
+beamContactInfo.append(contact1002)
+#puts $beamContactInfo "1003   99 101  92 1003  "
+beamContactInfo.append(contact1003)
+#puts $beamContactInfo "1004   99 101 112 1004  "
+beamContactInfo.append(contact1004)
+#puts $beamContactInfo "1005  101 106  93 1005  "
+beamContactInfo.append(contact1005)
+#puts $beamContactInfo "1006  101 106 116 1006  "
+beamContactInfo.append(contact1006)
+#puts $beamContactInfo "1007  106 113  98 1007  "
+beamContactInfo.append(contact1007)
+#puts $beamContactInfo "1008  106 113 119 1008  "
+beamContactInfo.append(contact1008)
+#puts $beamContactInfo "1009  113 123 105 1009  "
+beamContactInfo.append(contact1009)
+#puts $beamContactInfo "1010  113 123 126 1010  "
+beamContactInfo.append(contact1010)
+#puts $beamContactInfo "1011  123 128 115 1011  "
+beamContactInfo.append(contact1011)
+#puts $beamContactInfo "1012  123 128 135 1012  "
+beamContactInfo.append(contact1012)
+#puts $beamContactInfo "1013  128 141 125 1013  "
+beamContactInfo.append(contact1013)
+#puts $beamContactInfo "1014  128 141 144 1014  "
+beamContactInfo.append(contact1014)
+#puts $beamContactInfo "1015  141 151 139 1015  "
+beamContactInfo.append(contact1015)
+#puts $beamContactInfo "1016  141 151 158 1016  "
+beamContactInfo.append(contact1016)
+#puts $beamContactInfo "1017  151 168 150 1017  "
+beamContactInfo.append(contact1017)
+#puts $beamContactInfo "1018  151 168 171 1018  "
+beamContactInfo.append(contact1018)
+#puts $beamContactInfo "1019  168 184 166 1019  "
+beamContactInfo.append(contact1019)
+#puts $beamContactInfo "1020  168 184 185 1020  "
+beamContactInfo.append(contact1020)
+#puts $beamContactInfo "1021  184 197 182 1021  "
+beamContactInfo.append(contact1021)
+#puts $beamContactInfo "1022  184 197 200 1022  "
+beamContactInfo.append(contact1022)
+#puts $beamContactInfo "1023  197 219 199 1023  "
+beamContactInfo.append(contact1023)
+#puts $beamContactInfo "1025  219 242 221 1025  "
+beamContactInfo.append(contact1025)
+#puts $beamContactInfo "1027  242 264 244 1027  "
+beamContactInfo.append(contact1027)
+#puts $beamContactInfo "1029  264 285 267 1029  "
+beamContactInfo.append(contact1029)
+#puts $beamContactInfo "1031  285 311 291 1031  "
+beamContactInfo.append(contact1031)
+#puts $beamContactInfo "1033  311 338 315 1033  "
+beamContactInfo.append(contact1033)
+#puts $beamContactInfo "1035  338 368 344 1035  "
+beamContactInfo.append(contact1035)
+#puts $beamContactInfo "1037  368 396 372 1037  "
+beamContactInfo.append(contact1037)
+#puts $beamContactInfo "1039  396 417 400 1039  "
+beamContactInfo.append(contact1039)
+#puts $beamContactInfo "1041  417 435 421 1041  "
+beamContactInfo.append(contact1041)
+#close $beamContactInfo
+
+#-----------------------------------------------------------------------------
+#  11. CREATE RECORDER LISTS USING PREVIOUSLY DEFINED NODAL/ELEMENTAL DATA
+#-----------------------------------------------------------------------------
+#
+# Recorder definition pending.
+lmsg.log("Recorder definition PENDING...")#
+
+#-----------------------------------------------------------------------------
+#  12. GRAVITY ANALYSIS (w/ INITIAL STATE ANALYSIS TO RESET DISPLACEMENTS)
+#-----------------------------------------------------------------------------
+#
+class GravitySolutionProcedure(predefined_solutions.SolutionProcedure):
+    ''' Define analysis parameters for gravity phase
+    '''
+    def __init__(self, prb, name= None, maxNumIter= 15, convergenceTestTol= 1e-5, printFlag= 0, numSteps= 1, numberingMethod= 'rcm', convTestType= 'norm_disp_incr', integratorType:str= 'load_control_integrator'):
+        ''' Constructor.
+
+        :param prb: XC finite element problem.
+        :param name: identifier for the solution procedure.
+        :param maxNumIter: maximum number of iterations (defauts to 10)
+        :param convergenceTestTol: convergence tolerance (defaults to 1e-9)
+        :param printFlag: if not zero print convergence results on each step.
+        :param numSteps: number of steps to use in the analysis (useful only when loads are variable in time).
+        :param numberingMethod: numbering method (plain or reverse Cuthill-McKee or alternative minimum degree).
+        :param convTestType: convergence test for non linear analysis (norm unbalance,...).
+        :param integratorType: integrator type (see integratorSetup).
+        '''
+        super().__init__(name= name, constraintHandlerType= 'plain', maxNumIter= maxNumIter, convergenceTestTol= convergenceTestTol, printFlag= printFlag, numSteps= numSteps, numberingMethod= numberingMethod, convTestType= convTestType, soeType= 'sparse_gen_col_lin_soe', solverType= 'super_lu_solver', integratorType= integratorType, solutionAlgorithmType= 'newton_raphson_soln_algo')
+        self.feProblem= prb
+
+gravitySolutionProcedure= GravitySolutionProcedure(prb= feProblem)
+
+# turn on initial state analysis feature
+matWrapper.initialStateAnalysisPhase= True
+# ensure soil material intially considers linear elastic behavior
+matWrapper.updateMaterialStage(0)
