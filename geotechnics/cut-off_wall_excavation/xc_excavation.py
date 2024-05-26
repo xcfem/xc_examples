@@ -1008,12 +1008,9 @@ xWgt1 = 0.00
 # body force in y-direction
 #set yWgt1  [expr -9.81*1.8]
 yWgt1 = -9.81*1.8
-print(type(soilMat))
 
 # create wrapper material for initial state analysis
 matWrapper= typical_materials.defInitialStateAnalysisWrapper(preprocessor= preprocessor, name= 'matWrapper', ndim= 2, encapsulatedMaterial= soilMat)
-print(type(matWrapper))
-quit()
 
 lmsg.log("Finished creating all soil materials...")
 #-----------------------------------------------------------------------------
@@ -3100,89 +3097,89 @@ forceTol = 1.0e-10
 modelSpace.setDefaultMaterial(contactMat)
 # define beam contact elements
 #element BeamContact2D 1001  100  99  88 1001  2 $thick $gapTol $forceTol
-contact1001= modelSpace.newElement('BeamContact2d', [100, 99, 88, lagrangeNodes[1001].tag]); contact1001.gapTolerance= gapTol; contact1001.width= thick; contact1001.forceTolerance= forceTol
+contact1001= modelSpace.newElement('BeamContact2d', [n100.tag, n99.tag, n88.tag, lagrangeNodes[1001].tag]); contact1001.gapTolerance= gapTol; contact1001.width= thick; contact1001.forceTolerance= forceTol
 #element BeamContact2D 1002  100  99 109 1002  2 $thick $gapTol $forceTol
-contact1002= modelSpace.newElement('BeamContact2d', [100, 99, 109, lagrangeNodes[1002].tag]); contact1002.width= thick; contact1002.gapTolerance= gapTol; contact1002.forceTolerance= forceTol 
+contact1002= modelSpace.newElement('BeamContact2d', [n100.tag, n99.tag, n109.tag, lagrangeNodes[1002].tag]); contact1002.width= thick; contact1002.gapTolerance= gapTol; contact1002.forceTolerance= forceTol 
 #element BeamContact2D 1003   99 101  92 1003  2 $thick $gapTol $forceTol
-contact1003= modelSpace.newElement('BeamContact2d', [99, 101, 92, lagrangeNodes[1003].tag]); contact1003.width= thick; contact1003.gapTolerance= gapTol; contact1003.forceTolerance= forceTol 
+contact1003= modelSpace.newElement('BeamContact2d', [n99.tag, n101.tag, n92.tag, lagrangeNodes[1003].tag]); contact1003.width= thick; contact1003.gapTolerance= gapTol; contact1003.forceTolerance= forceTol 
 #element BeamContact2D 1004   99 101 112 1004  2 $thick $gapTol $forceTol
-contact1004= modelSpace.newElement('BeamContact2d', [99, 101, 112, lagrangeNodes[1004].tag]); contact1004.width= thick; contact1004.gapTolerance= gapTol; contact1004.forceTolerance= forceTol 
+contact1004= modelSpace.newElement('BeamContact2d', [n99.tag, n101.tag, n112.tag, lagrangeNodes[1004].tag]); contact1004.width= thick; contact1004.gapTolerance= gapTol; contact1004.forceTolerance= forceTol 
 #element BeamContact2D 1005  101 106  93 1005  2 $thick $gapTol $forceTol
-contact1005= modelSpace.newElement('BeamContact2d', [101, 106, 93, lagrangeNodes[1005].tag]); contact1005.width= thick; contact1005.gapTolerance= gapTol; contact1005.forceTolerance= forceTol 
+contact1005= modelSpace.newElement('BeamContact2d', [n101.tag, n106.tag, n93.tag, lagrangeNodes[1005].tag]); contact1005.width= thick; contact1005.gapTolerance= gapTol; contact1005.forceTolerance= forceTol 
 #element BeamContact2D 1006  101 106 116 1006  2 $thick $gapTol $forceTol
-contact1006= modelSpace.newElement('BeamContact2d', [101, 106, 116, lagrangeNodes[1006].tag]); contact1006.width= thick; contact1006.gapTolerance= gapTol; contact1006.forceTolerance= forceTol 
+contact1006= modelSpace.newElement('BeamContact2d', [n101.tag, n106.tag, n116.tag, lagrangeNodes[1006].tag]); contact1006.width= thick; contact1006.gapTolerance= gapTol; contact1006.forceTolerance= forceTol 
 #element BeamContact2D 1007  106 113  98 1007  2 $thick $gapTol $forceTol
-contact1007= modelSpace.newElement('BeamContact2d', [106, 113, 98, lagrangeNodes[1007].tag]); contact1007.width= thick; contact1007.gapTolerance= gapTol; contact1007.forceTolerance= forceTol 
+contact1007= modelSpace.newElement('BeamContact2d', [n106.tag, n113.tag, n98.tag, lagrangeNodes[1007].tag]); contact1007.width= thick; contact1007.gapTolerance= gapTol; contact1007.forceTolerance= forceTol 
 #element BeamContact2D 1008  106 113 119 1008  2 $thick $gapTol $forceTol
-contact1008= modelSpace.newElement('BeamContact2d', [106, 113, 119, lagrangeNodes[1008].tag]); contact1008.width= thick; contact1008.gapTolerance= gapTol; contact1008.forceTolerance= forceTol 
+contact1008= modelSpace.newElement('BeamContact2d', [n106.tag, n113.tag, n119.tag, lagrangeNodes[1008].tag]); contact1008.width= thick; contact1008.gapTolerance= gapTol; contact1008.forceTolerance= forceTol 
 #element BeamContact2D 1009  113 123 105 1009  2 $thick $gapTol $forceTol
-contact1009= modelSpace.newElement('BeamContact2d', [113, 123, 105, lagrangeNodes[1009].tag]); contact1009.width= thick; contact1009.gapTolerance= gapTol; contact1009.forceTolerance= forceTol 
+contact1009= modelSpace.newElement('BeamContact2d', [n113.tag, n123.tag, n105.tag, lagrangeNodes[1009].tag]); contact1009.width= thick; contact1009.gapTolerance= gapTol; contact1009.forceTolerance= forceTol 
 #element BeamContact2D 1010  113 123 126 1010  2 $thick $gapTol $forceTol
-contact1010= modelSpace.newElement('BeamContact2d', [113, 123, 126, lagrangeNodes[1010].tag]); contact1010.width= thick; contact1010.gapTolerance= gapTol; contact1010.forceTolerance= forceTol 
+contact1010= modelSpace.newElement('BeamContact2d', [n113.tag, n123.tag, n126.tag, lagrangeNodes[1010].tag]); contact1010.width= thick; contact1010.gapTolerance= gapTol; contact1010.forceTolerance= forceTol 
 #element BeamContact2D 1011  123 128 115 1011  2 $thick $gapTol $forceTol
-contact1011= modelSpace.newElement('BeamContact2d', [123, 128, 115, lagrangeNodes[1011].tag]); contact1011.width= thick; contact1011.gapTolerance= gapTol; contact1011.forceTolerance= forceTol 
+contact1011= modelSpace.newElement('BeamContact2d', [n123.tag, n128.tag, n115.tag, lagrangeNodes[1011].tag]); contact1011.width= thick; contact1011.gapTolerance= gapTol; contact1011.forceTolerance= forceTol 
 #element BeamContact2D 1012  123 128 135 1012  2 $thick $gapTol $forceTol
-contact1012= modelSpace.newElement('BeamContact2d', [123, 128, 135, lagrangeNodes[1012].tag]); contact1012.width= thick; contact1012.gapTolerance= gapTol; contact1012.forceTolerance= forceTol 
+contact1012= modelSpace.newElement('BeamContact2d', [n123.tag, n128.tag, n135.tag, lagrangeNodes[1012].tag]); contact1012.width= thick; contact1012.gapTolerance= gapTol; contact1012.forceTolerance= forceTol 
 #element BeamContact2D 1013  128 141 125 1013  2 $thick $gapTol $forceTol
-contact1013= modelSpace.newElement('BeamContact2d', [128, 141, 125, lagrangeNodes[1013].tag]); contact1013.width= thick; contact1013.gapTolerance= gapTol; contact1013.forceTolerance= forceTol 
+contact1013= modelSpace.newElement('BeamContact2d', [n128.tag, n141.tag, n125.tag, lagrangeNodes[1013].tag]); contact1013.width= thick; contact1013.gapTolerance= gapTol; contact1013.forceTolerance= forceTol 
 #element BeamContact2D 1014  128 141 144 1014  2 $thick $gapTol $forceTol
-contact1014= modelSpace.newElement('BeamContact2d', [128, 141, 144, lagrangeNodes[1014].tag]); contact1014.width= thick; contact1014.gapTolerance= gapTol; contact1014.forceTolerance= forceTol 
+contact1014= modelSpace.newElement('BeamContact2d', [n128.tag, n141.tag, n144.tag, lagrangeNodes[1014].tag]); contact1014.width= thick; contact1014.gapTolerance= gapTol; contact1014.forceTolerance= forceTol 
 #element BeamContact2D 1015  141 151 139 1015  2 $thick $gapTol $forceTol
-contact1015= modelSpace.newElement('BeamContact2d', [141, 151, 139, lagrangeNodes[1015].tag]); contact1015.width= thick; contact1015.gapTolerance= gapTol; contact1015.forceTolerance= forceTol 
+contact1015= modelSpace.newElement('BeamContact2d', [n141.tag, n151.tag, n139.tag, lagrangeNodes[1015].tag]); contact1015.width= thick; contact1015.gapTolerance= gapTol; contact1015.forceTolerance= forceTol 
 #element BeamContact2D 1016  141 151 158 1016  2 $thick $gapTol $forceTol
-contact1016= modelSpace.newElement('BeamContact2d', [141, 151, 158, lagrangeNodes[1016].tag]); contact1016.width= thick; contact1016.gapTolerance= gapTol; contact1016.forceTolerance= forceTol 
+contact1016= modelSpace.newElement('BeamContact2d', [n141.tag, n151.tag, n158.tag, lagrangeNodes[1016].tag]); contact1016.width= thick; contact1016.gapTolerance= gapTol; contact1016.forceTolerance= forceTol 
 #element BeamContact2D 1017  151 168 150 1017  2 $thick $gapTol $forceTol
-contact1017= modelSpace.newElement('BeamContact2d', [151, 168, 150, lagrangeNodes[1017].tag]); contact1017.width= thick; contact1017.gapTolerance= gapTol; contact1017.forceTolerance= forceTol 
+contact1017= modelSpace.newElement('BeamContact2d', [n151.tag, n168.tag, n150.tag, lagrangeNodes[1017].tag]); contact1017.width= thick; contact1017.gapTolerance= gapTol; contact1017.forceTolerance= forceTol
 #element BeamContact2D 1018  151 168 171 1018  2 $thick $gapTol $forceTol
-contact1018= modelSpace.newElement('BeamContact2d', [151, 168, 171, lagrangeNodes[1018].tag]); contact1018.width= thick; contact1018.gapTolerance= gapTol; contact1018.forceTolerance= forceTol 
+contact1018= modelSpace.newElement('BeamContact2d', [n151.tag, n168.tag, n171.tag, lagrangeNodes[1018].tag]); contact1018.width= thick; contact1018.gapTolerance= gapTol; contact1018.forceTolerance= forceTol 
 #element BeamContact2D 1019  168 184 166 1019  2 $thick $gapTol $forceTol
-contact1019= modelSpace.newElement('BeamContact2d', [168, 184, 166, lagrangeNodes[1019].tag]); contact1019.width= thick; contact1019.gapTolerance= gapTol; contact1019.forceTolerance= forceTol 
+contact1019= modelSpace.newElement('BeamContact2d', [n168.tag, n184.tag, n166.tag, lagrangeNodes[1019].tag]); contact1019.width= thick; contact1019.gapTolerance= gapTol; contact1019.forceTolerance= forceTol 
 #element BeamContact2D 1020  168 184 185 1020  2 $thick $gapTol $forceTol
-contact1020= modelSpace.newElement('BeamContact2d', [168, 184, 185, lagrangeNodes[1020].tag]); contact1020.width= thick; contact1020.gapTolerance= gapTol; contact1020.forceTolerance= forceTol 
+contact1020= modelSpace.newElement('BeamContact2d', [n168.tag, n184.tag, n185.tag, lagrangeNodes[1020].tag]); contact1020.width= thick; contact1020.gapTolerance= gapTol; contact1020.forceTolerance= forceTol 
 #element BeamContact2D 1021  184 197 182 1021  2 $thick $gapTol $forceTol
-contact1021= modelSpace.newElement('BeamContact2d', [184, 197, 182, lagrangeNodes[1021].tag]); contact1021.width= thick; contact1021.gapTolerance= gapTol; contact1021.forceTolerance= forceTol 
+contact1021= modelSpace.newElement('BeamContact2d', [n184.tag, n197.tag, n182.tag, lagrangeNodes[1021].tag]); contact1021.width= thick; contact1021.gapTolerance= gapTol; contact1021.forceTolerance= forceTol 
 #element BeamContact2D 1022  184 197 200 1022  2 $thick $gapTol $forceTol
-contact1022= modelSpace.newElement('BeamContact2d', [184, 197, 200, lagrangeNodes[1022].tag]); contact1022.width= thick; contact1022.gapTolerance= gapTol; contact1022.forceTolerance= forceTol 
+contact1022= modelSpace.newElement('BeamContact2d', [n184.tag, n197.tag, n200.tag, lagrangeNodes[1022].tag]); contact1022.width= thick; contact1022.gapTolerance= gapTol; contact1022.forceTolerance= forceTol 
 #element BeamContact2D 1023  197 219 199 1023  2 $thick $gapTol $forceTol
-contact1023= modelSpace.newElement('BeamContact2d', [197, 219, 199, lagrangeNodes[1023].tag]); contact1023.width= thick; contact1023.gapTolerance= gapTol; contact1023.forceTolerance= forceTol 
+contact1023= modelSpace.newElement('BeamContact2d', [n197.tag, n219.tag, n199.tag, lagrangeNodes[1023].tag]); contact1023.width= thick; contact1023.gapTolerance= gapTol; contact1023.forceTolerance= forceTol 
 #element BeamContact2D 1024  197 219 218 1024  2 $thick $gapTol $forceTol
-contact1024= modelSpace.newElement('BeamContact2d', [197, 219, 218, lagrangeNodes[1024].tag]); contact1024.width= thick; contact1024.gapTolerance= gapTol; contact1024.forceTolerance= forceTol 
+contact1024= modelSpace.newElement('BeamContact2d', [n197.tag, n219.tag, n218.tag, lagrangeNodes[1024].tag]); contact1024.width= thick; contact1024.gapTolerance= gapTol; contact1024.forceTolerance= forceTol 
 #element BeamContact2D 1025  219 242 221 1025  2 $thick $gapTol $forceTol
-contact1025= modelSpace.newElement('BeamContact2d', [219, 242, 221, lagrangeNodes[1025].tag]); contact1025.width= thick; contact1025.gapTolerance= gapTol; contact1025.forceTolerance= forceTol 
+contact1025= modelSpace.newElement('BeamContact2d', [n219.tag, n242.tag, n221.tag, lagrangeNodes[1025].tag]); contact1025.width= thick; contact1025.gapTolerance= gapTol; contact1025.forceTolerance= forceTol 
 #element BeamContact2D 1026  219 242 241 1026  2 $thick $gapTol $forceTol
-contact1026= modelSpace.newElement('BeamContact2d', [219, 242, 241, lagrangeNodes[1026].tag]); contact1026.width= thick; contact1026.gapTolerance= gapTol; contact1026.forceTolerance= forceTol 
+contact1026= modelSpace.newElement('BeamContact2d', [n219.tag, n242.tag, n241.tag, lagrangeNodes[1026].tag]); contact1026.width= thick; contact1026.gapTolerance= gapTol; contact1026.forceTolerance= forceTol 
 #element BeamContact2D 1027  242 264 244 1027  2 $thick $gapTol $forceTol
-contact1027= modelSpace.newElement('BeamContact2d', [242, 264, 244, lagrangeNodes[1027].tag]); contact1027.width= thick; contact1027.gapTolerance= gapTol; contact1027.forceTolerance= forceTol 
+contact1027= modelSpace.newElement('BeamContact2d', [n242.tag, n264.tag, n244.tag, lagrangeNodes[1027].tag]); contact1027.width= thick; contact1027.gapTolerance= gapTol; contact1027.forceTolerance= forceTol 
 #element BeamContact2D 1028  242 264 260 1028  2 $thick $gapTol $forceTol
-contact1028= modelSpace.newElement('BeamContact2d', [242, 264, 260, lagrangeNodes[1028].tag]); contact1028.width= thick; contact1028.gapTolerance= gapTol; contact1028.forceTolerance= forceTol 
+contact1028= modelSpace.newElement('BeamContact2d', [n242.tag, n264.tag, n260.tag, lagrangeNodes[1028].tag]); contact1028.width= thick; contact1028.gapTolerance= gapTol; contact1028.forceTolerance= forceTol 
 #element BeamContact2D 1029  264 285 267 1029  2 $thick $gapTol $forceTol
-contact1029= modelSpace.newElement('BeamContact2d', [264, 285, 267, lagrangeNodes[1029].tag]); contact1029.width= thick; contact1029.gapTolerance= gapTol; contact1029.forceTolerance= forceTol 
+contact1029= modelSpace.newElement('BeamContact2d', [n264.tag, n285.tag, n267.tag, lagrangeNodes[1029].tag]); contact1029.width= thick; contact1029.gapTolerance= gapTol; contact1029.forceTolerance= forceTol 
 #element BeamContact2D 1030  264 285 281 1030  2 $thick $gapTol $forceTol
-contact1030= modelSpace.newElement('BeamContact2d', [264, 285, 281, lagrangeNodes[1030].tag]); contact1030.width= thick; contact1030.gapTolerance= gapTol; contact1030.forceTolerance= forceTol 
+contact1030= modelSpace.newElement('BeamContact2d', [n264.tag, n285.tag, n281.tag, lagrangeNodes[1030].tag]); contact1030.width= thick; contact1030.gapTolerance= gapTol; contact1030.forceTolerance= forceTol 
 #element BeamContact2D 1031  285 311 291 1031  2 $thick $gapTol $forceTol
-contact1031= modelSpace.newElement('BeamContact2d', [285, 311, 291, lagrangeNodes[1031].tag]); contact1031.width= thick; contact1031.gapTolerance= gapTol; contact1031.forceTolerance= forceTol 
+contact1031= modelSpace.newElement('BeamContact2d', [n285.tag, n311.tag, n291.tag, lagrangeNodes[1031].tag]); contact1031.width= thick; contact1031.gapTolerance= gapTol; contact1031.forceTolerance= forceTol 
 #element BeamContact2D 1032  285 311 308 1032  2 $thick $gapTol $forceTol
-contact1032= modelSpace.newElement('BeamContact2d', [285, 311, 308, lagrangeNodes[1032].tag]); contact1032.width= thick; contact1032.gapTolerance= gapTol; contact1032.forceTolerance= forceTol 
+contact1032= modelSpace.newElement('BeamContact2d', [n285.tag, n311.tag, n308.tag, lagrangeNodes[1032].tag]); contact1032.width= thick; contact1032.gapTolerance= gapTol; contact1032.forceTolerance= forceTol 
 #element BeamContact2D 1033  311 338 315 1033  2 $thick $gapTol $forceTol
-contact1033= modelSpace.newElement('BeamContact2d', [311, 338, 315, lagrangeNodes[1033].tag]); contact1033.width= thick; contact1033.gapTolerance= gapTol; contact1033.forceTolerance= forceTol 
+contact1033= modelSpace.newElement('BeamContact2d', [n311.tag, n338.tag, n315.tag, lagrangeNodes[1033].tag]); contact1033.width= thick; contact1033.gapTolerance= gapTol; contact1033.forceTolerance= forceTol 
 #element BeamContact2D 1034  311 338 336 1034  2 $thick $gapTol $forceTol
-contact1034= modelSpace.newElement('BeamContact2d', [311, 338, 336, lagrangeNodes[1034].tag]); contact1034.width= thick; contact1034.gapTolerance= gapTol; contact1034.forceTolerance= forceTol 
+contact1034= modelSpace.newElement('BeamContact2d', [n311.tag, n338.tag, n336.tag, lagrangeNodes[1034].tag]); contact1034.width= thick; contact1034.gapTolerance= gapTol; contact1034.forceTolerance= forceTol 
 #element BeamContact2D 1035  338 368 344 1035  2 $thick $gapTol $forceTol
-contact1035= modelSpace.newElement('BeamContact2d', [338, 368, 344, lagrangeNodes[1035].tag]); contact1035.width= thick; contact1035.gapTolerance= gapTol; contact1035.forceTolerance= forceTol 
+contact1035= modelSpace.newElement('BeamContact2d', [n338.tag, n368.tag, n344.tag, lagrangeNodes[1035].tag]); contact1035.width= thick; contact1035.gapTolerance= gapTol; contact1035.forceTolerance= forceTol 
 #element BeamContact2D 1036  338 368 363 1036  2 $thick $gapTol $forceTol
-contact1036= modelSpace.newElement('BeamContact2d', [338, 368, 363, lagrangeNodes[1036].tag]); contact1036.width= thick; contact1036.gapTolerance= gapTol; contact1036.forceTolerance= forceTol 
+contact1036= modelSpace.newElement('BeamContact2d', [n338.tag, n368.tag, n363.tag, lagrangeNodes[1036].tag]); contact1036.width= thick; contact1036.gapTolerance= gapTol; contact1036.forceTolerance= forceTol 
 #element BeamContact2D 1037  368 396 372 1037  2 $thick $gapTol $forceTol
-contact1037= modelSpace.newElement('BeamContact2d', [368, 396, 372, lagrangeNodes[1037].tag]); contact1037.width= thick; contact1037.gapTolerance= gapTol; contact1037.forceTolerance= forceTol 
+contact1037= modelSpace.newElement('BeamContact2d', [n368.tag, n396.tag, n372.tag, lagrangeNodes[1037].tag]); contact1037.width= thick; contact1037.gapTolerance= gapTol; contact1037.forceTolerance= forceTol 
 #element BeamContact2D 1038  368 396 387 1038  2 $thick $gapTol $forceTol
-contact1038= modelSpace.newElement('BeamContact2d', [368, 396, 387, lagrangeNodes[1038].tag]); contact1038.width= thick; contact1038.gapTolerance= gapTol; contact1038.forceTolerance= forceTol 
+contact1038= modelSpace.newElement('BeamContact2d', [n368.tag, n396.tag, n387.tag, lagrangeNodes[1038].tag]); contact1038.width= thick; contact1038.gapTolerance= gapTol; contact1038.forceTolerance= forceTol 
 #element BeamContact2D 1039  396 417 400 1039  2 $thick $gapTol $forceTol
-contact1039= modelSpace.newElement('BeamContact2d', [396, 417, 400, lagrangeNodes[1039].tag]); contact1039.width= thick; contact1039.gapTolerance= gapTol; contact1039.forceTolerance= forceTol 
+contact1039= modelSpace.newElement('BeamContact2d', [n396.tag, n417.tag, n400.tag, lagrangeNodes[1039].tag]); contact1039.width= thick; contact1039.gapTolerance= gapTol; contact1039.forceTolerance= forceTol 
 #element BeamContact2D 1040  396 417 412 1040  2 $thick $gapTol $forceTol
-contact1040= modelSpace.newElement('BeamContact2d', [396, 417, 412, lagrangeNodes[1040].tag]); contact1040.width= thick; contact1040.gapTolerance= gapTol; contact1040.forceTolerance= forceTol 
+contact1040= modelSpace.newElement('BeamContact2d', [n396.tag, n417.tag, n412.tag, lagrangeNodes[1040].tag]); contact1040.width= thick; contact1040.gapTolerance= gapTol; contact1040.forceTolerance= forceTol 
 #element BeamContact2D 1041  417 435 421 1041  2 $thick $gapTol $forceTol
-contact1041= modelSpace.newElement('BeamContact2d', [417, 435, 421, lagrangeNodes[1041].tag]); contact1041.width= thick; contact1041.gapTolerance= gapTol; contact1041.forceTolerance= forceTol 
+contact1041= modelSpace.newElement('BeamContact2d', [n417.tag, n435.tag, n421.tag, lagrangeNodes[1041].tag]); contact1041.width= thick; contact1041.gapTolerance= gapTol; contact1041.forceTolerance= forceTol 
 #element BeamContact2D 1042  417 435 430 1042  2 $thick $gapTol $forceTol
-contact1042= modelSpace.newElement('BeamContact2d', [417, 435, 430, lagrangeNodes[1042].tag]); contact1042.width= thick; contact1042.gapTolerance= gapTol; contact1042.forceTolerance= forceTol 
+contact1042= modelSpace.newElement('BeamContact2d', [n417.tag, n435.tag, n430.tag, lagrangeNodes[1042].tag]); contact1042.width= thick; contact1042.gapTolerance= gapTol; contact1042.forceTolerance= forceTol 
 #puts "Finished creating all beam-contact elements..."
 lmsg.log("Finished creating all beam-contact elements...")#
 
@@ -3268,7 +3265,7 @@ lmsg.log("Recorder definition PENDING...")#
 class GravitySolutionProcedure(predefined_solutions.SolutionProcedure):
     ''' Define analysis parameters for gravity phase
     '''
-    def __init__(self, prb, name= None, maxNumIter= 15, convergenceTestTol= 1e-5, printFlag= 0, numSteps= 1, numberingMethod= 'rcm', convTestType= 'norm_disp_incr', integratorType:str= 'load_control_integrator'):
+    def __init__(self, prb, name= None, maxNumIter= 15, convergenceTestTol= 1e-5, printFlag= 0, numSteps= 1, numberingMethod= 'rcm', convTestType= 'norm_disp_incr_conv_test', integratorType:str= 'load_control_integrator'):
         ''' Constructor.
 
         :param prb: XC finite element problem.
@@ -3287,6 +3284,41 @@ class GravitySolutionProcedure(predefined_solutions.SolutionProcedure):
 gravitySolutionProcedure= GravitySolutionProcedure(prb= feProblem)
 
 # turn on initial state analysis feature
-matWrapper.initialStateAnalysisPhase= True
+matWrapper.setInitialStateAnalysisPhase(True)
 # ensure soil material intially considers linear elastic behavior
-matWrapper.updateMaterialStage(0)
+matWrapper.encapsulatedMaterial.updateMaterialStage(0)
+
+# set contact elements to be frictionless for gravity analysis
+for e in beamContactInfo:
+    mats= e.physicalProperties.getVectorMaterials # contact materials.
+    for m in mats:
+        m.setFrictionFlag(False) # Frictionless contact.
+
+gravitySolutionProcedure.setup()
+result= gravitySolutionProcedure.analysis.analyze(4)
+if(result!=0):
+    lmsg.error('Can\'t solve.')
+
+# update soil material to consider elastoplastic behavior
+matWrapper.encapsulatedMaterial.updateMaterialStage(1)
+
+# analyze a few more steps
+result= gravitySolutionProcedure.analysis.analyze(4)
+if(result!=0):
+    lmsg.error('Can\'t solve.')
+    info= None
+    solver= analysis.linearSOE.solver
+    if(solver.hasProp("info")):
+        info= solver.getProp("info")
+    unconstrainedNode= modelSpace.locateEquationNumber(eqNumber= info-1)
+    lmsg.log('unconstrained node: '+str(unconstrainedNode.tag))
+    quit()
+    
+# designate end of initial state analysis (zeros displacements, keeps state variables)
+matWrapper.setInitialStateAnalysisPhase(False)
+
+# turn on frictional behavior for beam contact elements
+for e in beamContactInfo:
+    mats= e.physicalProperties.getVectorMaterials # contact materials.
+    for m in mats:
+        m.setFrictionFlag(True) # Frictionless contact.
