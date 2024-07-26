@@ -88,8 +88,6 @@ latexOutputFile.close()
 refFile= pth+'/../../reference_files/ref_'+latexOutputFileName
 comparisonOK= filecmp.cmp(refFile, latexOutputPath, shallow=False)
 
-
-
 # DXF output
 doc = ezdxf.new("R2000")
 msp = doc.modelspace()
