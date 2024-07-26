@@ -29,7 +29,6 @@ from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
 
 
-#workingDirectory= default_config.findWorkingDirectory()+'/'
 import sys
 sys.path.insert(0, '../local_modules')
 import steel_connection_models as sbcm

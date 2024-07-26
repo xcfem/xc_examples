@@ -12,13 +12,9 @@ from postprocess.config import default_config
 # Definition of USL and SLS
 
 # import local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import data as dat
 import mesh_gen as msh
-
-
 
 #  *** ACTIONS DEFINITION ****
 def LoadsCollar(nodLst,loadLst):

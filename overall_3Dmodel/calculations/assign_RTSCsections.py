@@ -11,9 +11,7 @@ from postprocess import element_section_map
 # the concrete tension-stiffening
 
 # import local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 
 import model_gen as model #FE model generation
 import RC_sections_def as RCsect # reinforced-concrete sections

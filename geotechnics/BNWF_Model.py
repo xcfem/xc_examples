@@ -99,7 +99,7 @@ seedElemHandler= preprocessor.getElementHandler.seedElemHandler
 seedElemHandler.dimElem= 2 # Bars defined in a two-dimensional space.
 seedElemHandler.defaultMaterial= scc.name
 seedElemHandler.defaultTransformation= lin.name
-beam2d= seedElemHandler.newElement("ElasticBeam2d",xc.ID([0,0]))
+beam2d= seedElemHandler.newElement("ElasticBeam2d")
 beam2d.h= h
 
 for l in linesToMesh:

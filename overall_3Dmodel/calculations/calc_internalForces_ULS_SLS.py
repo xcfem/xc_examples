@@ -3,9 +3,7 @@ from postprocess import limit_state_data as lsd
 from postprocess.config import default_config
 
 # local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 import model_gen as model
 import steel_beams_def as sMemb # steel members
