@@ -14,12 +14,12 @@ from actions import load_cases as lcases
 from actions import combinations as cc
 from actions.earth_pressure import earth_pressure as ep
 from model.geometry import geom_utils as gut
-from postprocess.config import default_config
+from misc_utils import data_struct_utils as dsu
 
 # Default configuration of environment variables.
+from postprocess.config import default_config
 from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
-from misc_utils import data_struct_utils as dsu
 
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
@@ -44,8 +44,8 @@ out=outHndl.OutputHandler(modelSpace,sty)
 
 # coordinates in global X,Y,Z axes for the grid generation
 xList=[0,dat.LbeamX/2.0,dat.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xList)
-yList=[-dat.Wfoot/2.,0,dat.Wfoot/2.,dat.LbeamY]
-zList=[0,dat.LcolumnZ/2.0,dat.LcolumnZ]
+yList=[-dat.Wfoot/2.,0,dat.Wfoot/2.,dat.LbeamY]; yList.sort(); yList=dsu.remove_duplicates_list(yList)
+zList=[0,dat.LcolumnZ/2.0,dat.LcolumnZ]; zList.sort(); zList=dsu.remove_duplicates_list(zList)
 #auxiliary data
 lastXpos=len(xList)-1
 lastYpos=len(yList)-1
