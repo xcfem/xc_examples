@@ -14,12 +14,12 @@ from actions import load_cases as lcases
 from actions import combinations as cc
 from actions.earth_pressure import earth_pressure as ep
 from model.geometry import geom_utils as gut
-from postprocess.config import default_config
+from misc_utils import data_struct_utils as dsu
 
 # Default configuration of environment variables.
+from postprocess.config import default_config
 from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
-from misc_utils import data_struct_utils as dsu
 
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
@@ -43,9 +43,9 @@ modelSpace= predefined_spaces.StructuralMechanics3D(nodes) #Defines the
 out=outHndl.OutputHandler(modelSpace,sty)
 
 # coordinates in global X,Y,Z axes for the grid generation
-xList=[0,dat.LbeamX/2.0,dat.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xListBS)
-yList=[-dat.Wfoot/2.,0,dat.Wfoot/2.,dat.LbeamY]
-zList=[0,dat.LcolumnZ/2.0,dat.LcolumnZ]
+xList=[0,dat.LbeamX/2.0,dat.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xList)
+yList=[-dat.Wfoot/2.,0,dat.Wfoot/2.,dat.LbeamY]; yList.sort(); yList=dsu.remove_duplicates_list(yList)
+zList=[0,dat.LcolumnZ/2.0,dat.LcolumnZ]; zList.sort(); zList=dsu.remove_duplicates_list(zList)
 #auxiliary data
 lastXpos=len(xList)-1
 lastYpos=len(yList)-1
@@ -251,6 +251,7 @@ foot_wink.generateSprings(xcSet=foot)
 
 #fixed DOF (ux:'0FF_FFF', uy:'F0F_FFF', uz:'FF0_FFF',
 #           rx:'FFF_0FF', ry:'FFF_F0F', rz:'FFF_FF0')
+### se puede poner de la forma: set.nodes.getNearestNode(geom.Pos3d(0,dat.LbeamY,0))
 n_col1=nodes.getDomain.getMesh.getNearestNode(geom.Pos3d(0,dat.LbeamY,0))
 modelSpace.fixNode('000_FFF',n_col1.tag)
 n_col2=nodes.getDomain.getMesh.getNearestNode(geom.Pos3d(dat.LbeamX,dat.LbeamY,0))
@@ -397,6 +398,11 @@ vehicleDeck1=lmb.VehicleDistrLoad(name='vehicleDeck1',xcSet=decklv1,loadModel=sl
 
 
 #    ***LOAD CASES***
+# selfWeight=modelSpace.newLoadPattern(name="selfWeight",lpType="default")
+# modelSpace.setCurrentLoadPattern(selfWeight.name)
+# for e in stem.elements: e.createInertiaLoad(grav)
+# for e in lintel.elements: e.createInertiaLoad(grav)
+# modelSpace.addLoadCaseToDomain(selfWeight.name) # añadirla al dominio antes de dibujarla
 
 GselfWeight=lcases.LoadCase(preprocessor=prep,name="GselfWeight",loadPType="default",timeSType="constant_ts")
 GselfWeight.create()
