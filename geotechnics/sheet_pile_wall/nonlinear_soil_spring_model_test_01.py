@@ -13,6 +13,9 @@ from materials.sections.fiber_section import def_column_RC_section
 from materials.ehe import EHE_materials
 from materials.ehe import EHE_limit_state_checking
 import excavation_process as ep
+from misc_utils import log_messages as lmsg
+
+lmsg.log('WARNING: work in progress. Not ready for use in production.')
 
 # Define finite element problem.
 feProblem= xc.FEProblem()
@@ -118,7 +121,7 @@ for i, pair in enumerate(springPairs):
 numSteps= 10
 
 # Solve 
-solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-4, printFlag= 0)
+solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-6, printFlag= 1)
 ok= solProc.solve()
 if(ok!=0):
     lmsg.error('Can\'t solve')
