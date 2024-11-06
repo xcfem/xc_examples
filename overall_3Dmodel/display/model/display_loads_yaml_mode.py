@@ -6,7 +6,7 @@ from postprocess.config import default_config
 
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-import model_gen as model #FE model generation
+import xc_model as model #FE model generation
 
 dictLCG=yaml.safe_load(Path(workingDirectory+'LC_graph.yaml').read_text())
 

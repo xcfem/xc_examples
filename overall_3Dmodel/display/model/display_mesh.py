@@ -4,7 +4,7 @@ from postprocess.config import default_config
 
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-import model_gen as model #FE model generation
+import xc_model as model #FE model generation
 
 setsTodisp=[model.decklv1,model.decklv2,model.foot,model.wall,model.columnZconcr,model.columnZsteel,model.beamY,model.beamXconcr,model.beamXsteel]
 

@@ -6,7 +6,7 @@ from postprocess.config import default_config
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
-import model_gen as model #FE model generation
+import xc_model as model #FE model generation
 
 setToDisp=model.allBeams
 model.out.displayLocalAxes(setToDisplay=setToDisp,caption=None,fileName=None,defFScale=0.0)

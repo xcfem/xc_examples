@@ -13,7 +13,7 @@ from postprocess import element_section_map
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 
-import model_gen as model #FE model generation
+import xc_model as model #FE model generation
 import RC_sections_def as RCsect # reinforced-concrete sections
 
 #list of RC sections (from those whose attributes (materials, geometry, refinforcement, set of elements to which apply, ... are defined in the file 'RC_sections_def.py') that we want to process in order to run different limit-state checkings.

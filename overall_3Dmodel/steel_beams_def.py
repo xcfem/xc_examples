@@ -5,7 +5,7 @@ from model.geometry import grid_model as gm
 
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-import model_gen as model
+import xc_model as model
 
 # ** Steel beams
 # Support coefficients (1==free, 0.5==prevented) (all default to 1)

@@ -2,7 +2,7 @@
 
 #Load cases for graphics
 G1:
-    LCname: ' GselfWeight'
+    LCname: 'GselfWeight'
     setName: 'overallSet'
     description: ' G1: self weight'
     camera: 'XYZPos'

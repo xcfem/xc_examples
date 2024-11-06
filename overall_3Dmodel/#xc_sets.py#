@@ -1,0 +1,32 @@
+import sys
+# import local modules
+from postprocess.config import default_config
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
+sys.path.append(workingDirectory)
+import xc_geom as xcG
+
+# Sets description
+decklv1=xcG.decklv1
+decklv1.description='Deck level 1'
+decklv1.color=env.cfg.colors['purple01']
+decklv2.description='Deck level 2'
+decklv2.color=env.cfg.colors['blue01']
+foot.description='Foundation'
+foot.color=env.cfg.colors['orange01']
+wall.description='Wall'
+wall.color=env.cfg.colors['green01']
+beamXconcr.description='Beams in X direction'
+beamXconcr.color=env.cfg.colors['blue03']
+beamY.description='Beams in Y direction'
+beamY.color=env.cfg.colors['green03']
+columnZconcr.description='Concrete columns'
+columnZconcr.color=env.cfg.colors['red03']
+columnZsteel.description='Steel columns'
+columnZsteel.color=env.cfg.colors['blue02']
+
+beams=modelSpace.setSum('beams',[beamXconcr,beamY])
+beams.description='Beams'
+beams.fillDownwards()
+#out.displayBlocks()
+
+lstSets=[decklv1,decklv2,foot,wall,beamXconcr,beamY,columnZconcr,columnZsteel]
