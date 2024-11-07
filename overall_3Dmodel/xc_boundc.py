@@ -10,7 +10,7 @@ sys.path.append(workingDirectory)
 import xc_init
 import data_geom as datG
 import data_materials as datM
-import xc_geom_cart as xcG
+import xc_geom as xcG
 
 # Common variables
 nodes=xc_init.nodes

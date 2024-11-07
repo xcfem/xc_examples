@@ -9,7 +9,7 @@ workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 sys.path.append(workingDirectory)
 import data_geom as datG
 import xc_init
-import xc_geom_cart as xcG
+import xc_geom as xcG
 import xc_materials as xcM
 # Common variables
 prep=xc_init.prep

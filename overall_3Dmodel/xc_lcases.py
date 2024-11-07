@@ -7,7 +7,7 @@ from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 sys.path.append(workingDirectory)
 import xc_init
-import xc_geom_cart as xcG
+import xc_geom as xcG
 import xc_loads as xcL
 import xc_roadway_loads  as xcLr
 for st in xcG.lstSets: 

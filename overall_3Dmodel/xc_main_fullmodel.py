@@ -7,12 +7,11 @@ from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 sys.path.append(workingDirectory)
 import xc_init
-import xc_geom_cart as xcG
 # Common variables
 out=xc_init.out
 
 
-import xc_geom_cart as xcG # Geometry and sets
+import xc_geom as xcG # Geometry and sets
 import xc_materials as xcM # Materials
 import xc_fem as xcF # FE model
 import xc_boundc as xcB # Boundary conditions

@@ -8,7 +8,7 @@ from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 sys.path.append(workingDirectory)
 import data_geom as datG
-import xc_geom_cart as xcG
+import xc_geom as xcG
 
 # Point loads defined in the object lModel, distributed over the shell 
 # elements under the wheels affected by them.

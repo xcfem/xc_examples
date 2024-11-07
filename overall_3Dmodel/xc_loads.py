@@ -15,7 +15,7 @@ sys.path.append(workingDirectory)
 import xc_init
 import data_geom as datG
 import data_loads as datL
-import xc_geom_cart as xcG
+import xc_geom as xcG
 # Common variables
 prep=xc_init.prep
 
