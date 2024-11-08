@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from postprocess.xcVtk.FE_model import vtk_FE_graphic
 from postprocess.config import default_config
 
 # import local modules

@@ -1,5 +1,4 @@
-
-import sys
+# Space and common variables
 import xc
 from model import predefined_spaces
 # Default configuration of environment variables.
@@ -8,7 +7,6 @@ from postprocess import output_styles as outSty
 from postprocess import output_handler as outHndl
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import env_config as env
 sty=outSty.OutputStyle() 
 FEcase= xc.FEProblem()

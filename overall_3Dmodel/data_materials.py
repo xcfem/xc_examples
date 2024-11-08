@@ -8,6 +8,7 @@ reinfSteel=EHE_materials.B500S
 S235JR= EC3_materials.S235JR
 S235JR.gammaM= 1.00
 
+deckCover=35e-3
 # Soil
 wModulus=20e7 # Winkler modulus of the foundation (springs in Z direction)
 cRoz=0.2 #  fraction of the Winkler modulus to apply for friction in the contact plane (springs in X, Y directions)

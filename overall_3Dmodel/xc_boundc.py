@@ -1,12 +1,10 @@
 # Definition of boundary conditions
-import sys
 import geom
 from model.boundary_cond import spring_bound_cond as sprbc
 
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import xc_init
 import data_geom as datG
 import data_materials as datM

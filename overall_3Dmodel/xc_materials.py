@@ -1,12 +1,10 @@
 # Definition of materials for each set of elements
-import sys
 from materials import typical_materials as tm
 from materials.ec3 import EC3_materials
 
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import xc_init
 import data_geom as datG
 import data_materials as datM 
@@ -29,7 +27,6 @@ foot_mat.setupElasticSection(preprocessor=prep)   #creates the section-material
 from materials.sections import section_properties as sectpr
 geomSectBeamX=sectpr.RectangularSection(name='geomSectBeamX',b=datG.wbeamX,h=datG.hbeamX)
 geomSectBeamY=sectpr.RectangularSection(name='geomSectBeamY',b=datG.wbeamY,h=datG.hbeamY)
-geomSectColumnZ=sectpr.RectangularSection(name='geomSectColumnZ',b=datG.wcolumnZ,h=datG.hcolumnZ)
 
 # Elastic material-section appropiate for 3D beam analysis, including shear
   # deformations.
@@ -46,7 +43,9 @@ beamXconcr_mat= tm.BeamMaterialData(name= 'beamXconcr_mat', section=geomSectBeam
 beamXconcr_mat.setupElasticShear3DSection(preprocessor=prep)
 beamY_mat= tm.BeamMaterialData(name= 'beamY_mat', section=geomSectBeamY, material=concrProp)
 beamY_mat.setupElasticShear3DSection(preprocessor=prep)
-columnZconcr_mat= tm.BeamMaterialData(name= 'columnZconcr_mat', section=geomSectColumnZ, material=concrProp)
+# cylindrical column
+columnZconcr_gsect=sectpr.CircularSection(name='columnZconcr_gsect',Rext=datG.fiColumnZ/2.)
+columnZconcr_mat=tm.BeamMaterialData(name='columnZconcr_mat', section=columnZconcr_gsect, material=concrProp)
 columnZconcr_mat.setupElasticShear3DSection(preprocessor=prep)
 
 # Steel material-section appropiate for 3D beam analysis, including shear

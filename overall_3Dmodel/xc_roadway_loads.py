@@ -1,12 +1,10 @@
 # Definition of roadway loads
-import sys
 from actions.roadway_traffic import IAP_load_models as slm
 from actions.roadway_traffic import load_model_base as lmb
 
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import data_geom as datG
 import xc_geom as xcG
 

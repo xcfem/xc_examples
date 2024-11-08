@@ -1,5 +1,4 @@
 # Definition of loads (typical)
-import sys
 import xc
 import geom
 from scipy.constants import g
@@ -11,7 +10,6 @@ from actions.earth_pressure import earth_pressure as ep
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import xc_init
 import data_geom as datG
 import data_loads as datL

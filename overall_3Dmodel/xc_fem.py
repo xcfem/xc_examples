@@ -1,12 +1,10 @@
 # Generation of the finite element model
-import sys
 import xc
 from model.mesh import finit_el_model as fem
 
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import data_geom as datG
 import xc_init
 import xc_geom as xcG
@@ -43,3 +41,4 @@ fem.multi_mesh(preprocessor=prep,lstMeshSets=[beamXconcr_mesh,beamXsteel_mesh,be
 # out.displayFEMesh([xcG.columnZconcr,xcG.columnZsteel])
 # out.displayLocalAxes()
 # out.displayStrongWeakAxis(xcG.beams)
+

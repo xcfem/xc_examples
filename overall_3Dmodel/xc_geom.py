@@ -1,5 +1,4 @@
 # Geometry definition in cartesian coordinates and sets 
-import sys
 from model.geometry import grid_model as gm
 from misc_utils import data_struct_utils as dsu
 from model.geometry import geom_utils as gut
@@ -8,7 +7,6 @@ from model.sets import sets_mng as setMng
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import env_config as env
 import xc_init
 import data_geom as datG # geometry data
@@ -134,29 +132,31 @@ beams.fillDownwards()
 #out.displayBlocks()
 
 lstSets=[decklv1,decklv2,foot,wall,beamXconcr,beamY,columnZconcr,columnZsteel]
-decks=prep.getSets.defSet('decks')  #only this way we can recover this
-                         #set by calling it by its name with:
-                         #prep.getSets.getSet('decks') 
-decks=modelSpace.setSum('decks',[decklv1,decklv2])
-decks.description='Decks'
-decks.color=env.cfg.colors['purple01']
-allShells=modelSpace.setSum('allShells',[decklv1,decklv2,foot,wall])
-allShells.description='Shell elements'
-allBeams=modelSpace.setSum('',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel])
-allBeams.description='Beams+columns'
-overallSet=modelSpace.setSum('overallSet',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel,wall,foot,decklv1,decklv2])
-overallSet.description='overall set'
-overallSet.color=env.cfg.colors['purple01']
-allConcrete=modelSpace.setSum('allConcrete',[beamXconcr,beamY,columnZconcr,wall,foot,decklv1,decklv2])
-allConcrete.description='concrete elements'
-beamX=modelSpace.setSum('beamX',[beamXconcr,beamXsteel])
-beamX.description='beams X'
-columnZ=modelSpace.setSum('columnZ',[columnZconcr,columnZsteel])
-columnZ.description='columns'
-allSteel=modelSpace.setSum('allSteel',[beamXsteel,columnZsteel])
-allSteel.description='steel elements'
-#sets for displaying some results
-pBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=0,Lx=datG.LbeamX,Ly=datG.LbeamY-1.0)
 
-allShellsRes=setMng.set_included_in_orthoPrism(preprocessor=prep,setInit=allShells,prismBase=pBase,prismAxis='Z',setName='allShellsRes')
+# decks=prep.getSets.defSet('decks')  #only this way we can recover this
+#                          #set by calling it by its name with:
+#                          #prep.getSets.getSet('decks') 
+# decks=modelSpace.setSum('decks',[decklv1,decklv2])
+# decks.description='Decks'
+# decks.color=env.cfg.colors['purple01']
+# allShells=modelSpace.setSum('allShells',[decklv1,decklv2,foot,wall])
+# allShells.description='Shell elements'
+# allBeams=modelSpace.setSum('',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel])
+# allBeams.description='Beams+columns'
+# overallSet=modelSpace.setSum('overallSet',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel,wall,foot,decklv1,decklv2])
+# overallSet.description='overall set'
+# overallSet.color=env.cfg.colors['purple01']
+# allConcrete=modelSpace.setSum('allConcrete',[beamXconcr,beamY,columnZconcr,wall,foot,decklv1,decklv2])
+# allConcrete.description='concrete elements'
+# beamX=modelSpace.setSum('beamX',[beamXconcr,beamXsteel])
+# beamX.description='beams X'
+# columnZ=modelSpace.setSum('columnZ',[columnZconcr,columnZsteel])
+# columnZ.description='columns'
+# allSteel=modelSpace.setSum('allSteel',[beamXsteel,columnZsteel])
+# allSteel.description='steel elements'
+# #sets for displaying some results
+# pBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=0,Lx=datG.LbeamX,Ly=datG.LbeamY-1.0)
+
+# allShellsRes=setMng.set_included_in_orthoPrism(preprocessor=prep,setInit=allShells,prismBase=pBase,prismAxis='Z',setName='allShellsRes')
  
+

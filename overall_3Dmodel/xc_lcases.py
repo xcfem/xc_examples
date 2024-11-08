@@ -1,11 +1,9 @@
 # Definition of load cases
-import sys
 from actions import load_cases as lcases
 
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-sys.path.append(workingDirectory)
 import xc_init
 import xc_geom as xcG
 import xc_loads as xcL
@@ -103,3 +101,4 @@ for lc in [LS1,LS2]:
     out.displayDispRot('uZ')
     modelSpace.removeLoadCaseFromDomain(lc.name)
 '''
+lstLC=[GselfWeight,Qdecks,QearthPressWall,QearthPWallStrL,QearthPWallLinL,QearthPWallHrzL,qunifBeams,QpntBeams,qlinDeck,QwheelDeck1,QvehicleDeck1,LS1,LS2]

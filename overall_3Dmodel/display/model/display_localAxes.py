@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
-from postprocess.xcVtk import vtk_graphic_base
-from postprocess.xcVtk.FE_model import quick_graphics as qg
 from postprocess.config import default_config
 
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
-import env_config as env
-import xc_model as model #FE model generation
+import xc_init
+import xc_geom as xcG #FE model generation
+import xc_materials as xcM # Materials
+import xc_fem as xcF # FE model
 
-setToDisp=model.allBeams
-model.out.displayLocalAxes(setToDisplay=setToDisp,caption=None,fileName=None,defFScale=0.0)
+out=xc_init.out
+
+setToDisp=xcG.allBeams
+out.displayLocalAxes(setToDisplay=setToDisp,caption=None,fileName=None,defFScale=0.0)
 
 
 
