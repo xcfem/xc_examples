@@ -7,7 +7,7 @@ from postprocess.config import default_config
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
-import model_gen as model #FE model generation
+import xc_model as model #FE model generation
 
 
 # Verificacion of cracking SLS under frequent loads for reinf. concrete elements

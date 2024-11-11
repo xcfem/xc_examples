@@ -9,7 +9,7 @@ from postprocess.config import default_config
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
-import model_gen as model
+import xc_model as model
 
 #Verification of normal-stresses ULS for reinf. concrete elements
 lsd.LimitStateData.envConfig= env.cfg  #configuration defined in script
@@ -25,8 +25,8 @@ setCalc=model.allConcrete
 outCfg= lsd.VerifOutVars(setCalc=setCalc,appendToResFile='N',listFile='N',calcMeanCF='Y')
 
 limitState=lsd.normalStressesResistance
-outCfg.controller= lscheck.BiaxialBendingNormalStressController(limitState.label)
-mean=lsd.normalStressesResistance.check(reinfConcreteSections,outCfg)
+controller= lscheck.BiaxialBendingNormalStressController(limitState.label)
+mean=lsd.normalStressesResistance.check(crossSections= reinfConcreteSections, setCalc=setCalc,appendToResFile='N',listFile='N',calcMeanCF='Y', controller= controller)
 
 
 

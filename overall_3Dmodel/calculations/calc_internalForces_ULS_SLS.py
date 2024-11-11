@@ -5,7 +5,7 @@ from postprocess.config import default_config
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
-import model_gen as model
+import xc_model as model
 import steel_beams_def as sMemb # steel members
 
 lsd.LimitStateData.envConfig= env.cfg
