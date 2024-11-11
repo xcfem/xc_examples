@@ -14,8 +14,9 @@ from materials.ehe import EHE_materials
 from materials.ehe import EHE_limit_state_checking
 import excavation_process as ep
 from misc_utils import log_messages as lmsg
+from tabulate import tabulate
 
-lmsg.log('WARNING: work in progress. Not ready for use in production.')
+lmsg.log('WARNING: work in progress. Use with caution.')
 
 # Define finite element problem.
 feProblem= xc.FEProblem()
@@ -36,8 +37,10 @@ pileSection= def_column_RC_section.RCCircularSection(name='test',Rext= diameter/
 xcPileSection= pileSection.defElasticShearSection2d(preprocessor)
 
 # Problem geometry
-L= 11.11 # Total lenght (m)
+pileSpacing= 1.0 # One pile every meter.
 L1= 5.0 #5.0 # Excavation depth (m)
+Dteory= 4.7
+L= L1+1.3*Dteory # Total lenght (m)
 points= preprocessor.getMultiBlockTopology.getPoints
 pt1= points.newPoint(geom.Pos3d(0,0,0))
 pt2= points.newPoint(geom.Pos3d(0,-L,0))
@@ -74,14 +77,15 @@ for n in ln.nodes:
     if(nodeDepth<L1):
         nodesToExcavate.append((nodeDepth, n))
     nonLinearSpringMaterial= None
+    tributaryArea= 0.0
     if(nodeDepth>0.0): # Avoid zero soil response.
         tributaryLength= n.getTributaryLength()
-        tributaryArea= tributaryLength*diameter
-        tributaryAreas[n.tag]= tributaryArea
+        tributaryArea= tributaryLength*pileSpacing
         materialName= 'soilResponse_z_'+str(n.tag)
         nonLinearSpringMaterial= soil.defHorizontalSubgradeReactionNlMaterial(preprocessor, name= materialName, depth= nodeDepth, tributaryArea= tributaryArea, Kh= Kh)
         
         #print('node: ', n.tag, ' node depth: ', '{:.2f}'.format(nodeDepth), ' tributary area: ',  '{:.2f}'.format(tributaryArea), 'init strain: ', initStrain)
+    tributaryAreas[n.tag]= tributaryArea
     soilResponseMaterials[n.tag]= nonLinearSpringMaterial
 
 pileSet= preprocessor.getSets.defSet('pileSet')
@@ -121,34 +125,59 @@ for i, pair in enumerate(springPairs):
 numSteps= 10
 
 # Solve 
-solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-6, printFlag= 1)
+#solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-6, printFlag= 0)
+solProc= predefined_solutions.PenaltyNewtonRaphson(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-5, printFlag= 0)
 ok= solProc.solve()
 if(ok!=0):
     lmsg.error('Can\'t solve')
     exit(1)
 
+reactionCheckTolerance= 1e-6
 updatedElements= ep.excavation_process(preprocessor= preprocessor, solProc= solProc, nodesToExcavate= nodesToExcavate, elementsOnExcavationSide= leftZLElements, maxDepth= 5.0, tributaryAreas= tributaryAreas, soil= soil, Kh= Kh)
-modelSpace.calculateNodalReactions()
-# for sp in springPairs:
-#     fixedNode= sp[1]
-#     Rx= fixedNode.getReaction[0]
-#     pileNode= sp[0]
-#     Ux= pileNode.getDisp[0]
-#     print('pile node: ', pileNode.tag, 'fixed node: ', fixedNode.tag, 'Rx= ', Rx/1e3, 'Ux= ', Ux*1e3)
-#     if(pileNode.tag in leftZLElements):
-#         leftElement= leftZLElements[pileNode.tag]
-#         leftN= leftElement.getResistingForce()[0]
-#         rightElement= rightZLElements[pileNode.tag]
-#         rightN= rightElement.getResistingForce()[0]
-#         print('  leftN= ', leftN/1e3, 'rightN= ', rightN/1e3)
+modelSpace.calculateNodalReactions(reactionCheckTolerance= reactionCheckTolerance)
 
-# Graphic output.
-from postprocess import output_handler
-oh= output_handler.OutputHandler(modelSpace)
-# oh.displayFEMesh(setsToDisplay= [pileSet])
-#oh.displayLocalAxes()
-#oh.displayLoads()
-oh.displayReactions()
-oh.displayDispRot('uX', defFScale= 10.0)
-oh.displayIntForcDiag('M')
-oh.displayIntForcDiag('V')
+finalResults= ep.get_results_dict(soil= soil, tributaryAreas= tributaryAreas, springPairs= springPairs, pileWallElements= [ln])
+outputTable= ep.get_results_table(resultsDict= finalResults)
+
+# Compute maximum bending moment.
+MMin= 6.023e23
+MMax= -MMin
+for nodeTag in finalResults:
+    nodeResults= finalResults[nodeTag]
+    depth= nodeResults['depth']
+    M= nodeResults['M']
+    MMin= min(MMin, M)
+    MMax= max(MMax, M)
+    
+refValue= -212.0886594633984e3
+err= abs(max(abs(MMax), abs(MMin))+refValue)/refValue
+
+'''
+print('\nASCII output:')
+print(tabulate(outputTable, headers= 'firstrow'))
+print('MMax= ', MMax/1e3, 'kN.m')
+print('MMin= ', MMin/1e3, 'kN.m')
+print('err= ', err)
+'''
+
+import os
+from misc_utils import log_messages as lmsg
+fname= os.path.basename(__file__)
+if abs(err)<.05:
+    print('test: '+fname+': ok.')
+else:
+    lmsg.error('test: '+fname+' ERROR.')
+
+# Matplotlib output.
+# ep.plot_results(resultsDict= finalResults, title= 'Based on the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das.')
+
+# # VTK Graphic output.
+# from postprocess import output_handler
+# oh= output_handler.OutputHandler(modelSpace)
+# # oh.displayFEMesh(setsToDisplay= [pileSet])
+# #oh.displayLocalAxes()
+# #oh.displayLoads()
+# oh.displayReactions(reactionCheckTolerance= reactionCheckTolerance)
+# oh.displayDispRot('uX', defFScale= 10.0)
+# oh.displayIntForcDiag('M')
+# oh.displayIntForcDiag('V')
