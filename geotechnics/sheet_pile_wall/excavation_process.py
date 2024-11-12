@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 ''' Nonlinear soil spring model inspired in the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das. Eight Edition. CENGAGE Learning. 2016.'''
 
+from geotechnics import earth_pressure
+from scipy.constants import g
+
 from operator import itemgetter
 from scipy.interpolate import interp1d
 from postprocess.reports import common_formats as cf
@@ -8,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 
 # Excavation process.
-def update_spring_stiffness(remainingLeftElements, currentExcavationDepth, tributaryAreas, soil, Kh):
+def update_spring_stiffness(remainingLeftElements, currentExcavationDepth, tributaryAreas, soil):
     ''' Update the stiffness of the remaining materials after each excavation
         step.
 
@@ -16,7 +19,6 @@ def update_spring_stiffness(remainingLeftElements, currentExcavationDepth, tribu
     :param currentExcavationDepth: current excavation depth.
     :param tributaryAreas: dictionary containing the tributary areas corresponding to each node.
     :param soil: soil model to compute the soil reaction diagram.
-    :param Kh: horizontal subgrade reaction modulus.
     '''
     updatedElements= list()
     for nodeTag in remainingLeftElements:
@@ -35,13 +37,13 @@ def update_spring_stiffness(remainingLeftElements, currentExcavationDepth, tribu
         leftElementInitStrainMaterial= leftElement.getMaterials()[0]
         leftElementEyBasicMaterial= leftElementInitStrainMaterial.material
 
-        leftElementEyBasicMaterial.setParameters(Kh, -newEp, -newEa)
+        leftElementEyBasicMaterial.setParameters(soil.Kh, -newEp, -newEa)
         leftElementInitStrainMaterial.setInitialStress(-newE0)
         updatedElements.append(leftElement)
         #print('node: ', nodeTag, ' node depth: ', '{:.2f}'.format(nodeDepth), ' left node depth: ', '{:.2f}'.format(newDepth), ' tributary area: ', '{:.2f}'.format(tributaryAreas[nodeTag]), 'strains: ', oldInitStrain, -newInitStrain, newInitStrain+oldInitStrain, ' elementTag= ', leftElement.tag)
     return updatedElements
                     
-def excavation_process(preprocessor, solProc, nodesToExcavate, elementsOnExcavationSide, maxDepth, tributaryAreas, soil, Kh):
+def excavation_process(preprocessor, solProc, nodesToExcavate, elementsOnExcavationSide, maxDepth, tributaryAreas, soil):
     ''' Deactivates the excavated elements and updates the stiffness of the
         remaining ones.
 
@@ -53,7 +55,6 @@ def excavation_process(preprocessor, solProc, nodesToExcavate, elementsOnExcavat
     :param tributaryAreas: dictionary containing the tributary areas 
                            corresponding to each node.
     :param soil: soil model to compute the soil reaction diagram.
-    :param Kh: horizontal subgrade reaction modulus.
     '''
     ## Sort nodes to excavate on its depth
     nodesToExcavate.sort(key=itemgetter(0))
@@ -79,7 +80,7 @@ def excavation_process(preprocessor, solProc, nodesToExcavate, elementsOnExcavat
                     lmsg.error('Can\'t solve')
                     exit(1)
                 # Update left springs.
-                updatedElements= update_spring_stiffness(remainingLeftElements, currentExcavationDepth= currentExcavationDepth, tributaryAreas= tributaryAreas, soil= soil, Kh= Kh)
+                updatedElements= update_spring_stiffness(remainingLeftElements, currentExcavationDepth= currentExcavationDepth, tributaryAreas= tributaryAreas, soil= soil)
                 # Solve again.
                 ok= solProc.solve()
                 if(ok!=0):
@@ -310,3 +311,194 @@ def plot_results(resultsDict, title= None):
         fig.suptitle(title)
     plt.show()
 
+class SoilLayers(object):
+    '''Layers of different soils.
+
+    Soil with layers of different properties as described in
+    4.5.5.7 "Guía de cimentaciones en obras de carreteras"
+    (https://books.google.ch/books?id=a0eoygAACAAJ)
+    2009
+
+    :ivar depths: (float list) layer depths.
+    :ivar soils: (float list) soil for each layer.
+    :ivar waterTableDepth: (float list) depth of the water table.
+    '''
+    def __init__(self, depths, soils, waterTableDepth= None):
+        '''Constructor.
+
+        :param depths: (float list) layer depths.
+        :param soils: (float list) soil for each layer.
+        :param waterTableDepth: (float list) depth of the water table.
+        '''
+        self.depths= depths
+        self.soils= soils
+        self.setWaterTableDepth(waterTableDepth= waterTableDepth)
+
+    def setWaterTableDepth(self, waterTableDepth= None):
+        ''' Recomputes the depths and soils list to take account of
+            the water table.
+        :param waterTableDepth: (float list) depth of the water table.
+        '''
+        if(waterTableDepth):
+            calculationDepths= list()
+            calculationSoils= list()
+            waterTableDepthIndex= self.getSoilIndexAtDepth(depth= waterTableDepth)
+            # Check if already in depths list.
+            soilDepth= self.depths[waterTableDepthIndex]
+            if(abs(soilDepth-waterTableDepth)>1e-5): # not in depths list.
+                for i, (d, soil) in enumerate(zip(self.depths, self.soils)):
+                    calculationDepths.append(d)
+                    calculationSoils.append(soil)
+                    if(i==waterTableDepthIndex):
+                        calculationDepths.append(waterTableDepth)
+                        calculationSoils.append(soil)
+                        self.waterTableDepthIndex= waterTableDepthIndex+1
+                self.depths= calculationDepths
+                self.soils= calculationSoils
+            else:
+                self.waterTableDepthIndex= waterTableDepthIndex
+        
+    def getWaterTableDepth(self):
+        ''' Return the index that corresponds to water table depth.
+
+        '''
+        return self.depths[self.waterTableDepthIndex]
+
+    def getSoilIndexAtDepth(self, depth):
+        ''' Return the index of the soil corresponding to the given depth.
+
+        :param depth: depth of interest.
+        '''
+        retval= -1
+        for i, d in enumerate(self.depths):
+            if(depth>=d):
+                retval= i
+        return retval
+
+    def getSoilAtDepth(self, depth):
+        ''' Return the soil corresponding to the given depth.
+
+        :param depth: depth of interest.
+        '''
+        retval= None
+        soilIndex= self.getSoilIndexAtDepth(depth= depth)
+        if(soilIndex>=0):
+            retval= self.soils[soilIndex]
+        return retval
+    
+    def getHydrostaticPressureAtDepth(self, depth):
+        ''' Returns the hydrostatic presure at the given depth.
+
+        :param depth: depth to compute the pressure at.
+        '''
+        retval= 0.0
+        waterTableDepth= self.getWaterTableDepth()
+        if(depth>waterTableDepth):
+            retval= 1e3*g*(depth-waterTableDepth)
+        return retval
+
+    def getVerticalPressureAtDepth(self, depth):
+        ''' Returns the vertical presure at the given depth.
+
+        :param depth: depth to compute the pressure at.
+        '''
+        retval= 0.0
+        if(depth>self.depths[0]):
+          lastDepth= self.depths[0]
+          for i, d in enumerate(self.depths):
+              soil= self.soils[i]
+              gamma= soil.gamma()
+              currentDepth= min(depth, d)
+              if(currentDepth>self.getWaterTableDepth()):
+                  gamma= soil.submergedGamma()
+              soilThickness= currentDepth-lastDepth
+              retval+= gamma*soilThickness
+              if(abs(currentDepth-depth)<1e-6):
+                  break
+              lastDepth= d
+        return retval
+        
+    def getHorizontalPressureAtDepth(self, K, depth):
+        ''' Returns the horizontal presure at the given depth.
+
+        :param K: pressure coefficient.
+        :param depth: depth to compute the pressure at.
+        '''
+        return self.getVerticalPressureAtDepth(depth= depth)*K
+
+    def getActivePressureAtDepth(self, depth, designValue= False):
+        ''' Returns the active presure at the given depth.
+
+        :param depth: depth to compute the pressure at.
+        :param waterTableDepth: depth of the water table.
+        :param designValue: if true use the design value of the internal 
+                            friction.
+        '''
+        soil= self.getSoilAtDepth(depth= depth)
+        Ka= soil.Ka(designValue= designValue)
+        return self.getHorizontalPressureAtDepth(K= Ka, depth= depth)
+    
+    def getPassivePressureAtDepth(self, depth, designValue= False):
+        ''' Returns the passive presure at the given depth.
+
+        :param depth: depth to compute the pressure at.
+        :param waterTableDepth: depth of the water table.
+        :param designValue: if true use the design value of the internal 
+                            friction.
+        '''
+        soil= self.getSoilAtDepth(depth= depth)
+        Kp= soil.Kp(designValue= designValue)
+        return self.getHorizontalPressureAtDepth(K= Kp, depth= depth)
+    
+    def getAtRestPressureAtDepth(self, depth, designValue= False):
+        ''' Returns the at-rest presure at the given depth.
+
+        :param depth: depth to compute the pressure at.
+        :param waterTableDepth: depth of the water table.
+        :param designValue: if true use the design value of the internal 
+                            friction.
+        '''
+        soil= self.getSoilAtDepth(depth= depth)
+        K0= soil.K0Jaky(designValue= designValue)
+        return self.getHorizontalPressureAtDepth(K= K0, depth= depth)
+
+    def getEarthThrusts(self, depth, tributaryArea, waterTableDepth= 6371e3, designValue= False):
+        ''' Returns the active, at-rest and passive presure at the given depth.
+
+        :param depth: depth to compute the pressure.
+        :param tributaryArea: area on which the pressure acts.
+        :param waterTableDepth: depth of the water table.
+        :param designValue: if true use the design value of the internal 
+                            friction.
+        '''
+
+        Ea= self.getActivePressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # active.
+        E0= self.getAtRestPressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # at rest.
+        Ep= self.getPassivePressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # passive.
+        return Ea, E0, Ep
+    
+    def defHorizontalSubgradeReactionNlMaterialAtDepth(self, preprocessor, name, depth, tributaryArea, designValue= False):
+        ''' Return the points of the force-displacement diagram.
+
+        :param preprocessor: preprocessor of the finite element problem.
+        :param name: name identifying the material (if None compute a suitable name)
+        :param depth: depth of the point of interest.
+        :param tributaryArea: area on which the pressure acts.
+        :param designValue: if true use the design value of the internal 
+                            friction.
+        '''
+        # Compute corresponding earth thrusts (active, at rest, passive).
+        Ea, E0, Ep= self.getEarthThrusts(depth= depth, tributaryArea= tributaryArea, designValue= designValue)
+        # Define nonlinear spring material
+        matName= name
+        if(not matName):
+            matName= uuid.uuid1().hex            
+        eyMatName= 'ey'+matName
+        soil= self.getSoilAtDepth(depth= depth)
+        eyBasicMaterial= earth_pressure.def_ey_basic_material(preprocessor, name= eyMatName, E= soil.Kh, upperYieldStress= -Ea, lowerYieldStress= -Ep)
+        # Create initial stress material.
+        materialHandler= preprocessor.getMaterialHandler
+        retval= materialHandler.newMaterial("init_stress_material", matName)
+        retval.setMaterial(eyBasicMaterial.name)
+        retval.setInitialStress(-E0)
+        return retval
