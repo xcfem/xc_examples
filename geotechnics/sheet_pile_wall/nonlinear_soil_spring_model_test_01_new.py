@@ -29,6 +29,13 @@ modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
 ## Soil material
 soil= earth_pressure.RankineSoil(phi= math.radians(32), rho= 15.90e3/g, rhoSat= 19.33e3/g)
 soil.Kh= 30e6
+### Soil strata.
+L1= 5.0 #5.0 # Excavation depth (m)
+Dteory= 4.7
+L= L1+1.3*Dteory # Total lenght (m)
+soilLayersDepths= [0.0, L1, L]
+soilLayers= [soil, soil, soil]
+soilStrata= ep.SoilLayers(depths= soilLayersDepths, soils= soilLayers, waterTableDepth= None)
 
 ## Pile material.
 concr= EHE_materials.HA30
@@ -39,13 +46,16 @@ xcPileSection= pileSection.defElasticShearSection2d(preprocessor)
 
 # Problem geometry
 pileSpacing= 1.0 # One pile every meter.
-L1= 5.0 #5.0 # Excavation depth (m)
-Dteory= 4.7
-L= L1+1.3*Dteory # Total lenght (m)
-pt1= modelSpace.newKPoint(0,0,0)
-pt2= modelSpace.newKPoint(0,-L,0)
-ln= modelSpace.newLine(pt1, pt2)
-ln.setElemSize(0.25)
+lines= list()
+kPoints= list()
+for depth in soilLayersDepths:
+    kPoints.append(modelSpace.newKPoint(0,-depth,0))
+kPt0= kPoints[0]
+for kPt1 in kPoints[1:]:
+    newLine= modelSpace.newLine(kPt0, kPt1)
+    newLine.setElemSize(0.25)
+    kPt0= kPt1
+    lines.append(newLine)
 
 # Mesh generation
 ## Geometric transformations
@@ -57,10 +67,15 @@ seedElemHandler.defaultMaterial= xcPileSection.name
 seedElemHandler.defaultTransformation= lin.name
 beam2d= seedElemHandler.newElement("ElasticBeam2d")
 beam2d.h= diameter
-ln.genMesh(xc.meshDir.I)
+pileSet= preprocessor.getSets.defSet('pileSet')
+for ln in lines:
+    ln.genMesh(xc.meshDir.I)
+    pileSet.lines.append(ln)
+pileSet.fillDownwards()
 
 ## Constraints.
-modelSpace.fixNodeF0F(pt2.getNode().tag) # Fix vertical displacement.
+bottomNode= kPoints[-1].getNode()
+modelSpace.fixNodeF0F(bottomNode.tag) # Fix vertical displacement.
 
 ## Define nonlinear springs.
 
@@ -68,9 +83,11 @@ modelSpace.fixNodeF0F(pt2.getNode().tag) # Fix vertical displacement.
 soilResponseMaterials= dict()
 tributaryAreas= dict()
 nodesToExcavate= list() # Nodes in the excavation depth.
-ln.resetTributaries()
-ln.computeTributaryLengths(False) # Compute tributary lenghts.
-for n in ln.nodes:
+#### Compute tributary lengths.
+pileSet.resetTributaries()
+pileSet.computeTributaryLengths(False) # Compute tributary lenghts.
+#### Define non-linear springs.
+for n in pileSet.nodes:
     nodeDepth= -n.getInitialPos3d.y
     if(nodeDepth<L1):
         nodesToExcavate.append((nodeDepth, n))
@@ -80,23 +97,19 @@ for n in ln.nodes:
         tributaryLength= n.getTributaryLength()
         tributaryArea= tributaryLength*pileSpacing
         materialName= 'soilResponse_z_'+str(n.tag)
-        nonLinearSpringMaterial= soil.defHorizontalSubgradeReactionNlMaterial(preprocessor, name= materialName, depth= nodeDepth, tributaryArea= tributaryArea, Kh= soil.Kh)
+        nonLinearSpringMaterial= soilStrata.defHorizontalSubgradeReactionNlMaterialAtDepth(preprocessor, name= materialName, depth= nodeDepth, tributaryArea= tributaryArea)
         
     tributaryAreas[n.tag]= tributaryArea
     soilResponseMaterials[n.tag]= nonLinearSpringMaterial
 
-pileSet= preprocessor.getSets.defSet('pileSet')
-for e in ln.elements:
-    pileSet.getElements.append(e)
-
-# Sort nodes to excavate on depth.
-
 ### Duplicate nodes below ground level.
 springPairs= list()
-for n in ln.nodes:
-    newNode= nodes.duplicateNode(n.tag)
-    modelSpace.fixNode000(newNode.tag)
-    springPairs.append((n, newNode))
+for n in pileSet.nodes:
+    nodeTag= n.tag
+    if(nodeTag in soilResponseMaterials):
+        newNode= nodes.duplicateNode(nodeTag)
+        modelSpace.fixNode000(newNode.tag)
+        springPairs.append((n, newNode))
 
 ### Define Spring Elements
 elements= preprocessor.getElementHandler
@@ -133,7 +146,7 @@ reactionCheckTolerance= 1e-6
 updatedElements= ep.excavation_process(preprocessor= preprocessor, solProc= solProc, nodesToExcavate= nodesToExcavate, elementsOnExcavationSide= leftZLElements, maxDepth= 5.0, tributaryAreas= tributaryAreas, soil= soil)
 modelSpace.calculateNodalReactions(reactionCheckTolerance= reactionCheckTolerance)
 
-finalResults= ep.get_results_dict(soil= soil, tributaryAreas= tributaryAreas, springPairs= springPairs, pileWallElements= [ln])
+finalResults= ep.get_results_dict(soil= soil, tributaryAreas= tributaryAreas, springPairs= springPairs, pileWallElements= pileSet.lines)
 outputTable= ep.get_results_table(resultsDict= finalResults)
 
 # Compute maximum bending moment.
