@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 ''' Nonlinear soil spring model inspired in the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das. Eight Edition. CENGAGE Learning. 2016.'''
 
+import xc
 from geotechnics import earth_pressure
 from scipy.constants import g
+from model import predefined_spaces
+from solution import predefined_solutions
 
 from operator import itemgetter
 from scipy.interpolate import interp1d
@@ -323,14 +326,14 @@ class SoilLayers(object):
     2009
 
     :ivar depths: (float list) layer depths.
-    :ivar soils: (float list) soil for each layer.
-    :ivar waterTableDepth: (float list) depth of the water table.
+    :ivar soils: soil objects for each layer.
+    :ivar waterTableDepth: (float) depth of the water table.
     '''
     def __init__(self, depths, soils, waterTableDepth= None):
         '''Constructor.
 
         :param depths: (float list) layer depths.
-        :param soils: (float list) soil for each layer.
+        :param soils: soil objects for each layer.
         :param waterTableDepth: (float list) depth of the water table.
         '''
         self.depths= depths
@@ -371,6 +374,10 @@ class SoilLayers(object):
         if(self.waterTableDepthIndex>0):
             retval= self.depths[self.waterTableDepthIndex]
         return retval
+
+    def getDepths(self):
+        ''' Return the depths of the different soil strata.'''
+        return self.depths
 
     def getSoilIndexAtDepth(self, depth):
         ''' Return the index of the soil corresponding to the given depth.
@@ -434,90 +441,158 @@ class SoilLayers(object):
         '''
         return self.getVerticalPressureAtDepth(depth= depth)*K
 
-    def getActivePressureAtDepth(self, depth, designValue= False):
-        ''' Returns the active presure at the given depth.
-
-        :param depth: depth to compute the pressure at.
-        :param waterTableDepth: depth of the water table.
-        :param designValue: if true use the design value of the internal 
-                            friction.
-        '''
-        soil= self.getSoilAtDepth(depth= depth)
-        Ka= soil.Ka(designValue= designValue)
-        return self.getHorizontalPressureAtDepth(K= Ka, depth= depth)
     
-    def getPassivePressureAtDepth(self, depth, designValue= False):
-        ''' Returns the passive presure at the given depth.
 
-        :param depth: depth to compute the pressure at.
-        :param waterTableDepth: depth of the water table.
-        :param designValue: if true use the design value of the internal 
-                            friction.
-        '''
-        soil= self.getSoilAtDepth(depth= depth)
-        Kp= soil.Kp(designValue= designValue)
-        return self.getHorizontalPressureAtDepth(K= Kp, depth= depth)
+
+class PileWall(object):
+    '''Pile wall analysis using non-linear spring to represent soil-structure
+       interaction.
+
+    :ivar pileSection: 2D elastic shear section for the pile wall beam elements.
+    :ivar soilLayers: SoilLayers object.
+    :ivar excavationDepth: depth of the excavation.
+    '''
     
-    def getAtRestPressureAtDepth(self, depth, designValue= False):
-        ''' Returns the at-rest presure at the given depth.
+    def __init__(self, pileSection, soilLayersDepths, soilLayers, excavationDepth, pileSpacing= 1.0, waterTableDepth= None):
+        '''Constructor.
 
-        :param depth: depth to compute the pressure at.
-        :param waterTableDepth: depth of the water table.
-        :param designValue: if true use the design value of the internal 
-                            friction.
+        :param pileSection: 2D elastic shear section for the pile wall beam
+                            elements.
+        :param soilLayersDepths: (float list) layer depths.
+        :param soilLayers: soil object for each layer.
+        :param excavationDepth: depth of the excavation.
+        :param pileSpacing: distance between pile axes.
+        :param waterTableDepth: (float) depth of the water table.
         '''
-        soil= self.getSoilAtDepth(depth= depth)
-        K0= soil.K0Jaky(designValue= designValue)
-        return self.getHorizontalPressureAtDepth(K= K0, depth= depth)
+        self.pileSection= pileSection
+        self.soilLayers= SoilLayers(depths= soilLayersDepths, soils= soilLayers, waterTableDepth= None)
+        self.excavationDepth= excavationDepth
+        self.pileSpacing= pileSpacing
 
-    def getEarthThrusts(self, depth, tributaryArea, waterTableDepth= 6371e3, designValue= False):
-        ''' Returns the active, at-rest and passive presure at the given depth.
+    def defineFEProblem(self):
+        ''' Define the FE problem.'''
+        self.feProblem= xc.FEProblem()
+        preprocessor=  self.feProblem.getPreprocessor   
+        nodes= preprocessor.getNodeHandler
+        ## Problem type
+        self.modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
+        # Solution procedure. 
+        #solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-6, printFlag= 0)
+        self.solProc= predefined_solutions.PenaltyNewtonRaphson(prb= self.feProblem, numSteps= 10, maxNumIter= 300, convergenceTestTol= 1e-5, printFlag= 0)
+        
+    def setNodeSoils(self):
+        ''' Compute the soil corresponding to each node.'''
+        self.soilsAtNodes= dict()
+        for n in self.pileSet.nodes:
+            nodeDepth= -n.getInitialPos3d.y
+            nodeSoil= self.soilLayers.getSoilAtDepth(nodeDepth)
+            self.soilsAtNodes[n.tag]= nodeSoil
+            
+    def genMesh(self):
+        '''Define the FE mesh.
 
-        :param depth: depth to compute the pressure.
-        :param tributaryArea: area on which the pressure acts.
-        :param waterTableDepth: depth of the water table.
-        :param designValue: if true use the design value of the internal 
-                            friction.
+        :param modelSpace:
         '''
+        # Define finite element problem.
+        self.defineFEProblem()
+        preprocessor= self.feProblem.getPreprocessor
+        
+        # Problem geometry
+        lines= list()
+        kPoints= list()
+        for depth in self.soilLayers.getDepths():
+            kPoints.append(self.modelSpace.newKPoint(0,-depth,0))
+        kPt0= kPoints[0]
+        for kPt1 in kPoints[1:]:
+            newLine= self.modelSpace.newLine(kPt0, kPt1)
+            newLine.setElemSize(0.25)
+            kPt0= kPt1
+            lines.append(newLine)
+        
+        # Mesh generation
+        ## FE material.
+        xcPileSection= self.pileSection.defElasticShearSection2d(preprocessor)
+        ## Geometric transformations
+        lin= self.modelSpace.newLinearCrdTransf("lin")
+        ## Seed element
+        seedElemHandler= preprocessor.getElementHandler.seedElemHandler
+        seedElemHandler.dimElem= 2 # Bars defined in a two-dimensional space.
+        seedElemHandler.defaultMaterial= xcPileSection.name
+        seedElemHandler.defaultTransformation= lin.name
+        beam2d= seedElemHandler.newElement("ElasticBeam2d")
+        # beam2d.h= diameter
+        self.pileSet= preprocessor.getSets.defSet('pileSet')
+        for ln in lines:
+            ln.genMesh(xc.meshDir.I)
+            self.pileSet.lines.append(ln)
+        self.pileSet.fillDownwards()
 
-        Ea= self.getActivePressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # active.
-        E0= self.getAtRestPressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # at rest.
-        Ep= self.getPassivePressureAtDepth(depth= depth, designValue= designValue)*tributaryArea # passive.
-        return Ea, E0, Ep
-    
-    def defHorizontalSubgradeReactionNlMaterialAtDepth(self, preprocessor, name, depth, tributaryArea, designValue= False):
-        ''' Return the points of the force-displacement diagram.
+        ## Constraints.
+        bottomNode= kPoints[-1].getNode()
+        self.modelSpace.fixNodeF0F(bottomNode.tag) # Fix vertical displacement.
 
-        :param preprocessor: preprocessor of the finite element problem.
-        :param name: name identifying the material (if None compute a suitable name)
-        :param depth: depth of the point of interest.
-        :param tributaryArea: area on which the pressure acts.
-        :param designValue: if true use the design value of the internal 
-                            friction.
-        '''
-        # Compute corresponding earth thrusts (active, at rest, passive).
-        Ea, E0, Ep= self.getEarthThrusts(depth= depth, tributaryArea= tributaryArea, designValue= designValue)
-        # Define nonlinear spring material
-        matName= name
-        if(not matName):
-            matName= uuid.uuid1().hex            
-        eyMatName= 'ey'+matName
-        soil= self.getSoilAtDepth(depth= depth)
-        eyBasicMaterial= earth_pressure.def_ey_basic_material(preprocessor, name= eyMatName, E= soil.Kh, upperYieldStress= -Ea, lowerYieldStress= -Ep)
-        # Create initial stress material.
-        materialHandler= preprocessor.getMaterialHandler
-        retval= materialHandler.newMaterial("init_stress_material", matName)
-        retval.setMaterial(eyBasicMaterial.name)
-        retval.setInitialStress(-E0)
-        return retval
-    
-    def updateSpringStiffness(self, remainingLeftElements, currentExcavationDepth, tributaryAreas):
-        ''' Update the stiffness of the remaining materials after each excavation
-            step.
+        ### Define soil response diagrams.
+        soilResponseMaterials= dict()
+        self.tributaryAreas= dict()
+        self.nodesToExcavate= list() # Nodes in the excavation depth.
+        #### Compute tributary lengths.
+        self.pileSet.resetTributaries()
+        self.pileSet.computeTributaryLengths(False) # Compute tributary lenghts.
+        #### Compute soils at nodes.
+        self.setNodeSoils()
+        #### Define non-linear springs.
+        for n in self.pileSet.nodes:
+            nodeDepth= -n.getInitialPos3d.y
+            if(nodeDepth<self.excavationDepth):
+                self.nodesToExcavate.append((nodeDepth, n))
+            nonLinearSpringMaterial= None
+            tributaryArea= 0.0
+            if(nodeDepth>0.0): # Avoid zero soil response.
+                tributaryLength= n.getTributaryLength()
+                tributaryArea= tributaryLength*self.pileSpacing
+                materialName= 'soilResponse_z_'+str(n.tag)
+                nodeSoil= self.soilsAtNodes[n.tag]
+                nonLinearSpringMaterial= nodeSoil.defHorizontalSubgradeReactionNlMaterial(preprocessor, name= materialName, depth= nodeDepth, tributaryArea= tributaryArea, Kh= nodeSoil.Kh)
+
+            self.tributaryAreas[n.tag]= tributaryArea
+            soilResponseMaterials[n.tag]= nonLinearSpringMaterial
+
+        ### Duplicate nodes below ground level.
+        self.springPairs= list()
+        for n in self.pileSet.nodes:
+            nodeTag= n.tag
+            if(nodeTag in soilResponseMaterials):
+                newNode= self.modelSpace.duplicateNode(n)
+                self.modelSpace.fixNode000(newNode.tag)
+                self.springPairs.append((n, newNode))
+
+        ### Define Spring Elements
+        elements= preprocessor.getElementHandler
+        elements.dimElem= 2 #Element dimension.
+        self.leftZLElements= dict()
+        self.rightZLElements= dict()
+        for i, pair in enumerate(self.springPairs):
+            nodeTag= pair[0].tag
+            soilResponseMaterial= soilResponseMaterials[nodeTag]
+            if(soilResponseMaterial): # Spring defined for this node.
+                # Material for the left spring
+                elements.defaultMaterial= soilResponseMaterial.name
+                # Springs on the left side of the beam
+                zlLeft= elements.newElement("ZeroLength",xc.ID([pair[1].tag, pair[0].tag]))
+                zlLeft.setupVectors(xc.Vector([-1,0,0]),xc.Vector([0,-1,0]))
+                self.leftZLElements[nodeTag]= zlLeft
+
+                # Springs on the right side of the beam
+                zlRight= elements.newElement("ZeroLength",xc.ID([pair[0].tag, pair[1].tag]))
+                zlRight.setupVectors(xc.Vector([1,0,0]),xc.Vector([0,1,0]))
+                self.rightZLElements[nodeTag]= zlRight
+                
+    def updateSpringStiffness(self, remainingLeftElements, currentExcavationDepth):
+        ''' Update the stiffness of the remaining materials after each 
+            excavation step.
 
         :param remainingLeftElements: elements that remain "alive".
         :param currentExcavationDepth: current excavation depth.
-        :param tributaryAreas: dictionary containing the tributary areas corresponding to each node.
         '''
         updatedElements= list()
         for nodeTag in remainingLeftElements:
@@ -531,9 +606,8 @@ class SoilLayers(object):
             nodeDepth= -pileNode.getInitialPos3d.y
             newDepth= nodeDepth-currentExcavationDepth
             # Compute new soil response.
-            print('XXX asignar el suelo al nodo del muro como propiedad.')
-            soil= self.getSoilAtDepth(nodeDepth)
-            newEa, newE0, newEp= soil.getEarthThrusts(depth= newDepth, tributaryArea= tributaryAreas[nodeTag])
+            soil= self.soilsAtNodes[nodeTag]
+            newEa, newE0, newEp= soil.getEarthThrusts(depth= newDepth, tributaryArea= self.tributaryAreas[nodeTag])
             # Update soil response.
             leftElementInitStrainMaterial= leftElement.getMaterials()[0]
             leftElementEyBasicMaterial= leftElementInitStrainMaterial.material
@@ -543,26 +617,29 @@ class SoilLayers(object):
             updatedElements.append(leftElement)
             #print('node: ', nodeTag, ' node depth: ', '{:.2f}'.format(nodeDepth), ' left node depth: ', '{:.2f}'.format(newDepth), ' tributary area: ', '{:.2f}'.format(tributaryAreas[nodeTag]), 'strains: ', oldInitStrain, -newInitStrain, newInitStrain+oldInitStrain, ' elementTag= ', leftElement.tag)
         return updatedElements
-
-    def excavationProcess(self, preprocessor, solProc, nodesToExcavate, elementsOnExcavationSide, maxDepth, tributaryAreas):
+    
+    def excavationProcess(self, excavationSide):
         ''' Deactivates the excavated elements and updates the stiffness of the
             remaining ones.
 
-        :param preprocessor: pre-processor of the finite element problem.
-        :param solProc: solution procedure.
-        :param nodesToExcavate: nodes that lie on the excavation depth.
-        :param elementsOnExcavationSide: elements that lie on the excavation side.
-        :param maxDepth: maximum excavation depth.
-        :param tributaryAreas: dictionary containing the tributary areas 
-                               corresponding to each node.
+        :param excavationSide: side for the excavation ('left' or 'right')
         '''
         ## Sort nodes to excavate on its depth
-        nodesToExcavate.sort(key=itemgetter(0))
+        self.nodesToExcavate.sort(key=itemgetter(0))
+        ## Elements on excavation side.
+        elementsOnExcavationSide= None
+        if(excavationSide=='left'):
+            elementsOnExcavationSide= self.leftZLElements
+        elif(excavationSide=='right'):
+            elementsOnExcavationSide= self.rightZLElements
+        else:
+            lmsg.error("Excavation side can be 'left' or 'right'.")
+            exit(1)
         ## Elements to deactivate.
         remainingLeftElements= elementsOnExcavationSide
-        for tp in nodesToExcavate:
+        for tp in self.nodesToExcavate:
             currentExcavationDepth= tp[0]
-            if(currentExcavationDepth>maxDepth):
+            if(currentExcavationDepth>self.excavationDepth): # if excavation depth is reached, stop.
                 break
             node= tp[1]
             nodeTag= node.tag
@@ -571,49 +648,49 @@ class SoilLayers(object):
                 leftSpring= remainingLeftElements[nodeTag]
                 if(leftSpring):
                     # remove the spring.
-                    toKill= preprocessor.getSets.defSet('kill'+str(leftSpring.tag))
+                    toKill= self.modelSpace.defSet('kill'+str(leftSpring.tag))
                     toKill.getElements.append(leftSpring)
                     toKill.killElements()
                     remainingLeftElements.pop(nodeTag) # remove it from the dictionary.
-                    ok= solProc.solve()
+                    ok= self.solProc.solve()
                     if(ok!=0):
                         lmsg.error('Can\'t solve')
                         exit(1)
                     # Update left springs.
-                    updatedElements= self.updateSpringStiffness(remainingLeftElements, currentExcavationDepth= currentExcavationDepth, tributaryAreas= tributaryAreas)
+                    updatedElements= self.updateSpringStiffness(remainingLeftElements, currentExcavationDepth= currentExcavationDepth)
                     # Solve again.
-                    ok= solProc.solve()
+                    ok= self.solProc.solve()
                     if(ok!=0):
                         lmsg.error('Can\'t solve')
                         exit(1)
         return updatedElements
-    
-    def getResultsDict(self, tributaryAreas, springPairs, pileWallElements):
-        ''' Extracts earth pressures and internal forces from the model.
+                
+    def solve(self, reactionCheckTolerance= 1e-6, excavationSide= 'left'):
+        '''Compute the solution.
 
-        :param tributaryAreas: dictionary containing the tributary areas 
-                               corresponding to each node.
-        :param springPairs: pairs of nodes at the extremities of the springs
-                            elements representing the soil.
-        :param pileWallElements: top-down list of consecutive lines that compose
-                                 the pile wall.
+        :param reactionCheckTolerance: tolerance when checking nodal reactions.
+        :param excavationSide: side for the excavation ('left' or 'right')
         '''
+        ok= self.solProc.solve()
+        if(ok!=0):
+            lmsg.error('Can\'t solve')
+            exit(1)
+            
+        updatedElements= self.excavationProcess(excavationSide= excavationSide)
+        self.modelSpace.calculateNodalReactions(reactionCheckTolerance= reactionCheckTolerance)
+
+    def getResultsDict(self):
+        ''' Extracts earth pressures and internal forces from the model.'''
         retval= dict()
-        for sp in springPairs:
+        for sp in self.springPairs:
             fixedNode= sp[1]
             Rx= fixedNode.getReaction[0]
             pileNode= sp[0]
             Ux= pileNode.getDisp[0]
             depth= -fixedNode.getInitialPos3d.y
-            print('XXX asignar el suelo al nodo del muro como propiedad.')
-            soil= self.getSoilAtDepth(depth)
-            e0_factor= soil.K0Jaky()*soil.gamma()
-            ea_factor= soil.Ka()*soil.gamma()
-            ep_factor= soil.Kp()*soil.gamma()
-            tributaryArea= tributaryAreas[pileNode.tag]
-            E0= e0_factor*tributaryArea*depth
-            Ea= ea_factor*tributaryArea*depth
-            Ep= ep_factor*tributaryArea*depth
+            soil= self.soilsAtNodes[pileNode.tag]
+            tributaryArea= self.tributaryAreas[pileNode.tag]
+            Ea, E0, Ep= soil.getEarthThrusts(depth= depth, tributaryArea= tributaryArea)
             nodeResults= {'depth': depth, 'fixed_node':fixedNode.tag, 'Rx':Rx, 'E0':E0, 'Ea':Ea, 'Ep':Ep, 'Ux':Ux}
             # if(pileNode.tag in leftZLElements):
             #     leftElement= leftZLElements[pileNode.tag]
@@ -623,7 +700,7 @@ class SoilLayers(object):
             #     print('  leftN= ', leftN/1e3, 'rightN= ', rightN/1e3)
             retval[pileNode.tag]= nodeResults
         # Get internal forces.
-        for ln in pileWallElements: # for lines in list
+        for ln in self.pileSet.lines: # for lines in list
             for e in ln.elements: # for elements in line.
                 nodeTag= e.getNodes[0].tag
                 nodeResults= retval[nodeTag]
@@ -639,7 +716,7 @@ class SoilLayers(object):
         # Compute pres. dif.
         x= list()
         y= list()
-        for ln in pileWallElements: # for lines in list
+        for ln in self.pileSet.lines: # for lines in list
             for e in ln.elements: # for elements in line.
                 topNodeTag= e.getNodes[0].tag
                 topDepth= retval[topNodeTag]['depth']
@@ -658,3 +735,4 @@ class SoilLayers(object):
             pDif= presDif(depth)
             nodeResults['pDif']= pDif
         return retval
+
