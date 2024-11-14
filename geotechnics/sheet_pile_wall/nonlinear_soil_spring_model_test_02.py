@@ -9,7 +9,7 @@ from geotechnics import earth_pressure
 from materials.sections.fiber_section import def_column_RC_section
 from materials.ehe import EHE_materials
 from materials.ehe import EHE_limit_state_checking
-import excavation_process as ep
+import pile_wall as pw
 from misc_utils import log_messages as lmsg
 from tabulate import tabulate
 
@@ -32,18 +32,19 @@ steel= EHE_materials.B500S
 diameter= 450e-3 # Cross-section diameter [m]
 pileSection= def_column_RC_section.RCCircularSection(name='test',Rext= diameter/2.0, concrType=concr, reinfSteelType= steel)
 
-pileWall= ep.PileWall(pileSection= pileSection, soilLayersDepths= soilLayersDepths, soilLayers= soilLayers, excavationDepth= L1, pileSpacing= 1.0, waterTableDepth= None)
+pileWall= pw.PileWall(pileSection= pileSection, soilLayersDepths= soilLayersDepths, soilLayers= soilLayers, excavationDepth= L1, pileSpacing= 1.0, waterTableDepth= None)
 
 # Mesh generation
 pileWall.genMesh()
 
 # Solve 
-pileWall.solve(excavationSide= 'left')
+reactionCheckTolerance= 1e-6
+pileWall.solve(excavationSide= 'left', reactionCheckTolerance= reactionCheckTolerance)
 
 # Get results.
 results= pileWall.getResultsDict()
 
-outputTable= ep.get_results_table(resultsDict= results)
+outputTable= pw.get_results_table(resultsDict= results)
 
 # Compute maximum bending moment.
 MMin= 6.023e23
@@ -79,15 +80,15 @@ else:
     lmsg.error('test: '+fname+' ERROR.')
 
 # Matplotlib output.
-ep.plot_results(resultsDict= results, title= 'Based on the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das.')
+pw.plot_results(resultsDict= results, title= 'Based on the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das.')
 
-# # VTK Graphic output.
-# from postprocess import output_handler
-# oh= output_handler.OutputHandler(modelSpace)
-# # oh.displayFEMesh(setsToDisplay= [pileSet])
-# #oh.displayLocalAxes()
-# #oh.displayLoads()
-# oh.displayReactions(reactionCheckTolerance= reactionCheckTolerance)
-# oh.displayDispRot('uX', defFScale= 10.0)
-# oh.displayIntForcDiag('M')
-# oh.displayIntForcDiag('V')
+# VTK Graphic output.
+from postprocess import output_handler
+oh= output_handler.OutputHandler(pileWall.modelSpace)
+# oh.displayFEMesh(setsToDisplay= [pileSet])
+#oh.displayLocalAxes()
+#oh.displayLoads()
+oh.displayReactions(reactionCheckTolerance= reactionCheckTolerance)
+oh.displayDispRot('uX', defFScale= 10.0)
+oh.displayIntForcDiag('M')
+oh.displayIntForcDiag('V')

@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-''' Nonlinear soil spring model inspired in the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das. Eight Edition. CENGAGE Learning. 2016.'''
+''' Nonlinear non-linear spring model to analyze pile wall structutres.'''
+
+__author__= "Luis C. Pérez Tato (LCPT) , Ana Ortega (AO_O) "
+__copyright__= "Copyright 2024, LCPT, AO_O"
+__license__= "GPL"
+__version__= "3.0"
+__email__= "l.pereztato@ciccp.es, ana.Ortega@ciccp.es "
 
 import xc
 from geotechnics import earth_pressure

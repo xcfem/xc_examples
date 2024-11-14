@@ -12,7 +12,7 @@ from solution import predefined_solutions
 from materials.sections.fiber_section import def_column_RC_section
 from materials.ehe import EHE_materials
 from materials.ehe import EHE_limit_state_checking
-import excavation_process as ep
+import pile_wall as pw
 from misc_utils import log_messages as lmsg
 from tabulate import tabulate
 
@@ -40,7 +40,7 @@ steel= EHE_materials.B500S
 diameter= 450e-3 # Cross-section diameter [m]
 pileSection= def_column_RC_section.RCCircularSection(name='test',Rext= diameter/2.0, concrType=concr, reinfSteelType= steel)
 
-pileWall= ep.PileWall(pileSection= pileSection, soilLayersDepths= soilLayersDepths, soilLayers= soilLayers, excavationDepth= L2, pileSpacing= 1.0, waterTableDepth= L1)
+pileWall= pw.PileWall(pileSection= pileSection, soilLayersDepths= soilLayersDepths, soilLayers= soilLayers, excavationDepth= L2, pileSpacing= 1.0, waterTableDepth= L1)
 
 # Mesh generation
 pileWall.genMesh()
@@ -52,7 +52,7 @@ pileWall.solve(excavationSide= 'left', reactionCheckTolerance= reactionCheckTole
 # Get results.
 results= pileWall.getResultsDict()
 
-outputTable= ep.get_results_table(resultsDict= results)
+outputTable= pw.get_results_table(resultsDict= results)
 
 # Compute maximum bending moment.
 MMin= 6.023e23
@@ -80,6 +80,9 @@ if abs(err)<.05:
     print('test: '+fname+': ok.')
 else:
     lmsg.error('test: '+fname+' ERROR.')
+    
+# Matplotlib output.
+pw.plot_results(resultsDict= results, title= 'Based on the example 14.1 of the book "Principles of Foundation Engineering" of Braja M. Das.')
 
 # VTK Graphic output.
 from postprocess import output_handler
