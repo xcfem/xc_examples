@@ -521,7 +521,7 @@ class PileWall(object):
         seedElemHandler.defaultTransformation= lin.name
         beam2d= seedElemHandler.newElement("ElasticBeam2d")
         # beam2d.h= diameter
-        self.pileSet= preprocessor.getSets.defSet('pileSet')
+        self.pileSet= self.modelSpace.defSet('pileSet')
         for ln in lines:
             ln.genMesh(xc.meshDir.I)
             self.pileSet.lines.append(ln)
@@ -534,7 +534,6 @@ class PileWall(object):
         ### Define soil response diagrams.
         soilResponseMaterials= dict()
         self.tributaryAreas= dict()
-        self.nodesToExcavate= list() # Nodes in the excavation depth.
         #### Compute tributary lengths.
         self.pileSet.resetTributaries()
         self.pileSet.computeTributaryLengths(False) # Compute tributary lenghts.
@@ -543,8 +542,6 @@ class PileWall(object):
         #### Define non-linear springs.
         for n in self.pileSet.nodes:
             nodeDepth= -n.getInitialPos3d.y
-            if(nodeDepth<self.excavationDepth):
-                self.nodesToExcavate.append((nodeDepth, n))
             nonLinearSpringMaterial= None
             tributaryArea= 0.0
             if(nodeDepth>0.0): # Avoid zero soil response.
@@ -624,6 +621,13 @@ class PileWall(object):
 
         :param excavationSide: side for the excavation ('left' or 'right')
         '''
+        self.nodesToExcavate= list() # Nodes in the excavation depth.
+        for n in self.pileSet.nodes:
+            nodeDepth= -n.getInitialPos3d.y
+            print(n.tag, nodeDepth, self.excavationDepth)
+            if(nodeDepth<=self.excavationDepth):
+                print('  pasa: ', n.tag, nodeDepth, self.excavationDepth)
+                self.nodesToExcavate.append((nodeDepth, n))
         ## Sort nodes to excavate on its depth
         self.nodesToExcavate.sort(key=itemgetter(0))
         ## Elements on excavation side.
