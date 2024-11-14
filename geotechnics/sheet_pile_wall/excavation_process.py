@@ -14,152 +14,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 
 # Excavation process.
-def update_spring_stiffness(remainingLeftElements, currentExcavationDepth, tributaryAreas, soil):
-    ''' Update the stiffness of the remaining materials after each excavation
-        step.
-
-    :param remainingLeftElements: elements that remain "alive".
-    :param currentExcavationDepth: current excavation depth.
-    :param tributaryAreas: dictionary containing the tributary areas corresponding to each node.
-    :param soil: soil model to compute the soil reaction diagram.
-    '''
-    updatedElements= list()
-    for nodeTag in remainingLeftElements:
-        leftElement= remainingLeftElements[nodeTag]
-        elemNodes= leftElement.nodes
-        # Get the node depth.
-        nodeIndex= 1
-        if(nodeTag==elemNodes[0].tag):
-            nodeIndex= 0
-        pileNode= elemNodes[nodeIndex]
-        nodeDepth= -pileNode.getInitialPos3d.y
-        newDepth= nodeDepth-currentExcavationDepth
-        # Compute new soil response.
-        newEa, newE0, newEp= soil.getEarthThrusts(depth= newDepth, tributaryArea= tributaryAreas[nodeTag])
-        # Update soil response.
-        leftElementInitStrainMaterial= leftElement.getMaterials()[0]
-        leftElementEyBasicMaterial= leftElementInitStrainMaterial.material
-
-        leftElementEyBasicMaterial.setParameters(soil.Kh, -newEp, -newEa)
-        leftElementInitStrainMaterial.setInitialStress(-newE0)
-        updatedElements.append(leftElement)
-        #print('node: ', nodeTag, ' node depth: ', '{:.2f}'.format(nodeDepth), ' left node depth: ', '{:.2f}'.format(newDepth), ' tributary area: ', '{:.2f}'.format(tributaryAreas[nodeTag]), 'strains: ', oldInitStrain, -newInitStrain, newInitStrain+oldInitStrain, ' elementTag= ', leftElement.tag)
-    return updatedElements
-                    
-def excavation_process(preprocessor, solProc, nodesToExcavate, elementsOnExcavationSide, maxDepth, tributaryAreas, soil):
-    ''' Deactivates the excavated elements and updates the stiffness of the
-        remaining ones.
-
-    :param preprocessor: pre-processor of the finite element problem.
-    :param solProc: solution procedure.
-    :param nodesToExcavate: nodes that lie on the excavation depth.
-    :param elementsOnExcavationSide: elements that lie on the excavation side.
-    :param maxDepth: maximum excavation depth.
-    :param tributaryAreas: dictionary containing the tributary areas 
-                           corresponding to each node.
-    :param soil: soil model to compute the soil reaction diagram.
-    '''
-    ## Sort nodes to excavate on its depth
-    nodesToExcavate.sort(key=itemgetter(0))
-    ## Elements to deactivate.
-    remainingLeftElements= elementsOnExcavationSide
-    for tp in nodesToExcavate:
-        currentExcavationDepth= tp[0]
-        if(currentExcavationDepth>maxDepth):
-            break
-        node= tp[1]
-        nodeTag= node.tag
-        leftSpring= None
-        if(nodeTag in remainingLeftElements): # left spring still exists.
-            leftSpring= remainingLeftElements[nodeTag]
-            if(leftSpring):
-                # remove the spring.
-                toKill= preprocessor.getSets.defSet('kill'+str(leftSpring.tag))
-                toKill.getElements.append(leftSpring)
-                toKill.killElements()
-                remainingLeftElements.pop(nodeTag) # remove it from the dictionary.
-                ok= solProc.solve()
-                if(ok!=0):
-                    lmsg.error('Can\'t solve')
-                    exit(1)
-                # Update left springs.
-                updatedElements= update_spring_stiffness(remainingLeftElements, currentExcavationDepth= currentExcavationDepth, tributaryAreas= tributaryAreas, soil= soil)
-                # Solve again.
-                ok= solProc.solve()
-                if(ok!=0):
-                    lmsg.error('Can\'t solve')
-                    exit(1)
-    return updatedElements
-
-def get_results_dict(tributaryAreas, soil, springPairs, pileWallElements):
-    ''' Extracts earth pressures and internal forces from the model.
-
-    :param tributaryAreas: dictionary containing the tributary areas 
-                           corresponding to each node.
-    :param soil: soil model to compute the soil reaction diagram.
-    :param springPairs: pairs of nodes at the extremities of the springs
-                        elements representing the soil.
-    :param pileWallElements: top-down list of consecutive lines that compose
-                             the pile wall.
-    '''
-    retval= dict()
-    e0_factor= soil.K0Jaky()*soil.gamma()
-    ea_factor= soil.Ka()*soil.gamma()
-    ep_factor= soil.Kp()*soil.gamma()
-    for sp in springPairs:
-        fixedNode= sp[1]
-        Rx= fixedNode.getReaction[0]
-        pileNode= sp[0]
-        Ux= pileNode.getDisp[0]
-        depth= -fixedNode.getInitialPos3d.y
-        tributaryArea= tributaryAreas[pileNode.tag]
-        E0= e0_factor*tributaryArea*depth
-        Ea= ea_factor*tributaryArea*depth
-        Ep= ep_factor*tributaryArea*depth
-        nodeResults= {'depth': depth, 'fixed_node':fixedNode.tag, 'Rx':Rx, 'E0':E0, 'Ea':Ea, 'Ep':Ep, 'Ux':Ux}
-        # if(pileNode.tag in leftZLElements):
-        #     leftElement= leftZLElements[pileNode.tag]
-        #     leftN= leftElement.getResistingForce()[0]
-        #     rightElement= rightZLElements[pileNode.tag]
-        #     rightN= rightElement.getResistingForce()[0]
-        #     print('  leftN= ', leftN/1e3, 'rightN= ', rightN/1e3)
-        retval[pileNode.tag]= nodeResults
-    # Get internal forces.
-    for ln in pileWallElements: # for lines in list
-        for e in ln.elements: # for elements in line.
-            nodeTag= e.getNodes[0].tag
-            nodeResults= retval[nodeTag]
-            depth= nodeResults['depth']
-            # M2= e.getM2
-            nodeResults['M']= e.getM1 # bending moment.
-            nodeResults['V']= e.getV1 # shear force.    
-    # Get the moment in the deepest node.
-    nodeTag= e.getNodes[1].tag
-    retval[nodeTag]['M']= e.getM2 # bending moment.
-    retval[nodeTag]['V']= e.getV2 # shear force.
-    
-    # Compute pres. dif.
-    x= list()
-    y= list()
-    for ln in pileWallElements: # for lines in list
-        for e in ln.elements: # for elements in line.
-            topNodeTag= e.getNodes[0].tag
-            topDepth= retval[topNodeTag]['depth']
-            V1= retval[topNodeTag]['V'] # shear force at top node.
-            bottomNodeTag= e.getNodes[1].tag
-            bottomDepth= retval[bottomNodeTag]['depth']
-            V2= retval[bottomNodeTag]['V'] # shear force at bottom node.
-            presDif= (V2-V1)/(bottomDepth-topDepth)
-            avgDepth= (bottomDepth+topDepth)/2.0
-            x.append(avgDepth)
-            y.append(presDif)
-    presDif= interp1d(x, y, kind='linear', fill_value= 'extrapolate', assume_sorted=True)
-    for nodeTag in retval:
-        nodeResults= retval[nodeTag]
-        depth= nodeResults['depth']
-        pDif= presDif(depth)
-        nodeResults['pDif']= pDif
-    return retval
 
 def get_results_table(resultsDict):
     ''' Return the given results in tabular format.
@@ -193,18 +47,27 @@ def plot_results(resultsDict, title= None):
     :param resultsDict: dictionary containing the results.
     :param title: title.
     '''
+    def get_results(resultsDict, x_field:str, x_scale_factor:float, y_field= 'depth'):
+        ''' Extract the results from the given dictionary and sort them on
+            depth.
+
+        '''
+        xy= list()
+        for nodeTag in resultsDict:
+            nodeResults= resultsDict[nodeTag]
+            depth= nodeResults[y_field]
+            xValue= nodeResults[x_field]
+            xy.append((xValue*x_scale_factor, depth))
+        ## Sort on depth
+        xy= sorted(xy, key=lambda x: float(x[1]))
+        ## Unzip the tuples.
+        return zip(*xy)
+        
     fig, (disp, moment, shear, presDif, soilReact) = plt.subplots(1, 5)
     pileWallColor= 'tab:blue'
     diagramsColor= 'tab:red'
     # Plot displacements.
-    x= list()
-    y= list()
-    for nodeTag in resultsDict:
-        nodeResults= resultsDict[nodeTag]
-        depth= nodeResults['depth']
-        Ux= nodeResults['Ux']
-        y.append(depth)
-        x.append(Ux*1e3)
+    x, y= get_results(resultsDict= resultsDict, x_field= 'Ux', x_scale_factor= 1e3, y_field= 'depth')
     disp.plot(x, y, diagramsColor)
     disp.invert_yaxis()  # Reverse y-axis
     topPoint= (0.0, y[0])
@@ -222,14 +85,7 @@ def plot_results(resultsDict, title= None):
     disp.grid()
     
     # Plot bending moment.
-    x= list()
-    y= list()
-    for nodeTag in resultsDict:
-        nodeResults= resultsDict[nodeTag]
-        depth= nodeResults['depth']
-        M= nodeResults['M']
-        y.append(depth)
-        x.append(M/1e3)
+    x, y= get_results(resultsDict= resultsDict, x_field= 'M', x_scale_factor= 1e-3, y_field= 'depth')
     moment.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
     moment.plot(x, y, diagramsColor)
     moment.invert_yaxis()  # Reverse y-axis
@@ -245,14 +101,7 @@ def plot_results(resultsDict, title= None):
     moment.grid()
     
     # Plot shear forces.
-    x= list()
-    y= list()
-    for nodeTag in resultsDict:
-        nodeResults= resultsDict[nodeTag]
-        depth= nodeResults['depth']
-        V= nodeResults['V']
-        y.append(depth)
-        x.append(V/1e3)
+    x, y= get_results(resultsDict= resultsDict, x_field= 'V', x_scale_factor= 1e-3, y_field= 'depth')
     shear.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
     shear.plot(x, y, diagramsColor)
     shear.invert_yaxis()  # Reverse y-axis
@@ -267,15 +116,8 @@ def plot_results(resultsDict, title= None):
     shear.set_title('Shear')
     shear.grid()
     
-    # Plot shear forces.
-    x= list()
-    y= list()
-    for nodeTag in resultsDict:
-        nodeResults= resultsDict[nodeTag]
-        depth= nodeResults['depth']
-        pDif= nodeResults['pDif']
-        y.append(depth)
-        x.append(pDif/1e3)
+    # Plot pDif.
+    x, y= get_results(resultsDict= resultsDict, x_field= 'pDif', x_scale_factor= 1e-3, y_field= 'depth')
     presDif.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
     presDif.plot(x, y, diagramsColor)
     presDif.invert_yaxis()  # Reverse y-axis
@@ -291,14 +133,7 @@ def plot_results(resultsDict, title= None):
     presDif.grid()
     
     # Plot soil reactions.
-    x= list()
-    y= list()
-    for nodeTag in resultsDict:
-        nodeResults= resultsDict[nodeTag]
-        depth= nodeResults['depth']
-        pDif= nodeResults['Rx']
-        y.append(depth)
-        x.append(pDif/1e3)
+    x, y= get_results(resultsDict= resultsDict, x_field= 'Rx', x_scale_factor= 1e-3, y_field= 'depth')
     soilReact.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
     soilReact.plot(x, y, diagramsColor)
     soilReact.invert_yaxis()  # Reverse y-axis
@@ -327,52 +162,85 @@ class SoilLayers(object):
 
     :ivar depths: (float list) layer depths.
     :ivar soils: soil objects for each layer.
-    :ivar waterTableDepth: (float) depth of the water table.
+    :ivar waterTableDepthIndex: index of the water table depth in self.depths.
+    :ivar excavationDepthIndex: index of the excavation depth in self.depths.
     '''
-    def __init__(self, depths, soils, waterTableDepth= None):
+    def __init__(self, depths, soils, waterTableDepth= None, excavationDepth= None):
         '''Constructor.
 
         :param depths: (float list) layer depths.
         :param soils: soil objects for each layer.
-        :param waterTableDepth: (float list) depth of the water table.
+        :param waterTableDepth: depth of the water table.
         '''
         self.depths= depths
         self.soils= soils
         self.setWaterTableDepth(waterTableDepth= waterTableDepth)
+        self.setExcavationDepth(excavationDepth= excavationDepth)
 
-    def setWaterTableDepth(self, waterTableDepth= None):
-        ''' Recomputes the depths and soils list to take account of
-            the water table.
-        :param waterTableDepth: (float list) depth of the water table.
+    def getTotalDepth(self):
+        ''' Return the distance from the deepest to the shallwest depth in the
+            contariner.
         '''
-        if(waterTableDepth):
+        return self.depths[-1]-self.depths[0]
+        
+    def splitAtDepth(self, newDepth= None):
+        ''' Recomputes the depths and soils list to take account of
+            the given one.
+        :param newDepth: depth of interest.
+        '''
+        retval= -1
+        if(newDepth):
             calculationDepths= list()
             calculationSoils= list()
-            waterTableDepthIndex= self.getSoilIndexAtDepth(depth= waterTableDepth)
+            newDepthIndex= self.getSoilIndexAtDepth(depth= newDepth)
             # Check if already in depths list.
-            soilDepth= self.depths[waterTableDepthIndex]
-            if(abs(soilDepth-waterTableDepth)>1e-5): # not in depths list.
+            soilDepth= self.depths[newDepthIndex]
+            totalDepth= self.getTotalDepth()
+            tol= totalDepth/1e3
+            if(abs(soilDepth-newDepth)>tol): # not in depths list.
                 for i, (d, soil) in enumerate(zip(self.depths, self.soils)):
                     calculationDepths.append(d)
                     calculationSoils.append(soil)
-                    if(i==waterTableDepthIndex):
-                        calculationDepths.append(waterTableDepth)
+                    if(i==newDepthIndex):
+                        calculationDepths.append(newDepth)
                         calculationSoils.append(soil)
-                        self.waterTableDepthIndex= waterTableDepthIndex+1
+                        retval= newDepthIndex+1
                 self.depths= calculationDepths
                 self.soils= calculationSoils
             else:
-                self.waterTableDepthIndex= waterTableDepthIndex
-        else:
-            self.waterTableDepthIndex= -1
+                retval= newDepthIndex
+        return retval
+            
+    def setWaterTableDepth(self, waterTableDepth= None):
+        ''' Recomputes the depths and soils list to take account of
+            the water table.
+
+        :param waterTableDepth: depth of the water table.
+        '''
+        self.waterTableDepthIndex= self.splitAtDepth(waterTableDepth)
+        
+    def setExcavationDepth(self, excavationDepth= None):
+        ''' Recomputes the depths and soils list to take account of
+            the water table.
+
+        :param excavationDepth: depth of the water table.
+        '''
+        self.excavationDepthIndex= self.splitAtDepth(excavationDepth)
         
     def getWaterTableDepth(self):
-        ''' Return the index that corresponds to water table depth.
-
+        ''' Return the index that corresponds to the depth of the water table.
         '''
         retval= 6378e3
         if(self.waterTableDepthIndex>0):
             retval= self.depths[self.waterTableDepthIndex]
+        return retval
+        
+    def getExcavationDepth(self):
+        ''' Return the index that corresponds to the excavation depth.
+        '''
+        retval= 6378e3
+        if(self.excavationDepthIndex>0):
+            retval= self.depths[self.excavationDepthIndex]
         return retval
 
     def getDepths(self):
@@ -442,15 +310,12 @@ class SoilLayers(object):
         return self.getVerticalPressureAtDepth(depth= depth)*K
 
     
-
-
 class PileWall(object):
     '''Pile wall analysis using non-linear spring to represent soil-structure
        interaction.
 
     :ivar pileSection: 2D elastic shear section for the pile wall beam elements.
     :ivar soilLayers: SoilLayers object.
-    :ivar excavationDepth: depth of the excavation.
     '''
     
     def __init__(self, pileSection, soilLayersDepths, soilLayers, excavationDepth, pileSpacing= 1.0, waterTableDepth= None):
@@ -465,8 +330,7 @@ class PileWall(object):
         :param waterTableDepth: (float) depth of the water table.
         '''
         self.pileSection= pileSection
-        self.soilLayers= SoilLayers(depths= soilLayersDepths, soils= soilLayers, waterTableDepth= None)
-        self.excavationDepth= excavationDepth
+        self.soilLayers= SoilLayers(depths= soilLayersDepths, soils= soilLayers, waterTableDepth= waterTableDepth, excavationDepth= excavationDepth)
         self.pileSpacing= pileSpacing
 
     def defineFEProblem(self):
@@ -622,11 +486,11 @@ class PileWall(object):
         :param excavationSide: side for the excavation ('left' or 'right')
         '''
         self.nodesToExcavate= list() # Nodes in the excavation depth.
+        excavationDepth= self.soilLayers.getExcavationDepth()
         for n in self.pileSet.nodes:
             nodeDepth= -n.getInitialPos3d.y
-            print(n.tag, nodeDepth, self.excavationDepth)
-            if(nodeDepth<=self.excavationDepth):
-                print('  pasa: ', n.tag, nodeDepth, self.excavationDepth)
+            print(n.tag, nodeDepth, excavationDepth)
+            if(nodeDepth<=excavationDepth):
                 self.nodesToExcavate.append((nodeDepth, n))
         ## Sort nodes to excavate on its depth
         self.nodesToExcavate.sort(key=itemgetter(0))
@@ -641,9 +505,10 @@ class PileWall(object):
             exit(1)
         ## Elements to deactivate.
         remainingLeftElements= elementsOnExcavationSide
+        excavationDepth= self.soilLayers.getExcavationDepth()
         for tp in self.nodesToExcavate:
             currentExcavationDepth= tp[0]
-            if(currentExcavationDepth>self.excavationDepth): # if excavation depth is reached, stop.
+            if(currentExcavationDepth>excavationDepth): # if excavation depth is reached, stop.
                 break
             node= tp[1]
             nodeTag= node.tag

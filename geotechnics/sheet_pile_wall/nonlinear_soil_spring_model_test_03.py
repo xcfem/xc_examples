@@ -18,13 +18,6 @@ from tabulate import tabulate
 
 lmsg.log('WARNING: work in progress. Use with caution.')
 
-# Define finite element problem.
-feProblem= xc.FEProblem()
-preprocessor=  feProblem.getPreprocessor   
-nodes= preprocessor.getNodeHandler
-## Problem type
-modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
-
 # Materials definition
 ## Soil materials
 ### Dry soil.
@@ -40,126 +33,32 @@ Dtheory= 5.46 # theoretical depth of embedment
 L= L2+1.3*Dtheory # Total lenght (m)
 soilLayersDepths= [0.0, L1, L2, L]
 soilLayers= [drySoil, wetSoil, wetSoil, wetSoil]
-soilStrata= ep.SoilLayers(depths= soilLayersDepths, soils= soilLayers, waterTableDepth= L1)
 
 ## Pile material.
 concr= EHE_materials.HA30
 steel= EHE_materials.B500S
 diameter= 450e-3 # Cross-section diameter [m]
 pileSection= def_column_RC_section.RCCircularSection(name='test',Rext= diameter/2.0, concrType=concr, reinfSteelType= steel)
-xcPileSection= pileSection.defElasticShearSection2d(preprocessor)
 
-# Problem geometry
-pileSpacing= 1.0 # One pile every meter.
-lines= list()
-kPoints= list()
-for depth in soilLayersDepths:
-    kPoints.append(modelSpace.newKPoint(0,-depth,0))
-kPt0= kPoints[0]
-for kPt1 in kPoints[1:]:
-    newLine= modelSpace.newLine(kPt0, kPt1)
-    newLine.setElemSize(0.25)
-    kPt0= kPt1
-    lines.append(newLine)
+pileWall= ep.PileWall(pileSection= pileSection, soilLayersDepths= soilLayersDepths, soilLayers= soilLayers, excavationDepth= L2, pileSpacing= 1.0, waterTableDepth= L1)
 
-    
 # Mesh generation
-## Geometric transformations
-lin= modelSpace.newLinearCrdTransf("lin")
-## Seed element
-seedElemHandler= preprocessor.getElementHandler.seedElemHandler
-seedElemHandler.dimElem= 2 # Bars defined in a two-dimensional space.
-seedElemHandler.defaultMaterial= xcPileSection.name
-seedElemHandler.defaultTransformation= lin.name
-beam2d= seedElemHandler.newElement("ElasticBeam2d")
-beam2d.h= diameter
-pileSet= preprocessor.getSets.defSet('pileSet')
-for ln in lines:
-    ln.genMesh(xc.meshDir.I)
-    pileSet.lines.append(ln)
-pileSet.fillDownwards()
-        
-        
-## Constraints.
-bottomNode= kPoints[-1].getNode()
-modelSpace.fixNodeF0F(bottomNode.tag) # Fix vertical displacement.
+pileWall.genMesh()
 
-## Define nonlinear springs.
-
-### Define soil response diagrams.
-soilResponseMaterials= dict()
-tributaryAreas= dict()
-nodesToExcavate= list() # Nodes in the excavation depth.
-#### Compute tributary lengths.
-pileSet.resetTributaries()
-pileSet.computeTributaryLengths(False) # Compute tributary lenghts.
-#### Define non-linear springs.
-for n in pileSet.nodes:
-    nodeDepth= -n.getInitialPos3d.y
-    if(nodeDepth<L2):
-        nodesToExcavate.append((nodeDepth, n))
-    nonLinearSpringMaterial= None
-    tributaryArea= 0.0
-    if(nodeDepth>0.0): # Avoid zero soil response.
-        tributaryLength= n.getTributaryLength()
-        tributaryArea= tributaryLength*pileSpacing
-        materialName= 'soilResponse_z_'+str(n.tag)
-        nonLinearSpringMaterial= soilStrata.defHorizontalSubgradeReactionNlMaterialAtDepth(preprocessor, name= materialName, depth= nodeDepth, tributaryArea= tributaryArea)
-        
-    tributaryAreas[n.tag]= tributaryArea
-    soilResponseMaterials[n.tag]= nonLinearSpringMaterial
-        
-### Duplicate nodes below ground level.
-springPairs= list()
-for n in pileSet.nodes:
-    nodeTag= n.tag
-    if(nodeTag in soilResponseMaterials):
-        newNode= nodes.duplicateNode(nodeTag)
-        modelSpace.fixNode000(newNode.tag)
-        springPairs.append((n, newNode))
-
-### Define Spring Elements
-elements= preprocessor.getElementHandler
-elements.dimElem= 2 #Element dimension.
-leftZLElements= dict()
-rightZLElements= dict()
-for i, pair in enumerate(springPairs):
-    nodeTag= pair[0].tag
-    soilResponseMaterial= soilResponseMaterials[nodeTag]
-    if(soilResponseMaterial): # Spring defined for this node.
-        # Material for the left spring
-        elements.defaultMaterial= soilResponseMaterial.name
-        # Springs on the left side of the beam
-        zlLeft= elements.newElement("ZeroLength",xc.ID([pair[1].tag, pair[0].tag]))
-        zlLeft.setupVectors(xc.Vector([-1,0,0]),xc.Vector([0,-1,0]))
-        leftZLElements[nodeTag]= zlLeft
-        
-        # Springs on the right side of the beam
-        zlRight= elements.newElement("ZeroLength",xc.ID([pair[0].tag, pair[1].tag]))
-        zlRight.setupVectors(xc.Vector([1,0,0]),xc.Vector([0,1,0]))
-        rightZLElements[nodeTag]= zlRight
-        
 # Solve 
-numSteps= 10
-#solProc= predefined_solutions.PenaltyKrylovNewton(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-6, printFlag= 0)
-solProc= predefined_solutions.PenaltyNewtonRaphson(prb= feProblem, numSteps= numSteps, maxNumIter= 300, convergenceTestTol= 1e-5, printFlag= 0)
-ok= solProc.solve()
-if(ok!=0):
-    lmsg.error('Can\'t solve')
-    exit(1)
-    
 reactionCheckTolerance= 1e-6
-updatedElements= soilStrata.excavationProcess(preprocessor= preprocessor, solProc= solProc, nodesToExcavate= nodesToExcavate, elementsOnExcavationSide= leftZLElements, maxDepth= 5.0, tributaryAreas= tributaryAreas)
-modelSpace.calculateNodalReactions(reactionCheckTolerance= reactionCheckTolerance)
+pileWall.solve(excavationSide= 'left', reactionCheckTolerance= reactionCheckTolerance)
 
-finalResults= soilStrata.getResultsDict(tributaryAreas= tributaryAreas, springPairs= springPairs, pileWallElements= pileSet.lines)
-outputTable= ep.get_results_table(resultsDict= finalResults)
+# Get results.
+results= pileWall.getResultsDict()
+
+outputTable= ep.get_results_table(resultsDict= results)
 
 # Compute maximum bending moment.
 MMin= 6.023e23
 MMax= -MMin
-for nodeTag in finalResults:
-    nodeResults= finalResults[nodeTag]
+for nodeTag in results:
+    nodeResults= results[nodeTag]
     depth= nodeResults['depth']
     M= nodeResults['M']
     MMin= min(MMin, M)
@@ -184,7 +83,7 @@ else:
 
 # VTK Graphic output.
 from postprocess import output_handler
-oh= output_handler.OutputHandler(modelSpace)
+oh= output_handler.OutputHandler(pileWall.modelSpace)
 # oh.displayBlocks()
 # oh.displayFEMesh(setsToDisplay= [pileSet])
 # oh.displayLocalAxes()

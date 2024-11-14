@@ -80,7 +80,7 @@ else:
     lmsg.error('test: '+fname+' ERROR.')
 
 # Matplotlib output.
-# ep.plot_results(resultsDict= results, title= 'Based on the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das.')
+ep.plot_results(resultsDict= results, title= 'Based on the example 14.2 of the book "Principles of Foundation Engineering" of Braja M. Das.')
 
 # # VTK Graphic output.
 # from postprocess import output_handler
