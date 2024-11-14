@@ -13,8 +13,6 @@ from postprocess.reports import common_formats as cf
 import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 
-# Excavation process.
-
 def get_results_table(resultsDict):
     ''' Return the given results in tabular format.
 
@@ -51,6 +49,10 @@ def plot_results(resultsDict, title= None):
         ''' Extract the results from the given dictionary and sort them on
             depth.
 
+        :param resultsDict: dictionary containing the analysis results.
+        :param x_field: values for the x axis.
+        :param x_scale_factor: scale factor on the x axis.
+        :param y_field: values por the y axis.
         '''
         xy= list()
         for nodeTag in resultsDict:
@@ -62,91 +64,58 @@ def plot_results(resultsDict, title= None):
         xy= sorted(xy, key=lambda x: float(x[1]))
         ## Unzip the tuples.
         return zip(*xy)
+
+    def plot_diagram(ax, resultsDict, title:str, x_field:str, x_scale_factor:float, x_label:str, y_field= 'depth', y_label= None):
+        ''' Extract the results from the given dictionary and sort them on
+            depth.
+
+        :param ax: matplotlib Axes object.
+        :param resultsDict: dictionary containing the analysis results.
+        :param title: title for the diagram.
+        :param x_field: values for the x axis.
+        :param x_scale_factor: scale factor on the x axis.
+        :param x_label: label for the x axis.
+        :param y_field: values por the y axis.
+        :param y_label: label for the y axis.
+        '''
+        x, y= get_results(resultsDict= resultsDict, x_field= x_field, x_scale_factor= x_scale_factor, y_field= y_field)
+        ax.plot(x, y, diagramsColor)
+        ax.invert_yaxis()  # Reverse y-axis
+        topPoint= (0.0, y[0])
+        bottomPoint= (0.0, y[-1])
+        ax.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
+        ratio= 4
+        xleft, xright = ax.get_xlim()
+        ybottom, ytop = ax.get_ylim()
+        ax.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
+        if(x_field=='Ux'):
+            loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
+            ax.xaxis.set_major_locator(loc)
+
+        if(y_label):
+            ax.set(xlabel= x_label, ylabel= y_label)
+        else:
+            ax.set(xlabel= x_label)
+        ax.set_title(title)
+        ax.grid()
         
     fig, (disp, moment, shear, presDif, soilReact) = plt.subplots(1, 5)
     pileWallColor= 'tab:blue'
     diagramsColor= 'tab:red'
     # Plot displacements.
-    x, y= get_results(resultsDict= resultsDict, x_field= 'Ux', x_scale_factor= 1e3, y_field= 'depth')
-    disp.plot(x, y, diagramsColor)
-    disp.invert_yaxis()  # Reverse y-axis
-    topPoint= (0.0, y[0])
-    bottomPoint= (0.0, y[-1])
-    disp.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
-    ratio= 4
-    xleft, xright = disp.get_xlim()
-    ybottom, ytop = disp.get_ylim()
-    disp.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
-    loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
-    disp.xaxis.set_major_locator(loc)
-
-    disp.set(xlabel= 'Ux (mm)', ylabel= 'Depth (m)')
-    disp.set_title('Displacements')
-    disp.grid()
+    plot_diagram(ax= disp, resultsDict= resultsDict, title= 'Displacements', x_field= 'Ux', x_scale_factor= 1e3, x_label= 'Ux (mm)', y_field= 'depth', y_label= 'Depth (m)')
     
     # Plot bending moment.
-    x, y= get_results(resultsDict= resultsDict, x_field= 'M', x_scale_factor= 1e-3, y_field= 'depth')
-    moment.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
-    moment.plot(x, y, diagramsColor)
-    moment.invert_yaxis()  # Reverse y-axis
-    ratio= 4
-    xleft, xright = moment.get_xlim()
-    ybottom, ytop = moment.get_ylim()
-    moment.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
-    #loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
-    # moment.xaxis.set_major_locator(loc)
-
-    moment.set(xlabel= '$M (kN \cdot m)$')#, ylabel= 'Depth (m)')
-    moment.set_title('Moment')
-    moment.grid()
+    plot_diagram(ax= moment, resultsDict= resultsDict, title= 'Moment', x_field= 'M', x_scale_factor= 1e-3, x_label= '$M (kN \cdot m)$', y_field= 'depth', y_label= None)
     
     # Plot shear forces.
-    x, y= get_results(resultsDict= resultsDict, x_field= 'V', x_scale_factor= 1e-3, y_field= 'depth')
-    shear.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
-    shear.plot(x, y, diagramsColor)
-    shear.invert_yaxis()  # Reverse y-axis
-    ratio= 4
-    xleft, xright = shear.get_xlim()
-    ybottom, ytop = shear.get_ylim()
-    shear.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
-    #loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
-    # shear.xaxis.set_major_locator(loc)
-
-    shear.set(xlabel= '$V (kN)$')#, ylabel= 'Depth (m)')
-    shear.set_title('Shear')
-    shear.grid()
+    plot_diagram(ax= shear, resultsDict= resultsDict, title= 'Shear', x_field= 'V', x_scale_factor= 1e-3, x_label= '$V (kN)$', y_field= 'depth', y_label= None)
     
     # Plot pDif.
-    x, y= get_results(resultsDict= resultsDict, x_field= 'pDif', x_scale_factor= 1e-3, y_field= 'depth')
-    presDif.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
-    presDif.plot(x, y, diagramsColor)
-    presDif.invert_yaxis()  # Reverse y-axis
-    ratio= 4
-    xleft, xright = presDif.get_xlim()
-    ybottom, ytop = presDif.get_ylim()
-    presDif.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
-    #loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
-    # presDif.xaxis.set_major_locator(loc)
-
-    presDif.set(xlabel= '$pD (kN/m)$')#, ylabel= 'Depth (m)')
-    presDif.set_title('Pres. Dif.')
-    presDif.grid()
+    plot_diagram(ax= presDif, resultsDict= resultsDict, title= 'Pres. Dif.', x_field= 'pDif', x_scale_factor= 1e-3, x_label= '$pD (kN/m)$', y_field= 'depth', y_label= None)
     
     # Plot soil reactions.
-    x, y= get_results(resultsDict= resultsDict, x_field= 'Rx', x_scale_factor= 1e-3, y_field= 'depth')
-    soilReact.plot([bottomPoint[0], topPoint[0]], [bottomPoint[1], topPoint[1]], pileWallColor) # plot pile wall
-    soilReact.plot(x, y, diagramsColor)
-    soilReact.invert_yaxis()  # Reverse y-axis
-    ratio= 4
-    xleft, xright = soilReact.get_xlim()
-    ybottom, ytop = soilReact.get_ylim()
-    soilReact.set_aspect(abs((xright-xleft)/(ybottom-ytop))*ratio)
-    #loc = plticker.MultipleLocator(base=40.0) # this locator puts ticks at regular intervals
-    # soilReact.xaxis.set_major_locator(loc)
-
-    soilReact.set(xlabel= '$Rx (kN)$')#, ylabel= 'Depth (m)')
-    soilReact.set_title('Soil React.')
-    soilReact.grid()
+    plot_diagram(ax= soilReact, resultsDict= resultsDict, title= 'Soil Reac.', x_field= 'Rx', x_scale_factor= 1e-3, x_label= '$Rx (kN)$', y_field= 'depth', y_label= None)
 
     if(title):
         fig.suptitle(title)
