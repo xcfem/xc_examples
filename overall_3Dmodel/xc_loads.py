@@ -14,13 +14,14 @@ import xc_init
 import data_geom as datG
 import data_loads as datL
 import xc_geom as xcG
+import xc_sets as xcS
 # Common variables
 prep=xc_init.prep
 
 #Inertial load (density*acceleration) applied to the elements in a set
 grav=9.81 #Gravity acceleration (m/s2)
 #selfWeight=loads.InertialLoad(name='selfWeight', lstSets=[beamXconcr,beamY,columnZconcr,deck,wall,foot], vAccel=xc.Vector( [0.0,0.0,-g]))
-selfWeight=loads.InertialLoad(name='selfWeight', lstSets=[xcG.beamXconcr,xcG.beamY,xcG.columnZconcr,xcG.decklv1,xcG.decklv2], vAccel=xc.Vector( [0.0,0.0,-g]))
+selfWeight=loads.InertialLoad(name='selfWeight', lstSets=[xcS.beamXconcrSet,xcS.beamYSet,xcS.columnZconcrSet,xcS.decklv1Set,xcS.decklv2Set], vAccel=xc.Vector( [0.0,0.0,-g]))
 
 # Point load acting on one or several nodes
 #     name:       name identifying the load
@@ -40,8 +41,8 @@ QpuntBeams=loads.NodalLoad(name='QpuntBeams',lstNod=nodPLoad,loadVector=xc.Vecto
 #               'Local': element local coordinate system
 #               'Global': global coordinate system (defaults to 'Global)
 
-unifLoadDeck1= loads.UniformLoadOnSurfaces(name= 'unifLoadDeck1',xcSet=xcG.decklv1,loadVector=xc.Vector([0,0,-datL.qdeck1,0,0,0]),refSystem='Global')
-unifLoadDeck2= loads.UniformLoadOnSurfaces(name= 'unifLoadDeck2',xcSet=xcG.decklv2,loadVector=xc.Vector([0,0,-datL.qdeck2,0,0,0]),refSystem='Global')
+unifLoadDeck1= loads.UniformLoadOnSurfaces(name= 'unifLoadDeck1',xcSet=xcS.decklv1Set,loadVector=xc.Vector([0,0,-datL.qdeck1,0,0,0]),refSystem='Global')
+unifLoadDeck2= loads.UniformLoadOnSurfaces(name= 'unifLoadDeck2',xcSet=xcS.decklv2Set,loadVector=xc.Vector([0,0,-datL.qdeck2,0,0,0]),refSystem='Global')
 
 # Earth pressure applied to shell or 2D-beam elements
 #     Attributes:
@@ -87,7 +88,7 @@ earthPWallHrzL.horzLoads=[hrzL01]
 #    refSystem: reference system in which loadVector is defined:
 #               'Local': element local coordinate system
 #               'Global': global coordinate system (defaults to 'Global)
-unifLoadBeamsY=loads.UniformLoadOnBeams(name='unifLoadBeamsY', xcSet=xcG.beamY, loadVector=xc.Vector([0,0,-datL.qunifBeam,0,0,0]),refSystem='Global')
+unifLoadBeamsY=loads.UniformLoadOnBeams(name='unifLoadBeamsY', xcSet=xcS.beamYSet, loadVector=xc.Vector([0,0,-datL.qunifBeam,0,0,0]),refSystem='Global')
 
 # Strain gradient on shell elements
 #     name:  name identifying the load
@@ -106,7 +107,7 @@ unifLoadBeamsY=loads.UniformLoadOnBeams(name='unifLoadBeamsY', xcSet=xcG.beamY, 
 #     loadVector: xc.Vector with the six components of the load: 
 #                 xc.Vector([Fx,Fy,Fz,Mx,My,Mz]).
 
-unifLoadLinDeck2=loads.UniformLoadOnLines(name='unifLoadLinDeck2',xcSet=xcG.decklv2,loadVector=xc.Vector([0,datL.qLinDeck2,0,0,0,0]))
+unifLoadLinDeck2=loads.UniformLoadOnLines(name='unifLoadLinDeck2',xcSet=xcS.decklv2Set,loadVector=xc.Vector([0,datL.qLinDeck2,0,0,0,0]))
 
 # Point load distributed over the shell elements in xcSet whose 
 # centroids are inside the prism defined by the 2D polygon prismBase
@@ -129,5 +130,6 @@ unifLoadLinDeck2=loads.UniformLoadOnLines(name='unifLoadLinDeck2',xcSet=xcG.deck
 #                   'Global': global coordinate system (defaults to 'Global')
 
 prBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=datG.LbeamY/2.,Lx=0.5,Ly=1.0)
-wheelDeck1=loads.PointLoadOverShellElems(name='wheelDeck1', xcSet=xcG.decklv1, loadVector=xc.Vector([0,0,-datL.Qwheel]),prismBase=prBase,prismAxis='Z',refSystem='Global')
+wheelDeck1=loads.PointLoadOverShellElems(name='wheelDeck1', xcSet=xcS.decklv1Set, loadVector=xc.Vector([0,0,-datL.Qwheel]),prismBase=prBase,prismAxis='Z',refSystem='Global')
 
+lstL=[selfWeight,QpuntBeams,unifLoadDeck1,unifLoadDeck2,earthPressLoadWall,earthPWallStrL,earthPWallLinL,earthPWallHrzL,unifLoadBeamsY,unifLoadLinDeck2,wheelDeck1]

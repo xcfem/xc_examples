@@ -24,3 +24,5 @@ import xc_geom as xcG
 #               a wheel
 
 vehicleDeck1=lmb.VehicleDistrLoad(name='vehicleDeck1',xcSet=xcG.decklv1,loadModel=slm.IAP_notional_lane3_brake, xCentr=datG.LbeamX/2,yCentr=datG.LbeamY/2.,hDistr=0.25,slopeDistr=1.0)
+
+lstLr=[vehicleDeck1]

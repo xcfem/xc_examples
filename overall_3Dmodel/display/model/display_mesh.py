@@ -2,15 +2,12 @@
 from postprocess.config import default_config
 
 # import local modules
-workingDirectory= default_config.setWorkingDirectory() # search env_config.py
+workingDirectory= default_config.setWorkingDirectory() 
 import xc_init
-import xc_geom as xcG #FE model generation
-import xc_materials as xcM # Materials
-import xc_fem as xcF # FE model
-
+import xc_sets as xcS
 out=xc_init.out
 
-setsTodisp=[xcG.decklv1,xcG.decklv2,xcG.foot,xcG.wall,xcG.columnZconcr,xcG.columnZsteel,xcG.beamY,xcG.beamXconcr,xcG.beamXsteel]
+setsTodisp=[xcS.decklv1Set,xcS.decklv2Set,xcS.footSet,xcS.wallSet,xcS.columnZconcrSet,xcS.columnZsteelSet,xcS.beamYSet,xcS.beamXconcrSet,xcS.beamXsteelSet]
 
 out.displayFEMesh(setsToDisplay=setsTodisp,caption=None,fileName=None,defFScale=0.0)
 

@@ -16,4 +16,3 @@ import xc_roadway_loads as xcLr # roadway loads
 import xc_lcases as xcLC # load cases
 import xc_combinations as xcC # SLS and ULS combinations
 
-out.displayFEMesh(xcG.lstSets)
