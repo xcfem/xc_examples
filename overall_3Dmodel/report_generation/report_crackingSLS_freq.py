@@ -3,43 +3,29 @@ from postprocess.control_vars import *
 from postprocess import limit_state_data as lsd
 from postprocess.reports import report_generator as rprt
 from postprocess.config import default_config
-import json
-
 # import local modules
-import sys
-workingDirectory= default_config.findWorkingDirectory()+'/' #search env_config.py
-sys.path.append(workingDirectory)
+workingDirectory= default_config.setWorkingDirectory()
 import env_config as env
-import xc_model as model #FE model generation
+import xc_init
+import xc_sets as xcS
+# Common variables
+out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
+#
 
+# Ordered list of shell-element sets
+setsShEl=[xcS.wallSet]
+# Ordered list of arguments for shells
+# Possible arguments: 'CF' , 'N' , 'My' , 'Mz' , 's_rmax' , 'sigma_s' , 'sigma_c' , 'wk'
+argsShEl= [ 'CF' , 'N' , 'My' , 'Mz' , 's_rmax' , 'sigma_s' , 'sigma_c' , 'wk']
+# Ordered list of beam-element sets
+setsBmEl=[xcS.columnZconcrSet]
+# Ordered list of arguments for beams
+# Possible arguments: 'CF' , 'N' , 'My' , 'Mz' , 's_rmax' , 'sigma_s' , 'sigma_c' , 'wk'
+argsBmEl= [ 'CF' , 'N' , 'My' , 'Mz' , 's_rmax' , 'sigma_s' , 'sigma_c' , 'wk']
 #Load properties to display:
-model.modelSpace.readControlVars(inputFileName= env.cfg.projectDirTree.getVerifCrackFreqFile())
-
-
+modelSpace.readControlVars(inputFileName= env.cfg.projectDirTree.getVerifCrackFreqFile())
 limitStateLabel= lsd.freqLoadsCrackControl.label
-
-
-# Ordered list of sets (defined in model_data.py as instances of
-# utils_display.setToDisplay) to be included in the report
-setsShEl=[]
-# Ordered list of arguments to be included in the report
-# Possible arguments: 'getMaxSteelStress', 'getCF'
-argsShEl= ['getCF','getMaxSteelStress']
-# Ordered list of lists [set of beam elements, view to represent this set] to
-# be included in the report. 
-# The sets are defined in model_data.py as instances of
-# utils_display.setToDisplay and the possible views are: 'XYZPos','XNeg','XPos',
-# 'YNeg','YPos','ZNeg','ZPos'  (defaults to 'XYZPos')
-
-setsBmEl=[model.fbeamZA1,model.fbeamZA4a,model.fbeamZA4b,model.fbeamZA2,model.fbeamZA3,model.fbeamZA6,model.fbeamZA5]
-
-# Ordered list of lists [arguments, scale to represent the argument] to be
-# included in the report for beam elements
-# Possible arguments: 'getMaxSteelStress', 'getCF'
-
-argsBmEl= ['getCF','getMaxSteelStress']
-     
-report=rprt.ReportGenerator(model.modelSpace,env.cfg)
+report=rprt.ReportGenerator(modelSpace,env.cfg)
 report.checksReport(limitStateLabel,setsShEl,argsShEl,setsBmEl,argsBmEl)
 
 

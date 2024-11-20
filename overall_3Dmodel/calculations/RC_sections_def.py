@@ -39,12 +39,12 @@ cover=35 # nominal cover [mm]
 #reinforcement directions of a slab or the front and back ending sections
 #of a beam element
 
-def append2container(RCSects,sets2apply,plot=False):
-    sectContainer.append(RCSects)
+def append2container(RCsects,sets2apply,plot=False):
+    sectContainer.append(RCsects)
     for s in sets2apply:
-        reinfConcreteSectionDistribution.assign(elemSet=s.getElements,setRCSects=RCSects)
+        reinfConcreteSectionDistribution.assign(elemSet=s.getElements,setRCSects=RCsects)
     if plot:
-        RCSects.plot(prep,matDiagType='k')
+        RCsects.plot(prep,matDiagType='k')
 
 ## Deck
 cover=datM.deckCover
@@ -64,34 +64,34 @@ coverTransvTop=coverLongTop+fiLong
 coverStirrBot=0.01
 coverLongBot=coverStirrBot+fiStirr
 coverTransvBot=coverLongBot+fiLong
-deckRCSects= element_section_map.RCSlabBeamSection(name='deckRCSects',sectionDescr='slab of shell elements',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.deckTh)
-deckRCSects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiTransv,sTransv,coverTransvTop),rcs.rebLayer_m(fiStirr,sStirr1,coverStirrTop)])
-deckRCSects.dir1NegatvRebarRows=rcs.LongReinfLayers([rcs.rebLayer_m(fiTransv,sTransv,coverTransvBot),rcs.rebLayer_m(fiStirr,sStirr1,coverStirrBot)])
-deckRCSects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiLong,sLong,coverLongTop)])
-deckRCSects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiLong,sLong,coverLongBot)])
-deckRCSects.dir1ShReinfY=rcs.ShearReinforcement(familyName= "sh1Y",nShReinfBranches= nStirr1, areaShReinfBranch= math.pi*(fiStirr)**2/4., shReinfSpacing= sStirr1, angAlphaShReinf= math.pi/2.0,angThetaConcrStruts= math.pi/4.0)
-deckRCSects.dir2ShReinfY=rcs.ShearReinforcement(familyName= "sh2Y",nShReinfBranches= nStirr2, areaShReinfBranch= math.pi*(fiStirr)**2/4., shReinfSpacing= sStirr2, angAlphaShReinf= math.pi/2.0,angThetaConcrStruts= math.pi/4.0)
-append2container(deckRCSects,sets2apply,plot=plotSection)
+deckRCsects= element_section_map.RCSlabBeamSection(name='deckRCsects',sectionDescr='slab of shell elements',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.deckTh)
+deckRCsects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiTransv,sTransv,coverTransvTop),rcs.rebLayer_m(fiStirr,sStirr1,coverStirrTop)])
+deckRCsects.dir1NegatvRebarRows=rcs.LongReinfLayers([rcs.rebLayer_m(fiTransv,sTransv,coverTransvBot),rcs.rebLayer_m(fiStirr,sStirr1,coverStirrBot)])
+deckRCsects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiLong,sLong,coverLongTop)])
+deckRCsects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(fiLong,sLong,coverLongBot)])
+deckRCsects.dir1ShReinfY=rcs.ShearReinforcement(familyName= "sh1Y",nShReinfBranches= nStirr1, areaShReinfBranch= math.pi*(fiStirr)**2/4., shReinfSpacing= sStirr1, angAlphaShReinf= math.pi/2.0,angThetaConcrStruts= math.pi/4.0)
+deckRCsects.dir2ShReinfY=rcs.ShearReinforcement(familyName= "sh2Y",nShReinfBranches= nStirr2, areaShReinfBranch= math.pi*(fiStirr)**2/4., shReinfSpacing= sStirr2, angAlphaShReinf= math.pi/2.0,angThetaConcrStruts= math.pi/4.0)
+append2container(deckRCsects,sets2apply,plot=plotSection)
 
 ## Footing
 sets2apply=[xcG.foot]
-footRCSects= element_section_map.RCSlabBeamSection(name='footRCSects',sectionDescr='footing',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.footTh)
+footRCsects= element_section_map.RCSlabBeamSection(name='footRCsects',sectionDescr='footing',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.footTh)
 #D1: transversal rebars
 #D2: longitudinal rebars
-footRCSects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(12e-3,0.150,35e-3)])
-footRCSects.dir1NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(12e-3,0.150,35e-3)])
-footRCSects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(16e-3,0.150,35e-3)])
-footRCSects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(16e-3,0.150,35e-3)])
-append2container(footRCSects,sets2apply,plot=plotSection)
+footRCsects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(12e-3,0.150,35e-3)])
+footRCsects.dir1NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(12e-3,0.150,35e-3)])
+footRCsects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(16e-3,0.150,35e-3)])
+footRCsects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_m(16e-3,0.150,35e-3)])
+append2container(footRCsects,sets2apply,plot=plotSection)
     
 ## Wall
 sets2apply=[xcG.wall]
-wallRCSects= element_section_map.RCSlabBeamSection(name='wallRCSects',sectionDescr='wall of shell elements',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.wallTh)
-wallRCSects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(20,200,cover)])
-wallRCSects.dir1NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(25,150,cover)])
-wallRCSects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(16,150,cover)])
-wallRCSects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(12,150,cover)])
-append2container(wallRCSects,sets2apply,plot=plotSection)
+wallRCsects= element_section_map.RCSlabBeamSection(name='wallRCsects',sectionDescr='wall of shell elements',concrType=datM.concrete, reinfSteelType=datM.reinfSteel,depth=datG.wallTh)
+wallRCsects.dir1PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(20,200,cover)])
+wallRCsects.dir1NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(25,150,cover)])
+wallRCsects.dir2PositvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(16,150,cover)])
+wallRCsects.dir2NegatvRebarRows= rcs.LongReinfLayers([rcs.rebLayer_mm(12,150,cover)])
+append2container(wallRCsects,sets2apply,plot=plotSection)
 
 # beam X
 sets2apply=[xcG.beamXconcr]
@@ -137,8 +137,8 @@ columnZconcrSect=rccs.RCCircularSection(name='columnZconcrSect',sectionDescr='cy
 fiStirr=10
 columnZconcrSect.mainReinf=rcs.LongReinfLayers([rcs.ReinfRow(rebarsDiam= 20*1e-3, nRebars= 14, width= math.pi*(datG.fiColumnZ-2*(cover-3+fiStirr*1e-3)), nominalCover= cover)]) # in circular sections 'width' is the perimeter of the circumference that surrounds reinforcing bars
 columnZconcrSect.shReinf=rcs.ShearReinforcement(familyName= "sh",nShReinfBranches= 2, areaShReinfBranch= math.pi*(fiStirr*1e-3)**2/4., shReinfSpacing= 0.15, angAlphaShReinf= math.pi/2.0,angThetaConcrStruts= math.pi/4.0)
-columnZconcrRCSects= element_section_map.RCMemberSection(name='columnZconcrRCSects',templateSections=[columnZconcrSect,columnZconcrSect])
-append2container(columnZconcrRCSects,sets2apply,plotSection)
+columnZconcrRCsects= element_section_map.RCMemberSection(name='columnZconcrRCsects',templateSections=[columnZconcrSect,columnZconcrSect])
+append2container(columnZconcrRCsects,sets2apply,plotSection)
 
 #
 if plotSection:
@@ -146,3 +146,4 @@ if plotSection:
 else:
     reinfConcreteSectionDistribution.dump()
 
+lstRCsects=[deckRCsects,footRCsects,wallRCsects,beamXRCsect,beamYRCsect,columnZconcrSect]

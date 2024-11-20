@@ -1,0 +1,83 @@
+\documentclass[spanish, a3paper,twoside]{xc_project_a3}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{boldline}
+\usepackage[hidelinks]{hyperref}
+\usepackage{colortbl}
+\usepackage{amsmath}
+\usepackage{pdfpages}
+\usepackage{caption}[=v1]
+\usepackage{flafter}
+\usepackage{enumitem} %% compact description lists.
+\usepackage{wrapfig} %% Wrapping text around figures.
+\usepackage{longtable}
+\usepackage{multicol}
+\usepackage{nonfloat}
+\usepackage{multirow}
+\usepackage{wasysym}
+\usepackage{gensymb}
+\usepackage{xtab,booktabs}
+
+\renewcommand{\titProy}{\footnotesize{Proyecto}}
+\renewcommand{\titDoc}{Documento}
+\title{\underline{\textbf{\titDoc}}}
+\author{XC ingeniería estructural, S.L.}
+\date{\today}
+\renewcommand{\revision}{0.0}
+%\portadilla
+%\chapter*{\textbf{\titDoc}}
+\minitoc
+
+\newcommand{\ncols}{3}
+\newcommand{\dir}{}
+\setcounter{tocdepth}{5}
+
+\begin{document}
+\maketitle
+
+\newpage
+% Use Figure instead of figure for more than 2 columns of figures (multicols)
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+  
+\twocolumn
+ 
+\tableofcontents
+\listoftables
+\listoffigures
+\newpage
+\chapter{Introducción}
+\section{Introducción}
+
+%\onecolumn
+%\begin{multicols}{\ncols}
+\chapter{Datos y resultados del cálculo}\label{result_calc}
+\section{Acciones}\label{fig_acciones}
+\input{report_loads.tex}
+\clearpage
+\section{Desplazamientos en hipótesis simples de carga}
+\input{report_displacements.tex}
+\clearpage
+\section{Esfuerzos en hipótesis simples de carga}
+\input{report_intForc.tex}
+\clearpage
+\section{Materiales y secciones de cálculo}
+\input{report_RCsections.tex}
+\clearpage
+\section{Verificación del ELU de tensiones normales}
+\input{report_normStrsULS.tex}
+\clearpage
+\section{Verificación del ELU de esfuerzo cortante}
+\input{report_shearULS.tex}
+\clearpage
+\section{Verificación del ELS de fisuración, estados de carga frecuentes}
+\input{report_crackingSLS_freq.tex}
+\clearpage
+\section{Verificación del ELS de fisuración, estados de carga cuasipermanentes}
+\input{report_crackingSLS_qperm.tex}
+%\end{multicols}
+\clearpage
+\end{document}
+ 
