@@ -142,3 +142,15 @@ TAGS
 
 # AutoCAD temporary files
 *.dwl*
+
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.mtc*
+*.toc
+*.maf
