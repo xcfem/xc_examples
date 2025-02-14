@@ -14,15 +14,16 @@ from actions.load_combination_utils import ec0_es # Eurocode 0 Spanish annex.
 
 frameCombinations= True # Compute combinations for frame structures.
 
-lcg= ec0_es.combGenerator
+lcg= ec0_es.bridgeCombGenerator
+safetyFactorSet= 'B' # Table A2.4(B)
 # Permanent load.
-G= lcg.newPermanentAction(actionName=  'G', actionDescription= 'Peso propio.')
+G= lcg.newSelfWeightAction(actionName=  'G', actionDescription= 'Peso propio.', safetyFactorSet= safetyFactorSet)
 # Earth pressure.
-E= lcg.newPermanentAction(actionName=  'E', actionDescription= 'Empuje de tierras.')
+E= lcg.newEarthPressureAction(actionName=  'E', actionDescription= 'Empuje de tierras.', safetyFactorSet= safetyFactorSet)
 # Hidrostatic pressure.
-W= lcg.newHydrostaticPressureAction(actionName= 'W', actionDescription= 'Presión hidrostática', context= 'road_bridge')
+W= lcg.newHydrostaticPressureAction(actionName= 'W', actionDescription= 'Presión hidrostática', context= 'road_bridge', safetyFactorSet= safetyFactorSet)
 # Uniform traffic load.
-T= lcg.newUniformLoadAction(actionName= 'T', actionDescription= 'Carga de tráfico.')
+T= lcg.newUniformLoadAction(actionName= 'T', actionDescription= 'Carga de tráfico.', safetyFactorSet= safetyFactorSet)
 
 # Write the combinations to a file.
 lcg.computeCombinations()
