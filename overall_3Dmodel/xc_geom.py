@@ -1,8 +1,7 @@
-# Geometry definition in cartesian coordinates and sets 
+# Geometry definition in cartesian coordinates 
 from model.geometry import grid_model as gm
 from misc_utils import data_struct_utils as dsu
 from model.geometry import geom_utils as gut
-from model.sets import sets_mng as setMng
 
 # import local modules
 from postprocess.config import default_config
@@ -12,9 +11,7 @@ import xc_init
 import data_geom as datG # geometry data
 
 # Common variables
-out=xc_init.out
-modelSpace=xc_init.modelSpace
-prep=xc_init.prep
+out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
 #
 # coordinates in global X,Y,Z axes for the grid generation
 xList=[0,datG.LbeamX/2.0,datG.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xList)
@@ -107,56 +104,4 @@ decklv1=gridGeom.genSurfMultiRegion(lstIJKRange=decklv1_rg,setName='decklv1')
 decklv2=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.LcolumnZ),(datG.LbeamX/2.0,datG.LbeamY,datG.LcolumnZ)),setName='decklv2')
 wall=gridGeom.genSurfOneXYZRegion(xyzRange=((0,0,0),(datG.LbeamX,0,datG.LcolumnZ)),setName='wall')
 foot=gridGeom.genSurfMultiRegion(lstIJKRange=foot_rg,setName='foot')
-
-# Sets description
-decklv1.description='Deck level 1'
-decklv1.color=env.cfg.colors['purple01']
-decklv2.description='Deck level 2'
-decklv2.color=env.cfg.colors['blue01']
-foot.description='Foundation'
-foot.color=env.cfg.colors['orange01']
-wall.description='Wall'
-wall.color=env.cfg.colors['green01']
-beamXconcr.description='Beams in X direction'
-beamXconcr.color=env.cfg.colors['blue03']
-beamY.description='Beams in Y direction'
-beamY.color=env.cfg.colors['green03']
-columnZconcr.description='Concrete columns'
-columnZconcr.color=env.cfg.colors['red03']
-columnZsteel.description='Steel columns'
-columnZsteel.color=env.cfg.colors['blue02']
-
-beams=modelSpace.setSum('beams',[beamXconcr,beamY])
-beams.description='Beams'
-beams.fillDownwards()
-#out.displayBlocks()
-
-lstSets=[decklv1,decklv2,foot,wall,beamXconcr,beamY,columnZconcr,columnZsteel]
-
-# decks=prep.getSets.defSet('decks')  #only this way we can recover this
-#                          #set by calling it by its name with:
-#                          #prep.getSets.getSet('decks') 
-# decks=modelSpace.setSum('decks',[decklv1,decklv2])
-# decks.description='Decks'
-# decks.color=env.cfg.colors['purple01']
-# allShells=modelSpace.setSum('allShells',[decklv1,decklv2,foot,wall])
-# allShells.description='Shell elements'
-# allBeams=modelSpace.setSum('',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel])
-# allBeams.description='Beams+columns'
-# overallSet=modelSpace.setSum('overallSet',[beamXconcr,beamXsteel,beamY,columnZconcr,columnZsteel,wall,foot,decklv1,decklv2])
-# overallSet.description='overall set'
-# overallSet.color=env.cfg.colors['purple01']
-# allConcrete=modelSpace.setSum('allConcrete',[beamXconcr,beamY,columnZconcr,wall,foot,decklv1,decklv2])
-# allConcrete.description='concrete elements'
-# beamX=modelSpace.setSum('beamX',[beamXconcr,beamXsteel])
-# beamX.description='beams X'
-# columnZ=modelSpace.setSum('columnZ',[columnZconcr,columnZsteel])
-# columnZ.description='columns'
-# allSteel=modelSpace.setSum('allSteel',[beamXsteel,columnZsteel])
-# allSteel.description='steel elements'
-# #sets for displaying some results
-# pBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=0,Lx=datG.LbeamX,Ly=datG.LbeamY-1.0)
-
-# allShellsRes=setMng.set_included_in_orthoPrism(preprocessor=prep,setInit=allShells,prismBase=pBase,prismAxis='Z',setName='allShellsRes')
- 
 

@@ -40,13 +40,13 @@ geomSectBeamY=sectpr.RectangularSection(name='geomSectBeamY',b=datG.wbeamY,h=dat
   #                 shear modulus and mass density of the material
 
 beamXconcr_mat= tm.BeamMaterialData(name= 'beamXconcr_mat', section=geomSectBeamX, material=concrProp)
-beamXconcr_mat.setupElasticShear3DSection(preprocessor=prep)
+beamXconcr_mat.defElasticShearSection3d(preprocessor=prep)
 beamY_mat= tm.BeamMaterialData(name= 'beamY_mat', section=geomSectBeamY, material=concrProp)
-beamY_mat.setupElasticShear3DSection(preprocessor=prep)
+beamY_mat.defElasticShearSection3d(preprocessor=prep)
 # cylindrical column
 columnZconcr_gsect=sectpr.CircularSection(name='columnZconcr_gsect',Rext=datG.fiColumnZ/2.)
 columnZconcr_mat=tm.BeamMaterialData(name='columnZconcr_mat', section=columnZconcr_gsect, material=concrProp)
-columnZconcr_mat.setupElasticShear3DSection(preprocessor=prep)
+columnZconcr_mat.defElasticShearSection3d(preprocessor=prep)
 
 # Steel material-section appropiate for 3D beam analysis, including shear
   # deformations.

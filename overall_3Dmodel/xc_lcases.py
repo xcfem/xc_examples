@@ -1,4 +1,4 @@
-# Definition of load cases
+
 from actions import load_cases as lcases
 
 # import local modules
@@ -8,25 +8,27 @@ import xc_init
 import xc_geom as xcG
 import xc_loads as xcL
 import xc_roadway_loads  as xcLr
-for st in xcG.lstSets: 
-    st.fillDownwards()
+import xc_sets
 
 # Common variables
-prep=xc_init.prep
-
-# selfWeight=modelSpace.newLoadPattern(name="selfWeight",lpType="default")
-# modelSpace.setCurrentLoadPattern(selfWeight.name)
-# for e in stem.elements: e.createInertiaLoad(grav)
-# for e in lintel.elements: e.createInertiaLoad(grav)
-# modelSpace.addLoadCaseToDomain(selfWeight.name) # añadirla al dominio antes de dibujarla
+out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
 
 GselfWeight=lcases.LoadCase(preprocessor=prep,name="GselfWeight",loadPType="default",timeSType="constant_ts")
 GselfWeight.create()
 GselfWeight.addLstLoads([xcL.selfWeight])
 '''
+# display
 modelSpace.addLoadCaseToDomain("GselfWeight")
 out.displayLoads()
 modelSpace.removeLoadCaseFromDomain("GselfWeight")
+'''
+# self-weight direct generation
+'''
+selfWeight=modelSpace.newLoadPattern(name="selfWeight",lpType="default")
+modelSpace.setCurrentLoadPattern(selfWeight.name)
+for e in stem.elements: e.createInertiaLoad(grav)
+for e in lintel.elements: e.createInertiaLoad(grav)
+modelSpace.addLoadCaseToDomain(selfWeight.name) # añadirla al dominio antes de dibujarla
 '''
 
 Qdecks=lcases.LoadCase(preprocessor=prep,name="Qdecks")

@@ -7,15 +7,14 @@ from postprocess.config import default_config
 # import local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import xc_init
-import xc_main_fullmodel
-
+#import xc_main_fullmodel
+import xc_lcases as xcLC # load cases
+import xc_sets as xcS
 # Common variables
-out=xc_init.out
-modelSpace=xc_init.modelSpace
-prep=xc_init.prep
+out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
 #
-dictLCG=yaml.safe_load(Path(workingDirectory+'LC_graph.yaml').read_text())
 
+dictLCG=yaml.safe_load(Path(workingDirectory+'LC_graph.yaml').read_text())
 setsMng=prep.getSets
 modelSpace.removeAllLoadPatternsFromDomain()
 for ky in dictLCG.keys():
