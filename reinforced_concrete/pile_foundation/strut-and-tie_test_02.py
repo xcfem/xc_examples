@@ -5,7 +5,7 @@ from __future__ import division
 from __future__ import print_function
 
 __author__= "Luis Claudio Pérez Tato (LCPT)"
-__copyright__= "Copyright 2022, LCPT"
+__copyright__= "Copyright 2025, LCPT"
 __license__= "GPL"
 __version__= "3.0"
 __email__= "l.pereztato@gmail.com"
@@ -17,6 +17,7 @@ from materials.sections.fiber_section import def_simple_RC_section
 from materials.sections.fiber_section import def_column_RC_section
 from misc_utils import log_messages as lmsg
 from solution import predefined_solutions
+import strut_and_tie_utils
 
 # Problem type.
 feProblem= xc.FEProblem()
@@ -53,7 +54,7 @@ a= pierSide/2.0
 ## Define mesh.
 ### Top of the pier.
 n0= modelSpace.newNode(0.0, d+pierHeight)
-### Top of tue abutment.
+### Top of the abutment.
 n1= modelSpace.newNode(-v, d)
 n2= modelSpace.newNode(-a, d)
 n3= modelSpace.newNode(0.0, d) # pier bottom.
@@ -68,12 +69,20 @@ n9= modelSpace.newNode(v, 0.0)
 n10= modelSpace.newNode(-v, -pileLength)
 n11= modelSpace.newNode(v, -pileLength)
 
+linearElastic= False
 ## Define materials.
 reinfSteel= EC2_materials.S500B
-steelNoCompression= reinfSteel.defElasticNoCompressionMaterial(preprocessor= preprocessor)
+if(linearElastic):
+    steelNoCompression= reinfSteel.defElasticMaterial(preprocessor= preprocessor)
+else:
+    steelNoCompression= reinfSteel.defElasticNoCompressionMaterial(preprocessor= preprocessor)
+
 tieArea= 5.8e-4
 concrete= EC2_materials.C30
-concreteNoTension= concrete.defElasticNoTensMaterial(preprocessor= preprocessor)
+if(linearElastic):
+    concreteNoTension= concrete.defElasticNoTensMaterial(preprocessor= preprocessor)
+else:
+    concreteNoTension= concrete.defElasticMaterial(preprocessor= preprocessor)
 strutArea= 0.25
 
 ## Define elements.
@@ -140,16 +149,8 @@ modelSpace.setDefaultMaterial(pilesMaterial)
 modelSpace.newElement('ElasticBeam2d', [n6.tag, n10.tag])
 modelSpace.newElement('ElasticBeam2d', [n9.tag, n11.tag])
 
-### Define dummy elements (to fix rotational DOFs only).
-#### Define dummy material.
-dummySectionSide= .01
-dummySection= def_simple_RC_section.RCRectangularSection(name= 'dummySection', sectionDescr= 'dummy section', concrType= concrete, reinfSteelType= reinfSteel, width= dummySectionSide, depth= dummySectionSide)
-xcDummySectionMaterial= dummySection.defElasticShearSection2d(preprocessor, reductionFactor= 1e-4)
-#### Define pier elements.
-modelSpace.setDefaultMaterial(xcDummySectionMaterial)
-dummy12= modelSpace.newElement('ElasticBeam2d', [n1.tag, n2.tag])
-dummy45= modelSpace.newElement('ElasticBeam2d', [n4.tag, n5.tag])
-dummy78= modelSpace.newElement('ElasticBeam2d', [n7.tag, n8.tag])
+### Define dummy springs (to fix rotational DOFs only).
+springsAndNodes= strut_and_tie_utils.define_dummy_springs(modelSpace, [n1, n5, n7, n8])
 
 ## Define constraints
 modelSpace.fixNode('000', n10.tag)
@@ -162,10 +163,20 @@ lp0.newNodalLoad(n0.tag,xc.Vector([0,-F,0]))
 modelSpace.addLoadCaseToDomain(lp0.name)
 
 # Solution
-analysis= predefined_solutions.penalty_newton_raphson(feProblem, printFlag= 1)#, convergenceTestTol= 1e-2)
+if(linearElastic):
+    analysis= predefined_solutions.simple_static_linear(feProblem)
+else:
+    analysis= predefined_solutions.penalty_newton_raphson(feProblem, printFlag= 1)
 result= analysis.analyze(1)
 if(result!=0):
     lmsg.error("Can't solve.")
+    info= None
+    solver= analysis.linearSOE.solver
+    if(solver.hasProp("info")):
+        info= solver.getProp("info")
+    unconstrainedNode= modelSpace.locateEquationNumber(eqNumber= info-1)
+    print('unconstrained node id: ', unconstrainedNode.tag)
+    print('unconstrained node position: ', unconstrainedNode.getInitialPos2d)
     exit(1)
 
 # Check results.
