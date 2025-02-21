@@ -120,7 +120,7 @@ class Pilecap2Piles(object):
         self.rightPileTopNode= rightPileTopNode
         self.pierEffectiveWidth= pierEffectiveWidth
 
-    def createStrutAndTieModel(self, modelSpace, strutArea, concrete, topDownTiesArea, topChordTiesArea, bottomChordTiesArea, reinfSteel, xcPierSectionMaterial):
+    def createStrutAndTieModel(self, modelSpace, strutArea, concrete, topDownTiesArea, topChordTiesArea, bottomChordTiesArea, reinfSteel, xcPierSectionMaterial, linearElastic= False):
         ''' Creates an strut-and-tie model and attach it to the nodes of the 
             pier and the piles.
 
@@ -186,7 +186,10 @@ class Pilecap2Piles(object):
         # Define elements.
         ## Define struts.
         ### Define material.
-        concreteNoTension= concrete.defElasticNoTensMaterial(preprocessor= modelSpace.preprocessor)
+        if(linearElastic):
+            concreteNoTension= concrete.defElasticMaterial(preprocessor= modelSpace.preprocessor)
+        else:
+            concreteNoTension= concrete.defElasticNoTensMaterial(preprocessor= modelSpace.preprocessor, a= .001)
         modelSpace.setElementDimension(dim)
         modelSpace.setDefaultMaterial(concreteNoTension)
         self.pilecapStruts= list() # Struts in the pilecap.
@@ -210,7 +213,10 @@ class Pilecap2Piles(object):
 
         ## Define ties.
         ### Define material.
-        steelNoCompression= reinfSteel.defElasticNoCompressionMaterial(preprocessor= modelSpace.preprocessor)
+        if(linearElastic):
+            steelNoCompression= reinfSteel.defElasticMaterial(preprocessor= modelSpace.preprocessor)
+        else:
+            steelNoCompression= reinfSteel.defElasticNoCompressionMaterial(preprocessor= modelSpace.preprocessor, a= .001)
         modelSpace.setDefaultMaterial(steelNoCompression)
         modelSpace.setElementDimension(dim)
         ### Define top-down ties.
@@ -281,6 +287,11 @@ class Pilecap2Piles(object):
             methodName= sys._getframe(0).f_code.co_name
             errorMessage= className+'.'+methodName+"; not implemented for dimension: "+str(dim)
             lmsg.error(errMsg)
+            
+    def getBottomChordTies(self):
+        ''' Return a list containing the elements that model the bottom chord
+            tie.'''
+        return self.pilecapBottomChordTies
             
         
         

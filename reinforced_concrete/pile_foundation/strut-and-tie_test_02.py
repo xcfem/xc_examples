@@ -74,7 +74,7 @@ pierRCSection= def_simple_RC_section.RCRectangularSection(name= 'pierRCSection',
 xcPierSectionMaterial= pierRCSection.defElasticShearSection2d(preprocessor)
 
 # Define pile cap.
-pilecap.createStrutAndTieModel(modelSpace, strutArea= strutArea, concrete= concrete, topDownTiesArea= tieArea, bottomChordTiesArea= tieArea, topChordTiesArea= tieArea, reinfSteel= reinfSteel, xcPierSectionMaterial= xcPierSectionMaterial)
+pilecap.createStrutAndTieModel(modelSpace, strutArea= strutArea, concrete= concrete, topDownTiesArea= tieArea, bottomChordTiesArea= tieArea, topChordTiesArea= tieArea, reinfSteel= reinfSteel, xcPierSectionMaterial= xcPierSectionMaterial, linearElastic= False)
 
 ### Define pier.
 #### Define pier elements.
@@ -116,9 +116,12 @@ if(result!=0):
     print('unconstrained node position: ', unconstrainedNode.getInitialPos2d)
     # exit(1)
 
-'''
 # Check results.
-T0= (tie67.getN()+tie89.getN())/2.0
+T0= 0.0
+bottomChordTies= pilecap.getBottomChordTies()
+for tie in bottomChordTies:
+    T0+= tie.getN()
+T0/= len(bottomChordTies)
 T0ref= F*(v-a)/2.0/d
 ratio1= abs(T0-T0ref)/T0ref
 
@@ -174,7 +177,6 @@ if abs(ratio1)<1e-3:
     print('test '+fname+': ok.')
 else:
     lmsg.error(fname+' ERROR.')
-'''
 
 # Graphic stuff.
 from postprocess import output_handler
