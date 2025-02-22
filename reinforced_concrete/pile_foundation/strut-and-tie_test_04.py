@@ -20,6 +20,7 @@ __version__= "3.0"
 __email__= "l.pereztato@gmail.com"
 
 import math
+import geom
 import xc
 from model import predefined_spaces
 from materials.ec2 import EC2_materials
@@ -33,60 +34,48 @@ import strut_and_tie_utils
 feProblem= xc.FEProblem()
 preprocessor=  feProblem.getPreprocessor
 nodes= preprocessor.getNodeHandler
-modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
+modelSpace= predefined_spaces.StructuralMechanics3D(nodes)
 
-# Problem geometry.
-#    
-#                n0
-#                 |  pier
-#                 |
-#                 |
-#                 |n1
-#                 +
-#                / \
-#               /   \    d
-#              /     \
-#             +-------+
-#          n6 |       | n9
-#             |       | 
-#             |       | piles
-#             |       |
-#          n10         n11
-#    
-s= 1.6
-d= 1.0
+radius= 2.0
+angles= [math.radians(-30), math.pi/2.0, math.radians(210)]
+pileTopPoints= list()
+for a in angles: 
+    pt= geom.Pos3d(radius*math.cos(a), radius*math.sin(a), 0.0)
+    pileTopPoints.append(pt)
+    
+d= 1.995
 pierHeight= 2
+pierDiameter= 1.25
+pierEffectiveDiameter= 0.85*pierDiameter
 pileLength= 5.0
-pierSide= 0.25
-pileDiameter= 150e-3
-v= s/2.0
-a= pierSide/2.0
+pileDiameter= 1.25
 
 ## Define mesh.
 ### Top of the pier.
-n0= modelSpace.newNode(0.0, d+pierHeight) # pier top.
-n3= modelSpace.newNode(0.0, d) # pier bottom.
-### Bottom of the abutment.
-n6= modelSpace.newNode(-v, 0.0) # left pile top.
-n9= modelSpace.newNode(v, 0.0) # right pile top.
-### Bottom of the piles.
-n10= modelSpace.newNode(-v, -pileLength)
-n11= modelSpace.newNode(v, -pileLength)
+n0= modelSpace.newNode(0.0, 0.0, d+pierHeight) # pier top.
+n3= modelSpace.newNode(0.0, 0.0, d) # pier bottom.
+### Bottom of the pile cap.
+pileTopNodes= list()
+for pt in pileTopPoints:
+    pileTopNodes.append(modelSpace.newNode(pt.x, pt.y, pt.z))
 
-pilecap= strut_and_tie_utils.Pilecap2Piles(pierBottomNode= n3, leftPileTopNode= n6, rightPileTopNode= n9, pierEffectiveWidth= pierSide)
+pilecap= strut_and_tie_utils.Pilecap3Piles(pierBottomNode= n3, pileTopNodeA= pileTopNodes[0], pileTopNodeB= pileTopNodes[1], pileTopNodeC= pileTopNodes[2],  pierEffectiveDiameter= pierEffectiveDiameter)
 
 # Define materials. 
 concrete= EC2_materials.C30
-strutArea= 0.25
 reinfSteel= EC2_materials.S500B
-tieArea= 5.8e-4
 ## Define pier material.
-pierRCSection= def_simple_RC_section.RCRectangularSection(name= 'pierRCSection', sectionDescr= 'pier section', concrType= concrete, reinfSteelType= reinfSteel, width= pierSide, depth= pierSide)
+pierRCSection= def_column_RC_section.RCCircularSection(name= 'pierRCSection', sectionDescr= 'pier section', concrType= concrete, reinfSteelType= reinfSteel, Rext= pierDiameter)
 xcPierSectionMaterial= pierRCSection.defElasticShearSection2d(preprocessor)
 
 # Define pile cap.
-pilecap.createDummyElasticModel(modelSpace, concrete= concrete)
+strutArea= pierRCSection.getAc()/math.sqrt(2)
+diam32Area= math.pi*(32e-3/2.0)**2
+diam25Area= math.pi*(25e-3/2.0)**2
+diam16Area= math.pi*(16e-3/2.0)**2
+pilecap.createStrutAndTieModel(modelSpace, strutArea= strutArea, concrete= concrete, pileTiesArea= 24*diam25Area, topChordsTiesArea= 10*diam25Area, bottomChordsTiesArea= 10*diam32Area, reinfSteel= reinfSteel, xcPierSectionMaterial= xcPierSectionMaterial)
 
+'''
 ### Define pier.
 #### Define pier elements.
 lin= modelSpace.newLinearCrdTransf("lin")
@@ -134,13 +123,13 @@ ratio1= abs(R0a[1]+R0b[1]-F)/F
 ratio2= abs(R0a[0]+R0b[0])
 R0= R0a+R0b
 
-'''
+
 print('\nR0a= ', R0a*1/1e3, 'kN')
 print('R0b= ', R0b*1/1e3, 'kN')
 print('R0= ', R0*1/1e3, 'kN')
 print('ratio1= ', ratio1)
 print('ratio2= ', ratio2)
-'''
+
 testOK= (abs(ratio1)<1e-8) and (abs(ratio2)<1e-8)
 
 import os
@@ -150,14 +139,15 @@ if testOK:
     print('test '+fname+': ok.')
 else:
     lmsg.error(fname+' ERROR.')
+'''
 
-# # Graphic stuff.
-# from postprocess import output_handler
-# oh= output_handler.OutputHandler(modelSpace)
-# # oh.displayBlocks()
-# oh.displayFEMesh()
+# Graphic stuff.
+from postprocess import output_handler
+oh= output_handler.OutputHandler(modelSpace)
+# oh.displayBlocks()
+oh.displayFEMesh()
 # oh.displayLoads()
 # oh.displayReactions()
 # oh.displayIntForcDiag('N')
-# # oh.displayDispRot(itemToDisp='uY')
+# oh.displayDispRot(itemToDisp='uY')
 
