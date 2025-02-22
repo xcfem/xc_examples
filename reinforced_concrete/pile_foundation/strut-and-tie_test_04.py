@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-''' Not so naive approach to calculation of pile cap on two piles. Home made test.'''
+''' Generation of a simple linear elastic pilecap model that transfer the
+    loads from the piles to the piles. This example tries to show how the
+    Pilecap2Piles object can be used inside a biggen model.
+
+    When analyzing the pilecap itself we create the strut-and-tie model by
+    means of the createStrutAndTieModel method. When analyzing other parts
+    of the model we use the createDummyElasticModel as a set of rigid bars
+    to simulate the pilecap without the complexities of the 
+    strut-and-tie model.
+'''
 
 from __future__ import division
 from __future__ import print_function
@@ -10,6 +19,7 @@ __license__= "GPL"
 __version__= "3.0"
 __email__= "l.pereztato@gmail.com"
 
+import math
 import xc
 from model import predefined_spaces
 from materials.ec2 import EC2_materials
@@ -30,17 +40,18 @@ modelSpace= predefined_spaces.StructuralMechanics2D(nodes)
 #                n0
 #                 |  pier
 #                 |
-#       n1   n2   |n3 n4   n5
-#         +----+--+--+----+
-#         | \ /.\  / .\  /|
-#         |  / .  \  . \/ |  d
-#         | / \./   \. / \|
-#         +----+-----+----+
-#       n6|   n7     n8   |n9
-#         |               | 
-#         |               | pile
-#         |               |
-#        n10             n11
+#                 |
+#                 |n1
+#                 +
+#                / \
+#               /   \    d
+#              /     \
+#             +-------+
+#          n6 |       | n9
+#             |       | 
+#             |       | piles
+#             |       |
+#          n10         n11
 #    
 s= 1.6
 d= 1.0
@@ -74,7 +85,7 @@ pierRCSection= def_simple_RC_section.RCRectangularSection(name= 'pierRCSection',
 xcPierSectionMaterial= pierRCSection.defElasticShearSection2d(preprocessor)
 
 # Define pile cap.
-pilecap.createStrutAndTieModel(modelSpace, strutArea= strutArea, concrete= concrete, topDownTiesArea= tieArea, bottomChordTiesArea= tieArea, topChordTiesArea= tieArea, reinfSteel= reinfSteel, xcPierSectionMaterial= xcPierSectionMaterial, linearElastic= False)
+pilecap.createDummyElasticModel(modelSpace, concrete= concrete)
 
 ### Define pier.
 #### Define pier elements.
@@ -103,8 +114,7 @@ lp0.newNodalLoad(n0.tag,xc.Vector([0,-F,0]))
 modelSpace.addLoadCaseToDomain(lp0.name)
 
 # Solution
-analysis= predefined_solutions.penalty_newton_raphson(feProblem, printFlag= 1)
-result= analysis.analyze(1)
+result= modelSpace.analyze(calculateNodalReactions= False)
 if(result!=0):
     lmsg.error("Can't solve.")
     info= None
@@ -114,77 +124,40 @@ if(result!=0):
     unconstrainedNode= modelSpace.locateEquationNumber(eqNumber= info-1)
     print('unconstrained node id: ', unconstrainedNode.tag)
     print('unconstrained node position: ', unconstrainedNode.getInitialPos2d)
-    # exit(1)
+    exit(1)
 
 # Check results.
-T0= 0.0
-bottomChordTies= pilecap.getBottomChordTies()
-for tie in bottomChordTies:
-    T0+= tie.getN()
-T0/= len(bottomChordTies)
-T0ref= F*(v-a)/2.0/d
-ratio1= abs(T0-T0ref)/T0ref
+modelSpace.calculateNodalReactions()
+R0a= n10.getReaction
+R0b= n11.getReaction
+ratio1= abs(R0a[1]+R0b[1]-F)/F
+ratio2= abs(R0a[0]+R0b[0])
+R0= R0a+R0b
 
-modelSpace.removeLoadCaseFromDomain(lp0.name)
-modelSpace.revertToStart()
-lp1= modelSpace.newLoadPattern(name= '1')
-lp1.newNodalLoad(n0.tag,xc.Vector([F,0,0]))
-# We add the load case to domain.
-modelSpace.addLoadCaseToDomain(lp1.name)
-
-result= analysis.analyze(1)
-if(result!=0):
-    lmsg.error("Can't solve.")
-    exit(1)
-    
-modelSpace.removeLoadCaseFromDomain(lp1.name)
-modelSpace.revertToStart()
-lp2= modelSpace.newLoadPattern(name= '2')
-lp2.newNodalLoad(n0.tag,xc.Vector([0,F,0]))
-# We add the load case to domain.
-modelSpace.addLoadCaseToDomain(lp2.name)
-
-result= analysis.analyze(1)
-if(result!=0):
-    lmsg.error("Can't solve.")
-    exit(1)
-    
-modelSpace.removeLoadCaseFromDomain(lp2.name)
-modelSpace.revertToStart()
-lp3= modelSpace.newLoadPattern(name= '3')
-lp3.newNodalLoad(n0.tag,xc.Vector([F,F,0]))
-# We add the load case to domain.
-modelSpace.addLoadCaseToDomain(lp3.name)
-
-result= analysis.analyze(1)
-if(result!=0):
-    lmsg.error("Can't solve.")
-    exit(1)
-
-# print('dummy12.N= ', dummy12.getN()/1e3)
-# print('dummy45.N= ', dummy45.getN()/1e3)
-# print('dummy78.N= ', dummy78.getN()/1e3)
-# print('\ntie12.N= ', tie67.getN()/1e3)
-# print('tie89.N= ', tie89.getN()/1e3)
-print('T0= ', T0/1e3, 'kN')
-print('T0ref= ', T0ref/1e3, 'kN')
+'''
+print('\nR0a= ', R0a*1/1e3, 'kN')
+print('R0b= ', R0b*1/1e3, 'kN')
+print('R0= ', R0*1/1e3, 'kN')
 print('ratio1= ', ratio1)
+print('ratio2= ', ratio2)
+'''
+testOK= (abs(ratio1)<1e-8) and (abs(ratio2)<1e-8)
 
 import os
 from misc_utils import log_messages as lmsg
 fname= os.path.basename(__file__)
-if abs(ratio1)<1e-3:
+if testOK:
     print('test '+fname+': ok.')
 else:
     lmsg.error(fname+' ERROR.')
 
-# Graphic stuff.
-from postprocess import output_handler
-oh= output_handler.OutputHandler(modelSpace)
-# oh.displayBlocks()
-oh.displayFEMesh()
-oh.displayLoads()
-oh.displayReactions()
-oh.displayIntForcDiag('N')
-# oh.displayDispRot(itemToDisp='uY')
+# # Graphic stuff.
+# from postprocess import output_handler
+# oh= output_handler.OutputHandler(modelSpace)
+# # oh.displayBlocks()
+# oh.displayFEMesh()
+# oh.displayLoads()
+# oh.displayReactions()
+# oh.displayIntForcDiag('N')
+# # oh.displayDispRot(itemToDisp='uY')
 
