@@ -469,7 +469,7 @@ class InitialStateStorage(object):
         :param combName: load combination name.
         :param combExpr: load combination expression.
         '''
-        initialState, loadState= utils.splitCombination(combExpr, self.initialStateLoads)
+        initialState, loadState= utils.split_combination(combExpr, self.initialStateLoads)
         print(combName, 'initial state: ', initialState, ' load state:', loadState)
         self.solveForInitialState(initialState) # initial state.
 
