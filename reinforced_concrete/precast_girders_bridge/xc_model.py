@@ -356,7 +356,7 @@ def solve_for_initial_state(loadCombExpr:str):
     modelSpace.revertToStart()
     modelSpace.deactivateElements(bridgeDeckSet) # Deactivate bridge deck.
 
-    combDict= utils.getCombinationDict(loadCombExpr)
+    combDict= utils.get_combination_dict(loadCombExpr)
     g1factor= float(combDict['G1']) # Self weight factor.
     g2factor= float(combDict['G2']) # Dead load factor.
     g3factor= float(combDict['G3']) # Creep and shrinkage effects factor.
@@ -473,7 +473,7 @@ class InitialStateStorage(object):
         print(combName, 'initial state: ', initialState, ' load state:', loadState)
         self.solveForInitialState(initialState) # initial state.
 
-        loadPatternDict= utils.getCombinationDict(loadState)
+        loadPatternDict= utils.get_combination_dict(loadState)
         for key in loadPatternDict: # rest of the loads.
             lp= modelSpace.addLoadCaseToDomain(key)
             lp.gammaF= loadPatternDict[key]
