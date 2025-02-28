@@ -450,7 +450,7 @@ class InitialStateStorage(object):
 
         :param initialState: load combination corresponding to an initial state.
         '''
-        initStateKey= utils.getFileNameFromCombinationExpresion(initialState)
+        initStateKey= utils.get_file_name_from_combination_expresion(initialState)
         if initStateKey in self.storedStates:
             pseudoTime= self.storedStates[initStateKey]
             modelSpace.restore(pseudoTime)
