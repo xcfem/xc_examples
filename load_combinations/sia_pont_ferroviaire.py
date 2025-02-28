@@ -60,16 +60,16 @@ lcg.genera()
 
 
 print("ELS fréq.")
-ec.writeXCLoadCombinations(prefix= "ELSF", loadCombinations= lcg.getLoadCombinations.getSLSFrequentCombinations, outputFileName= "load_combs_els_freq.py")
+ec.write_xc_load_combinations(prefix= "ELSF", loadCombinations= lcg.getLoadCombinations.getSLSFrequentCombinations, outputFileName= "load_combs_els_freq.py")
 
 
 print("ELS quasi perm.")
-ec.writeXCLoadCombinations(prefix= "ELSQP", loadCombinations= lcg.getLoadCombinations.getSLSQuasiPermanentCombinations, outputFileName= "load_combs_els_qp.py")
+ec.write_xc_load_combinations(prefix= "ELSQP", loadCombinations= lcg.getLoadCombinations.getSLSQuasiPermanentCombinations, outputFileName= "load_combs_els_qp.py")
 
 
 print("ELU")
-ec.writeXCLoadCombinations(prefix= "ELU", loadCombinations= lcg.getLoadCombinations.getULSTransientCombinations, outputFileName= "load_combs_elu.py")
+ec.write_xc_load_combinations(prefix= "ELU", loadCombinations= lcg.getLoadCombinations.getULSTransientCombinations, outputFileName= "load_combs_elu.py")
 
 print("ACCID")
-ec.writeXCLoadCombinations(prefix= "ELUA", loadCombinations= lcg.getLoadCombinations.getULSAccidentalCombinations, outputFileName= "load_combs_acc.py")
+ec.write_xc_load_combinations(prefix= "ELUA", loadCombinations= lcg.getLoadCombinations.getULSAccidentalCombinations, outputFileName= "load_combs_acc.py")
 
