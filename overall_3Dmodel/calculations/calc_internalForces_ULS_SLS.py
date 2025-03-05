@@ -28,7 +28,7 @@ loadCombinations= prep.getLoadHandler.getLoadCombinations
 # Limit states to calculate internal forces for.
 # REINFORCED CONCRETE
 limitStates= [lsd.normalStressesResistance, 
-              lsd.steelShearResistance, 
+              lsd.shearResistance, 
               lsd.freqLoadsCrackControl,
               lsd.rareLoadsCrackControl,
               lsd.quasiPermanentLoadsCrackControl, 
