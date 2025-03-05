@@ -1,9 +1,3 @@
-# Loads
-from actions import combinations as combs
-
-# Container for load combinations.
-combContainer= combs.CombContainer()
-
 combContainer.SLS.rare.add("SLSR0","1.00*G + 1.00*E + 1.00*W")
 combContainer.SLS.rare.add("SLSR1","1.00*G + 1.00*E + 1.00*W + 0.40*T")
 combContainer.SLS.rare.add("SLSR2","1.00*G + 1.00*E + 1.00*T")

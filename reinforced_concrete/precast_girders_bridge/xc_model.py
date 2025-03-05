@@ -450,7 +450,7 @@ class InitialStateStorage(object):
 
         :param initialState: load combination corresponding to an initial state.
         '''
-        initStateKey= utils.getFileNameFromCombinationExpresion(initialState)
+        initStateKey= utils.get_file_name_from_combination_expresion(initialState)
         if initStateKey in self.storedStates:
             pseudoTime= self.storedStates[initStateKey]
             modelSpace.restore(pseudoTime)
@@ -469,7 +469,7 @@ class InitialStateStorage(object):
         :param combName: load combination name.
         :param combExpr: load combination expression.
         '''
-        initialState, loadState= utils.splitCombination(combExpr, self.initialStateLoads)
+        initialState, loadState= utils.split_combination(combExpr, self.initialStateLoads)
         print(combName, 'initial state: ', initialState, ' load state:', loadState)
         self.solveForInitialState(initialState) # initial state.
 
