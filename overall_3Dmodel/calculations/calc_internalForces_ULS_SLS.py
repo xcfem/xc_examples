@@ -2,6 +2,7 @@
 from postprocess import limit_state_data as lsd
 from postprocess.config import default_config
 from actions import combinations as cc
+from solution import predefined_solutions
 
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
@@ -47,15 +48,31 @@ limitStates= [lsd.steelNormalStressesResistance,
 limitStates= [lsd.woodNormalStressesResistance,
               ]
 '''
+# add the effect of the in-plane Nxy forces to the axial internal forces (defaults to True)
+'''
+lsd.normalStressesResistance.woodArmerAlsoForAxialForces= False
+'''
 
-for ls in limitStates:
-    ls.saveAll(combContainer=xcC.combContainer,setCalc=setCalc,bucklingMembers=None)
-    print('combinations for ', ls.label, ': ', loadCombinations.getKeys())
+linearCalc=True
+
+if linearCalc:
+    for ls in limitStates:
+        ls.saveAll(combContainer=xcC.combContainer,setCalc=setCalc,bucklingMembers=None)
+        print('combinations for ', ls.label, ': ', loadCombinations.getKeys())
+else:
+    class CustomSolver(predefined_solutions.PlainNewtonRaphsonMUMPS):
+        def __init__(self, prb):
+            super(CustomSolver,self).__init__(prb= prb, name= 'test', maxNumIter= 30, printFlag= 1, convergenceTestTol= 1e-1)
+
+    for ls in limitStates:
+        ls.saveAll(combContainer=xcC.combContainer,setCalc=setCalc,solutionProcedureType=CustomSolver,bucklingMembers=None)
+        print('combinations for ', ls.label, ': ', loadCombinations.getKeys())
 
 
 
-# add the effect of the in-plane Vxy forces to the axial internal forces 
-#lsd.normalStressesResistance.woodArmerAlsoForAxialForces= True
+
+# add the effect of the in-plane Nxy forces to the axial internal forces (defaults to True)
+#lsd.normalStressesResistance.woodArmerAlsoForAxialForces= False
 
 # for ls in limitStates:
 #     ls.saveAll(
