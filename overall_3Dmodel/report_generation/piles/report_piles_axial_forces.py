@@ -34,7 +34,9 @@ for n in reactNod.keys():
     reactNod[n]['combNmax']=' '
     reactNod[n]['combNmaxExpr']=' '
     
-analysis= predefined_solutions.simple_static_linear(xcM.FEcase)
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis
 for cmb in combs.keys():
     cmbExpr=combs[cmb].expr
     modelSpace.addNewLoadCaseToDomain(cmb,cmbExpr)

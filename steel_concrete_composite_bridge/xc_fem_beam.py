@@ -12,6 +12,7 @@ import xc_materials as xcM
 # Common variables
 prep=xc_init.prep
 out=xc_init.out
+modelSpace=xc_init.modelSpace
 #                         ***FE model - MESH***
 
 ## Section type 1
@@ -26,12 +27,18 @@ wST2_mesh=fem.SurfSetToMesh(surfSet=xcG.wST2,matSect=xcM.wST2_mat,elemSize=datG.
 bfST3_mesh=fem.SurfSetToMesh(surfSet=xcG.bfST3,matSect=xcM.bfST3_mat,elemSize=datG.eSize,elemType='ShellMITC4')
 tfST3_mesh=fem.SurfSetToMesh(surfSet=xcG.tfST3,matSect=xcM.tfST3_mat,elemSize=datG.eSize,elemType='ShellMITC4')
 wST3_mesh=fem.SurfSetToMesh(surfSet=xcG.wST3,matSect=xcM.wST3_mat,elemSize=datG.eSize,elemType='ShellMITC4')
+## Transverse stiffeners
+Tstiff_mesh=fem.SurfSetToMesh(surfSet=xcG.Tstiff,matSect=xcM.Tstiff_mat,elemSize=datG.eSize,elemType='ShellMITC4')
+#Tstiff_mesh.generateMesh(prep)
+#xcG.Tstiff.fillDownwards()
+#out.displayBlocks()
+#out.displayFEMesh(xcG.Tstiff)
 
 fem.multi_mesh(preprocessor=prep,
                lstMeshSets=[bfST1_mesh,tfST1_mesh,wST1_mesh,
                             bfST2_mesh,tfST2_mesh,wST2_mesh,
                             bfST3_mesh,tfST3_mesh,wST3_mesh,
+                            Tstiff_mesh,
                             ])
 
-
-#out.displayFEMesh(xcG.beamSets)
+out.displayFEMesh(xcG.beamSets)

@@ -13,7 +13,9 @@ import xc_sets as xcS
 # Common variables
 out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep ; FEcase=xc_init.FEcase
 #
-analysis= predefined_solutions.simple_static_linear(FEcase)
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis
 for ls in [xcLC.QearthPressWall]:#,xcLC.QearthPWallStrL]:
     modelSpace.removeAllLoadPatternsFromDomain()
     modelSpace.addLoadCaseToDomain(ls.name)

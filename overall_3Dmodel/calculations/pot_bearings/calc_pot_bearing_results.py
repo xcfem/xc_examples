@@ -63,7 +63,9 @@ else:
 f.close()
 
 # Cálculo
-analysis= predefined_solutions.simple_static_linear(model.FEcase)
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis
 for ky in LCdef.LCG_perm+LCdef.LCG_reol+ LCdef.LCG_vert + LCdef.LCG_fren +  LCdef.LCG_centr+ LCdef.LCG_lazo + LCdef.LCG_paseos + LCdef.LCG_viento+ LCdef.LCG_term:
     lcg=dictLCG[ky]
     lcName=lcg['LCname']

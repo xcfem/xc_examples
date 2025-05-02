@@ -1,11 +1,25 @@
+from postprocess.config import default_config
+workingDirectory= default_config.setWorkingDirectory() # search env_config.py
+import data_geom as datG
+
 # Loads data
 ## Loads on each beam (half deck)
-beamSW=5e3 # beam self-weigth [N/m]
-slabSW=31.25e3 # concrete slab self-weigth [N/m]
-deadL=1.6e3 # dead load [N/m]
-qUnifTraffic=(9*3+2.5*2)*1e3 # uniform traffic load [N/m2]
-QconcentrTraffic=800 # [kN]
-lineWidth=3 # [m] width of each line
+deadL=1.6e3 # dead load [N/m2]
+qUnifTraffic=(9*3+2.5*(datG.slabW-3))*1e3/datG.slabW # uniform traffic load [N/m2]
+# heavy vehicle concentrated loads (the sum is 800 kN = half bridge)
+import geom
+from actions.roadway_traffic import load_model_base as lmb
+# wheels
+w1=lmb.WheelLoad(pos=geom.Pos2d(-1,-0.6),ld=150e3,lx=0.4,ly=0.4)
+w2=lmb.WheelLoad(pos=geom.Pos2d(+1,-0.6),ld=150e3,lx=0.4,ly=0.4)
+w3=lmb.WheelLoad(pos=geom.Pos2d(-1,+0.6),ld=150e3,lx=0.4,ly=0.4)
+w4=lmb.WheelLoad(pos=geom.Pos2d(+1,+0.6),ld=150e3,lx=0.4,ly=0.4)
+w5=lmb.WheelLoad(pos=geom.Pos2d(+2,-0.6),ld=100e3,lx=0.4,ly=0.4)
+w6=lmb.WheelLoad(pos=geom.Pos2d(+2,+0.6),ld=100e3,lx=0.4,ly=0.4)
+truck3axes=lmb.LoadModel(wLoads=[w1,w2,w3,w4,w5,w6])
+
+#QconcentrTraffic=800 # [kN]
+laneWidth=3 # [m] width of each lane
 qTrfRest=2.5e3 #uniform traffic load on lines 2, 3 and rest [N/m2]
 
 topTemp=+15 # degrees temperture at top face

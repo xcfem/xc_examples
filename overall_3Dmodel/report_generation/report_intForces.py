@@ -24,6 +24,9 @@ units=env.cfg.getForceUnitsDescription()
 textfl=open(reportFile,'w')  #tex file to be generated
 
 st=xcS.columnZconcrSet
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis # do not define analysis more than once
 for ky in dictLCG.keys():
     lcg=dictLCG[ky]
     lcName=lcg['LCname']
@@ -31,7 +34,6 @@ for ky in dictLCG.keys():
     modelSpace.removeAllLoadPatternsFromDomain()
     modelSpace.revertToStart()
     modelSpace.addLoadCaseToDomain(lcName)
-    analysis= predefined_solutions.simple_static_linear(FEcase)
     result= analysis.analyze(1)
     fLabel=lcName+st.name+'Mz'
     grFileName=fLabel+'.png'

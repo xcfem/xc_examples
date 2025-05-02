@@ -50,11 +50,54 @@ sbeam_st3={
     'tf_t':25e-3,
     }
 
-eSize= 0.35     #length of elements
+# transverse stiffeners (Y-coord)
+yTS=list()
+# intermediate diaphragms (Y-coord)
+yID=list()
+
+yTS+=[2.0833]
+yTS.append(yTS[-1]+2.0833)
+yID.append(yTS[-1]+2.0833)
+yTS.append(yID[-1]+3.125)
+yID.append(yTS[-1]+3.125)
+yTS.append(yID[-1]+3.125)
+yID.append(yTS[-1]+3.125)
+yTS.append(yID[-1]+3.125)
+yID.append(yTS[-1]+3.125)
+yTS.append(yID[-1]+2.5)
+yTS.append(yTS[-1]+2.5+2.5)
+yID.append(yTS[-1]+2.5)
+yTS.append(yID[-1]+3.35)
+yID.append(yTS[-1]+3.35)
+yTS.append(yID[-1]+3.35)
+yID.append(yTS[-1]+3.35)
+
+yTSaux=list()
+for y in yTS:
+    yTSaux.append(Lbeam-y)
+yTSaux.sort()
+yTS+=[Lbeam/2]+yTSaux
+
+yIDaux=list()
+for y in yID:
+    yIDaux.append(Lbeam-y)
+yIDaux.sort()
+yID+=yIDaux
+# z coordinate of the diaphragms flanges
+zBF_ID=1
+zTF_ID=zBF_ID+0.5
+# Transverse stiffness geometry
+TSw=600e-3 #width 
+TSth=12e-3 #thickness
+# 
+eSize= 0.30     #length of elements
 
 # Effective width calculation EC4-2 art. 5.4.1.2
 b_0=0.20 # [m] distance between the centres of the outstand shear connectors
+# Y-interval width shear connections each 150 mm
+SCdisY=0.20
 '''
+
 ### NOT USED IN THIS MODEL
 # equivalent spans= approximate distance between points of zero bending n10ment.: EC4-2, fig. 5.1
 b_i_real=[beamsDist/2-b_0/2, beamsDist/2-b_0/2] # real slab flange width (at each side of the beam)

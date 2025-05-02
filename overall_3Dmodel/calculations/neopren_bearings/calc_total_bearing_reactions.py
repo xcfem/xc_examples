@@ -15,7 +15,9 @@ import load_case_definition as LCdef
 
 dictLCG=yaml.safe_load(Path(workingDirectory+'LC_graph.yaml').read_text())
 f = open('result_total_bearing_reactions_1.tex','w')
-analysis= predefined_solutions.simple_static_linear(model.FEcase)
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis
 for ky in LCdef.listLCs_1:
     lcg=dictLCG[ky]
     model.modelSpace.removeAllLoadPatternsFromDomain()

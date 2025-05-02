@@ -61,3 +61,6 @@ columnZsteel_mat.sectionClass=1
 beamXsteel_mat= EC3_materials.IPEShape(steel=datM.S235JR,name='IPE_A_300')
 beamXsteel_mat.defElasticShearSection3d(prep)
 beamXsteel_mat.sectionClass=1
+
+# X spring material
+Xspring_mat= typical_materials.defElasticMaterial(preprocessor, "kx",datM.KSpring)

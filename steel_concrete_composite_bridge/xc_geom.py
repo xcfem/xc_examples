@@ -32,30 +32,35 @@ xTFst3=[-datST3['tf_w']/2,datST3['tf_w']/2]
 
 yAbut=[0,datG.Lbeam]
 yPier=[datG.spansL[0],datG.spansL[0]+datG.spansL[1]]
+ySC=[i*datG.SCdisY for i in range(int(datG.Lbeam/datG.SCdisY))] # Y-coord shear connections
+yTS=datG.yTS # Y-coord. of transverse stiffeners
+yID=datG.yID # Y-coord. of intermediate diaphragms
+zID=[datG.zBF_ID,datG.zTF_ID]#  Z-coordinate of the diaphragms flanges
 #
 xList=xSlab+xShrC+[xWeb]+xBFst1+xBFst2+xBFst3
 xList.sort(); xList=dsu.remove_duplicates_list(xList)
-yList=yAbut+yPier
+yList=yAbut+yPier+ySC+yTS+zID
 for yl in datST1['yCoord']+datST2['yCoord']+datST3['yCoord']:
     yList+=yl
-yList.sort(); yList=dsu.remove_duplicates_list(yList)
-zList=[zBF,zTF,zSlab]; zList.sort(); zList=dsu.remove_duplicates_list(zList)
+yList.sort(); yList=dsu.remove_close_values(yList,tolerance=0.05)
+zList=[zBF,zTF,zSlab]+zID; zList.sort(); zList=dsu.remove_duplicates_list(zList)
 gridGeom= gm.GridModel(prep,xList,yList,zList)
 gridGeom.generatePoints()
 
 # Section type 1
 dat=datG.sbeam_st1
 yCoo=dat['yCoord']
-lstXYZRange=list()
 ## Bottom flange
 xmin=xBFst1[0]; xmax=xBFst1[-1]
 z=zBF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 bfST1=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='bfST1')
 ## Top flange
 xmin=xTFst1[0]; xmax=xTFst1[-1]
 z=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 tfST1=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST1')
@@ -63,6 +68,7 @@ tfST1=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST1')
 x=0
 zmin=zBF
 zmax=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[x,yl[0],zmin],[x,yl[-1],zmax]])
 wST1=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='wST1')
@@ -70,16 +76,17 @@ wST1=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='wST1')
 # Section type 2
 dat=datG.sbeam_st2
 yCoo=dat['yCoord']
-lstXYZRange=list()
 ## Bottom flange
 xmin=xBFst2[0]; xmax=xBFst2[-1]
 z=zBF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 bfST2=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='bfST2')
 ## Top flange
 xmin=xTFst2[0]; xmax=xTFst2[-1]
 z=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 tfST2=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST2')
@@ -87,6 +94,7 @@ tfST2=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST2')
 x=0
 zmin=zBF
 zmax=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[x,yl[0],zmin],[x,yl[-1],zmax]])
 wST2=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='wST2')
@@ -94,16 +102,17 @@ wST2=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='wST2')
 # Section type 3
 dat=datG.sbeam_st3
 yCoo=dat['yCoord']
-lstXYZRange=list()
 ## Bottom flange
 xmin=xBFst3[0]; xmax=xBFst3[-1]
 z=zBF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 bfST3=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='bfST3')
 ## Top flange
 xmin=xTFst3[0]; xmax=xTFst3[-1]
 z=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[xmin,yl[0],z],[xmax,yl[-1],z]])
 tfST3=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST3')
@@ -111,6 +120,7 @@ tfST3=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='tfST3')
 x=0
 zmin=zBF
 zmax=zTF
+lstXYZRange=list()
 for yl in yCoo:
     lstXYZRange.append([[x,yl[0],zmin],[x,yl[-1],zmax]])
 wST3=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='wST3')
@@ -121,9 +131,28 @@ slab=gridGeom.genSurfOneXYZRegion(
     setName='slab'
     )
 
+# transverse stiffeners
+xmin=xTFst1[0];xmax=xTFst1[-1]
+zmin=zBF; zmax=zTF
+lstXYZRange=list()
+for y in yTS:
+    lstXYZRange.append([[xmin,y,zmin],[xmax,y,zmax]])
+Tstiff=gridGeom.genSurfMultiXYZRegion(lstXYZRange=lstXYZRange,setName='Tstiff')
+
+# shear connectors
+#shearC=prep.getSets.defSet('shearC')
+lstXYZRange=list()
+for y in ySC:
+    lstXYZRange.append([[xShrC[0],y,zTF],[xShrC[0],y,zSlab]])
+    lstXYZRange.append([[xShrC[-1],y,zTF],[xShrC[-1],y,zSlab]])
+shearC=gridGeom.genLinMultiXYZRegion(lstXYZRange=lstXYZRange,setName='shearC')
+# 
 beamSets=[bfST1,tfST1,wST1,
           bfST2,tfST2,wST2,
-          bfST3,tfST3,wST3]
+          bfST3,tfST3,wST3,
+          Tstiff,
+          ]
+
 slabSets=[slab]
-allSets=beamSets+slabSets
-#out.displayBlocks()  
+allSets=beamSets+slabSets+[shearC]
+#out.displayBlocks()
