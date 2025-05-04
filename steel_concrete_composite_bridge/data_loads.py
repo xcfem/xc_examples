@@ -24,7 +24,8 @@ qTrfRest=2.5e3 #uniform traffic load on lines 2, 3 and rest [N/m2]
 
 topTemp=+15 # degrees temperture at top face
 
-epsShrinkage=-389e-6 #shrinkage strain
+epsShrinkage_inf=-389e-6 #shrinkage strain (t=infinity)
+epsShrinkage_15=
 creepCoef=2.17 # creep coefficient
 
 qUnifConstruct=1.2e3 # [N/m2] uniform load over the steel beam during construction

@@ -10,14 +10,6 @@ import xc_sets
 
 # Common variables
 out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
-# beam self-weight
-G1beamSW=lcases.LoadCase(preprocessor=prep,name="G1beamSW",loadPType="default",timeSType="constant_ts")
-G1beamSW.create()
-G1beamSW.addLstLoads([xcL.beamSW])
-# slab weight on top of flanges
-G2slabSW=lcases.LoadCase(preprocessor=prep,name="G2slabSW",loadPType="default",timeSType="constant_ts")
-G2slabSW.create()
-G2slabSW.addLstLoads([xcL.slabSWst1,xcL.slabSWst2,xcL.slabSWst3])
 # dead load
 G3deadL=lcases.LoadCase(preprocessor=prep,name="G3deadL",loadPType="default",timeSType="constant_ts")
 G3deadL.create()
@@ -31,6 +23,4 @@ Q2TraffConc=lcases.LoadCase(preprocessor=prep,name="Q2TraffConc",loadPType="defa
 Q2TraffConc.create()
 Q2TraffConc.addLstLoads([xcL.truckLoad])
 
-lstLCnmOnlyBeam=[G1beamSW.name,G2slabSW.name]
-lstLCnmPostSlab=[G3deadL.name,Q1TraffUnif.name,Q2TraffConc.name]
-lstLCnames=lstLCnmOnlyBeam+lstLCnmPostSlab
+lstLCnm=[G3deadL.name,Q1TraffUnif.name,Q2TraffConc.name]
