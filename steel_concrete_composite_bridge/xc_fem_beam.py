@@ -8,12 +8,14 @@ workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import data_geom as datG
 import xc_init
 import xc_geom as xcG
+import data_materials as datM
 import xc_materials as xcM
 # Common variables
 prep=xc_init.prep
 out=xc_init.out
 modelSpace=xc_init.modelSpace
 #                         ***FE model - MESH***
+
 
 ## Section type 1
 bfST1_mesh=fem.SurfSetToMesh(surfSet=xcG.bfST1,matSect=xcM.bfST1_mat,elemSize=datG.eSize,elemType='ShellMITC4')
@@ -41,4 +43,8 @@ fem.multi_mesh(preprocessor=prep,
                             Tstiff_mesh,
                             ])
 
+for st in xcG.beamSets:
+    for e in st.elements: e.setProp('yieldStress',datM.strSteel.fy)
+
 out.displayFEMesh(xcG.beamSets)
+

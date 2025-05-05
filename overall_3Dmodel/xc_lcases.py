@@ -105,3 +105,10 @@ for lc in [LS1,LS2]:
     modelSpace.removeLoadCaseFromDomain(lc.name)
 '''
 lstLC=[GselfWeight,Qdecks,QearthPressWall,QearthPWallStrL,QearthPWallLinL,QearthPWallHrzL,qunifBeams,QpntBeams,qlinDeck,QwheelDeck1,QvehicleDeck1,LS1,LS2]
+
+#Shrinkage
+Gshrink=lcases.LoadCase(preprocessor=prep,name="Gshrink",loadPType="default",timeSType="constant_ts")
+Gshrink.create()
+modelSpace.setCurrentLoadPattern(Gshrink.name)
+Gshrink.addLstLoads([xcL.shrinkage])
+

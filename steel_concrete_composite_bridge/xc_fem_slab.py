@@ -39,7 +39,7 @@ shearC_mesh=fem.LinSetToMesh(
     )
 shearC_mesh.generateMesh(prep)
 
-out.displayFEMesh()
+#out.displayFEMesh()
 '''
 # Nodes in top flange with shear connectors
 ySC=[i*datG.SCdisY for i in range(int(datG.Lbeam/datG.SCdisY))] # Y-coord shear connections

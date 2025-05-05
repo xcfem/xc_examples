@@ -23,3 +23,5 @@ w6=lmb.WheelLoad(pos=geom.Pos2d(1,-4.19),ld=35e3,lx=0.4,ly=0.4)
 
 truck3axes=lmb.LoadModel(wLoads=[w1,w2,w3,w4,w5,w6])
 
+# shrinkage
+epsShrinkage=350e-6 #shrinkage strain

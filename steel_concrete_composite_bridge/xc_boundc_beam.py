@@ -49,6 +49,6 @@ for y in yDiaphragms:
 TF_ID_spring=sprbc.SpringBC(name='TF_ID_spring',modelSpace=modelSpace,Kx=datM.K_TF_ID,Ky=0,Kz=0)
 TF_ID_spring.applyOnNodesLst(lstNod_TF_ID)
 
-out.displayFEMesh()
+#out.displayFEMesh()
 
         

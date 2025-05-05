@@ -148,3 +148,8 @@ truckLoad=lmb.VehicleDistrLoad(
     slopeDistr=1,
     vehicleRot=0)
 
+# Shrinkage
+shrinkage=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.epsShrinkage)
+
+# Heating
+heating=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.TempIncr*datM.)

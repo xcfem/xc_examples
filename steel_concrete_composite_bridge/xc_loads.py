@@ -37,8 +37,14 @@ wTF=datG.sbeam_st3['tf_w']
 qUnif=slabSWpm/wTF # [N/m2]
 slabSWst3=loads.UniformLoadOnSurfaces(name= 'slabSWst3',xcSet=xcG.tfST3,loadVector=xc.Vector([0,0,-qUnif,0,0,0]),refSystem='Global')
 
+# shrinkage t=15
+shrink0_15=loads.StrainLoadOnShells(name='shrink15',xcSet=xcG.slab,DOFstrain=[0,1],strain=datL.epsShrinkage_15)
+
 # dead load
 qDL=loads.UniformLoadOnSurfaces(name= 'qDL',xcSet=xcG.slab,loadVector=xc.Vector([0,0,-datL.deadL,0,0,0]),refSystem='Global')
+
+# shrinkage t= 15 to infinite days
+shrink15_inf=loads.StrainLoadOnShells(name='shrink15',xcSet=xcG.slab,DOFstrain=[0,1],strain=datL.epsShrinkage_inf-datL.epsShrinkage_15)
 
 # traffic unif. load
 qUnifTrf=loads.UniformLoadOnSurfaces(name= 'qUnifTrf',xcSet=xcG.slab,loadVector=xc.Vector([0,0,-datL.qUnifTraffic,0,0,0]),refSystem='Global')
@@ -56,4 +62,11 @@ truckLoad=lmb.VehicleDistrLoad(
     hDistr=0.1,
     slopeDistr=1,
     vehicleRot=0)
+# Thermal
+## heating
+heating=loads.StrainLoadOnShells(name='heating',xcSet=xcS.beam,DOFstrain=[0,1,2],strain=datL.TempIncr*datM.strSteel.alpha)
+
+## cooling
+cooling=loads.StrainLoadOnShells(name='cooling',xcSet=xcS.beam,DOFstrain=[0,1,2],strain=datL.TempDecr*datM.strSteel.alpha)
+
 
