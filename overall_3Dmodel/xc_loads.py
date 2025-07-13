@@ -75,7 +75,7 @@ lineL01=ep.LineVerticalLoadOnBackfill(qLoad=1e5, zLoad=xcG.zList[-1],distWall=1.
 earthPWallLinL= loads.EarthPressLoad(name= 'earthPWallLinL', xcSet=xcG.wall,soilData=None, vDir=xc.Vector([0,1,0]))
 earthPWallLinL.lineLoads=[lineL01]
 
-hrzL01=ep.HorizontalLoadOnBackfill(phi=math.radians(30), qLoad=2e5, zLoad=xcG.zList[-1],distWall=1,widthLoadArea=0.5,lengthLoadArea=1.5,horDistrAngle= math.radians(45))
+hrzL01=ep.HorizontalLoadOnBackfill(phi=math.radians(30), qLoad=2e5, zLoad=xcG.zList[-1],distWall=1, loadedAreaWidth= 0.5, loadedAreaLength= 1.5,horDistrAngle= math.radians(45))
 earthPWallHrzL=loads.EarthPressLoad(name= 'earthPWallHrzL', xcSet=xcG.wall,soilData=None, vDir=xc.Vector([0,1,0]))
 earthPWallHrzL.horzLoads=[hrzL01]
 
