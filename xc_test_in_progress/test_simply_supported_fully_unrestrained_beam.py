@@ -112,7 +112,7 @@ combContainer.dumpCombinations(preprocessor)
 
 ## Setup working directory.
 cfg= default_config.get_temporary_env_config()
-lsd.LimitStateData.envConfig= cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 
 ## Set combinations to compute.
 loadCombinations= preprocessor.getLoadHandler.getLoadCombinations

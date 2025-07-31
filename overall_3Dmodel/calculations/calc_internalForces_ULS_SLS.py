@@ -15,7 +15,7 @@ import xc_combinations as xcC
 # Common variables
 modelSpace=xc_init.modelSpace ; prep=xc_init.prep ; out=xc_init.out
 
-lsd.LimitStateData.envConfig= env.cfg
+lsd.LimitStateData.setEnvConfig(env.cfg)
 
 #Reinforced concrete sections on each element.
 #reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()

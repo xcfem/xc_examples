@@ -305,6 +305,6 @@ for l in xcTotalSet.getLines:
     member= nds.Member(name= l.name, section= memberSection, unbracedLengthX= Lx, lstLines= [l])
     #member.setControlPoints()
     ndsMembers.append(member)
-    
+
 # Setup working directory.
-lsd.LimitStateData.envConfig= default_config.get_temporary_env_config()
+lsd.LimitStateData.setEnvConfig(default_config.get_temporary_env_config())

@@ -7,7 +7,7 @@ from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 
-lsd.LimitStateData.envConfig= env.cfg
+lsd.LimitStateData.setEnvConfig(env.cfg)
 
 lmsg.warning('Implementation pending. Do not use.')
 quit()

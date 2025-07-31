@@ -13,7 +13,7 @@ import env_config as env
 # Verificacion of cracking SLS under permanent loads for reinf. concrete
 # elements, taking account of tension-stiffening
 
-lsd.LimitStateData.envConfig= env.cfg #configuration defined in script
+lsd.LimitStateData.setEnvConfig(env.cfg)#configuration defined in script
                                   #env_config.py
 
 # variables that control the output of the checking (setCalc,

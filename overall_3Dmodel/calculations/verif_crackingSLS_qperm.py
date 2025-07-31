@@ -11,7 +11,7 @@ import env_config as env
 import xc_sets as xcS
 
 # Verificacion of cracking SLS under permanent loads for reinf. concrete elements
-lsd.LimitStateData.envConfig= env.cfg 
+lsd.LimitStateData.setEnvConfig(env.cfg)
 setCalc=xcS.mixSet
 reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
 limitState= lsd.quasiPermanentLoadsCrackControl

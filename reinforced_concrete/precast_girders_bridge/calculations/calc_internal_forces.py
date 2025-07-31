@@ -13,7 +13,7 @@ girdersConcreteAgeAtLoading= deckConcreteAgeAtLoading+28 # Age of the girders co
 HR= 0.25 # Ambient relative humidity
 exec(cfg.compileCode('loads.py'))
 
-lsd.LimitStateData.envConfig=cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 
 #Set of entities for which checking is going to be performed.
 setCalc= concreteSet

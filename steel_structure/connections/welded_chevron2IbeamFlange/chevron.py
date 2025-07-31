@@ -208,7 +208,7 @@ setCalc=centerShells
 
 cfg= default_config.EnvConfig(language='en', resultsPath= 'tmp_results/', intForcPath= 'internalForces/',verifPath= 'verifications/',reportPath='./',reportResultsPath= 'annex/',grWidth='120mm')
 cfg.projectDirTree.workingDirectory='./'
-lsd.LimitStateData.envConfig= cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 ### Set combinations to compute.
 loadCombinations= prep.getLoadHandler.getLoadCombinations
 

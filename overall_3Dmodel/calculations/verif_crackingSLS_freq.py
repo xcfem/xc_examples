@@ -12,7 +12,7 @@ import xc_sets as xcS
 
 # Verificacion of cracking SLS under frequent loads for reinf. concrete elements
 
-lsd.LimitStateData.envConfig= env.cfg 
+lsd.LimitStateData.setEnvConfig(env.cfg)
 setCalc=xcS.mixSet
 limitState= lsd.freqLoadsCrackControl
 # Plan B

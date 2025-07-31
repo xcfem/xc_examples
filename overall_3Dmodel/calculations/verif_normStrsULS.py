@@ -12,7 +12,7 @@ import xc_sets as xcS
 #   *** Verification of normal-stresses ULS for reinf. concrete elements***
 
 setCalc=xcS.mixSet
-lsd.LimitStateData.envConfig= env.cfg  
+lsd.LimitStateData.setEnvConfig(env.cfg) 
 reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
 limitState=lsd.normalStressesResistance
 controller= lscheck.BiaxialBendingNormalStressController(limitState.label)

@@ -12,7 +12,7 @@ import xc_sets as xcS
 
 #   *** Verificacion of shear ULS for reinf. concrete elements ***
 
-lsd.LimitStateData.envConfig= env.cfg 
+lsd.LimitStateData.setEnvConfig(env.cfg)
 reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
 setCalc=xcS.mixSet
 

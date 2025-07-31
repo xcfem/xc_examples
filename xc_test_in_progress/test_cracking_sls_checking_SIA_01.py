@@ -103,7 +103,7 @@ combContainer= combs.CombContainer()
 combContainer.SLS.freq.add('combSLS01','1.*load')
 xcTotalSet= preprocessor.getSets.getSet('total')
 cfg= default_config.get_temporary_env_config()
-lsd.LimitStateData.envConfig= cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 ### Save internal forces.
 lsd.freqLoadsCrackControl.saveAll(combContainer,xcTotalSet) 
 # Define reinforcement.

@@ -8,7 +8,7 @@ from materials.ec2 import EC2_limit_state_checking as lscheck
 
 import xc_model # Import finite element model.
 
-lsd.LimitStateData.envConfig= xc_model.cfg
+lsd.LimitStateData.setEnvConfig(xc_model.cfg)
 #
 from shutil import copyfile
 internalForcesPath= xc_model.cfg.projectDirTree.getInternalForcesResultsPath()
