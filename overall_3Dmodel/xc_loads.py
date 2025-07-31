@@ -133,3 +133,23 @@ prBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=datG.LbeamY/2.,Lx=0.5,Ly=1.0
 wheelDeck1=loads.PointLoadOverShellElems(name='wheelDeck1', xcSet=xcS.decklv1Set, loadVector=xc.Vector([0,0,-datL.Qwheel]),prismBase=prBase,prismAxis='Z',refSystem='Global')
 
 lstL=[selfWeight,QpuntBeams,unifLoadDeck1,unifLoadDeck2,earthPressLoadWall,earthPWallStrL,earthPWallLinL,earthPWallHrzL,unifLoadBeamsY,unifLoadLinDeck2,wheelDeck1]
+
+# Vehicle load
+from actions.roadway_traffic import load_model_base as lmb
+xCentCV1=2
+yCentCV1=2
+truckLoad=lmb.VehicleDistrLoad(
+    name='truckLoad',
+    xcSet=xcS.decklv2Set,
+    loadModel=datL.truck3axes,
+    xCentr=xCentCV1,
+    yCentr=yCentCV1,
+    hDistr=0.1,
+    slopeDistr=1,
+    vehicleRot=0)
+
+# Shrinkage
+shrinkage=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.epsShrinkage)
+
+# Heating
+heating=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.TempIncr*datM.)

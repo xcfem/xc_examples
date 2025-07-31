@@ -19,7 +19,9 @@ grphRltvPath= env.cfg.projectDirTree.getRltvReportSimplLCGrPath()   #relative di
 grphPath=env.cfg.projectDirTree.getFullGraphicsPath()+'resSimplLC/' # full path to place the graphics
 reportPath=env.cfg.projectDirTree.getFullTextReportPath() # absolute path to place the report
 reportFile= reportPath+'report_displacements.tex'  #laTex file where to include the graphics
-
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis # do not define analysis more than one
 textfl=open(reportFile,'w')  #tex file to be generated
 for ky in dictLCG.keys():
     lcg=dictLCG[ky]
@@ -28,7 +30,6 @@ for ky in dictLCG.keys():
     modelSpace.removeAllLoadPatternsFromDomain()
     modelSpace.revertToStart()
     modelSpace.addLoadCaseToDomain(lcName)
-    analysis= predefined_solutions.simple_static_linear(FEcase)
     result= analysis.analyze(1)
     fLabel=lcName+'uX'
     grFileName=fLabel+'.png'

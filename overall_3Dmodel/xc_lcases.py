@@ -94,8 +94,9 @@ for lc in [LS1,LS2]:
 '''
 '''
 from solution import predefined_solutions
-analysis= predefined_solutions.simple_static_linear(FEcase) # No definirlo más de una vez
-
+solProc= predefined_solutions.SimpleStaticLinear(FEcase)
+solProc.setup()
+analysis= solProc.analysis
 for lc in [LS1,LS2]:
     modelSpace.removeAllLoadPatternsFromDomain()
     modelSpace.addLoadCaseToDomain(lc.name)
@@ -104,3 +105,10 @@ for lc in [LS1,LS2]:
     modelSpace.removeLoadCaseFromDomain(lc.name)
 '''
 lstLC=[GselfWeight,Qdecks,QearthPressWall,QearthPWallStrL,QearthPWallLinL,QearthPWallHrzL,qunifBeams,QpntBeams,qlinDeck,QwheelDeck1,QvehicleDeck1,LS1,LS2]
+
+#Shrinkage
+Gshrink=lcases.LoadCase(preprocessor=prep,name="Gshrink",loadPType="default",timeSType="constant_ts")
+Gshrink.create()
+modelSpace.setCurrentLoadPattern(Gshrink.name)
+Gshrink.addLstLoads([xcL.shrinkage])
+

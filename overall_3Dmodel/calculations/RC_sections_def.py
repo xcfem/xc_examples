@@ -146,4 +146,4 @@ if plotSection:
 else:
     reinfConcreteSectionDistribution.dump()
 
-lstRCsects=[deckRCsects,footRCsects,wallRCsects,beamXRCsect,beamYRCsect,columnZconcrSect]
+lstRCsects=[deckRCsects,footRCsects,wallRCsects,beamXRCsect,beamYRCsect,columnZconcrRCsects]

@@ -25,8 +25,8 @@ foot_wink.generateSprings(xcSet=xcG.foot)
 # Springs (defined by Kx,Ky,Kz) to apply on nodes, points, 3Dpos, ...
 # Default values for Kx, Ky, Kz are 0, which means that no spring is
 # created in the corresponding direction
-# spring_col=sprbc.SpringBC(name='spring_col',modelSpace=modelSpace,Kx=10e3,Ky=50e3,Kz=30e3)
-# a=spring_col.applyOnNodesIn3Dpos(lst3DPos=[geom.Pos3d(0,datG.LbeamY,0)])
+spring_col=sprbc.SpringBC(name='spring_col',modelSpace=modelSpace,Kx=10e3,Ky=50e3,Kz=30e3)
+a=spring_col.applyOnNodesIn3Dpos(lst3DPos=[geom.Pos3d(0,datG.LbeamY,0)])
 
 #fixed DOF (ux:'0FF_FFF', uy:'F0F_FFF', uz:'FF0_FFF',
 #           rx:'FFF_0FF', ry:'FFF_F0F', rz:'FFF_FF0')

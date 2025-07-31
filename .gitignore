@@ -108,8 +108,6 @@ venv.bak/
 *.bak
 
 # xc results directories
-**/annex
-**/results
 **/tmp_results
 
 #specific files
