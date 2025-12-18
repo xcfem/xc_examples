@@ -6,7 +6,7 @@ from misc_utils import log_messages as lmsg
 
 import xc_model # Import finite element model.
 
-lsd.LimitStateData.envConfig= xc_model.cfg
+lsd.LimitStateData.setEnvConfig(xc_model.cfg)
 
 #Set of entities for which checking is going to be performed.
 setCalc= xc_model.concreteSet

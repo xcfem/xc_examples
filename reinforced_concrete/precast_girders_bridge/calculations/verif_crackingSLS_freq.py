@@ -7,7 +7,7 @@ from materials.sia262 import SIA262_limit_state_checking as lscheck  #Checking m
 
 exec(default_config.compileCode('../xc_model.py'))
 print('model built')
-lsd.LimitStateData.envConfig=cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 #
 #
 #

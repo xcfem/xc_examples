@@ -11,7 +11,7 @@ import env_config as env
 import mesh_gen as msh
 import limit_states_def as lstts
 
-lsd.LimitStateData.envConfig= env.cfg
+lsd.LimitStateData.setEnvConfig(env.cfg)
 
 #Reinforced concrete sections on each element.
 #reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()

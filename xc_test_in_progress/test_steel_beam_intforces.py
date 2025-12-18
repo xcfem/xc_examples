@@ -104,7 +104,7 @@ ec3beam.installULSControlRecorder(recorderType="element_prop_recorder")
 
 # Internal forces calculation
 limitStates= [lsd.steelNormalStressesResistance]
-lsd.steelNormalStressesResistance.envConfig=cfg
+lsd.steelNormalStressesResistance.setEnvConfig(cfg)
 for ls in limitStates:
     ls.saveAll(combContainer,setCalc=beamY)
 

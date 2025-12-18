@@ -8,7 +8,7 @@ from materials.sia262 import SIA262_limit_state_checking as lscheck  #Checking m
 
 import xc_model # Import finite element model.
 
-lsd.LimitStateData.envConfig= xc_model.cfg
+lsd.LimitStateData.setEnvConfig(xc_model.cfg)
 
 #Reinforced concrete sections on each element.
 reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()

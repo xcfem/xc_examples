@@ -14,7 +14,7 @@ for e in tank.elements: e.setProp('yieldStress', AISI_fy)
 setCalc=tank
 
 
-lsd.LimitStateData.envConfig= cfg_imperf
+lsd.LimitStateData.setEnvConfig(cfg_imperf)
 
 limitState= lsd.vonMisesStressResistance
 limitState.vonMisesStressId= 'avg_von_mises_stress'

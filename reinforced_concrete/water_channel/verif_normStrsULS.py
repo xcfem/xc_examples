@@ -11,7 +11,7 @@ from materials.ec2 import EC2_materials
 
 import xc_model # Import finite element model.
 
-lsd.LimitStateData.envConfig= xc_model.cfg
+lsd.LimitStateData.setEnvConfig(xc_model.cfg)
 
 #Reinforced concrete sections on each element.
 reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()

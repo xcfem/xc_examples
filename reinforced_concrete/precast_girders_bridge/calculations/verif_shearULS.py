@@ -7,7 +7,7 @@ from materials.ehe import EHE_limit_state_checking as lscheck
 
 exec(default_config.compileCode('../xc_model.py'))
 print('model built')
-lsd.LimitStateData.envConfig=cfg
+lsd.LimitStateData.setEnvConfig(cfg)
 #
 from shutil import copyfile
 internalForcesPath= cfg.projectDirTree.getInternalForcesResultsPath()

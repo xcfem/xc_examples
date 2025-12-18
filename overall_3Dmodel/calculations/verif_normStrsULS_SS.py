@@ -14,7 +14,7 @@ import xc_model as model
 import steel_beams_def as sMemb # steel members
 
 #Verification of normal-stresses ULS for structural steel
-lsd.LimitStateData.envConfig= env.cfg #configuration defined in script
+lsd.LimitStateData.setEnvConfig(env.cfg)#configuration defined in script
                                   #env_config.py
 
 setCalc=model.allSteel

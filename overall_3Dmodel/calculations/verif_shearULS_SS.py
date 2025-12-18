@@ -13,7 +13,7 @@ import xc_model as model
 import steel_beams_def as sMemb # steel members
 
 # Verificacion of shear ULS for structural steel
-lsd.LimitStateData.envConfig= env.cfg
+lsd.LimitStateData.setEnvConfig(env.cfg)
 
 setCalc=model.allSteel
 # variables that control the output of the checking (setCalc,
