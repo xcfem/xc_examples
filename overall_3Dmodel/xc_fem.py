@@ -28,6 +28,8 @@ wall_mesh=fem.SurfSetToMesh(surfSet=xcG.wall,matSect=xcM.wall_mat,elemSize=datG.
 wall_mesh.generateMesh(prep) 
 foot_mesh=fem.SurfSetToMesh(surfSet=xcG.foot,matSect=xcM.foot_mat,elemSize=datG.eSize,elemType='ShellMITC4')
 foot_mesh.generateMesh(prep)
+steelPlate_mesh=fem.SurfSetToMesh(surfSet=xcG.steelPlate,matSect=xcM.steelPlate_mat,elemSize=datG.eSize,elemType='ShellMITC4')
+steelPlate_mesh.generateMesh(prep)
 
 #Steel elements: local Z-axis corresponds to weak axis of the steel shape
 beamXsteel_mesh=fem.LinSetToMesh(linSet=xcG.beamXsteel,matSect=xcM.beamXsteel_mat,elemSize=datG.eSize,vDirLAxZ=xc.Vector([0,-1,0]),elemType='ElasticBeam3d',dimElemSpace=3,coordTransfType='linear')
@@ -35,7 +37,7 @@ columnZsteel_mesh=fem.LinSetToMesh(linSet=xcG.columnZsteel,matSect=xcM.columnZst
 
 fem.multi_mesh(preprocessor=prep,lstMeshSets=[beamXconcr_mesh,beamXsteel_mesh,beamY_mesh,columnZconcr_mesh,columnZsteel_mesh])     #mesh these sets
 
-# out.displayFEMesh()
+out.displayFEMesh()
 # out.displayFEMesh([xcG.beamXconcr,xcG.beamY,xcG.columnZconcr,xcG.decklv1,xcG.decklv2,xcG.wall,xcG.foot])
 # out.displayFEMesh([xcG.beamXconcr,xcG.beamXsteel])
 # out.displayFEMesh([xcG.columnZconcr,xcG.columnZsteel])

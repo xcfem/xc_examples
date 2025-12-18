@@ -13,6 +13,11 @@ prep=xc_init.prep
 
 #                         *** MATERIALS *** 
 concrProp=tm.MaterialData(name='concrProp',E=datM.concrete.Ecm(),nu=datM.concrete.nuc,rho=datM.concrete.density())
+# structural steel for shell elements (von mises linear analysis)
+strSteelPlate=tm.defElasticIsotropic3d(preprocessor=prep,name='strSteelPlate',E=datM.strSteel.E,nu=datM.strSteel.nu,rho=datM.strSteel.rho)
+# for Von mises Structural steel Non-linear analysis. Steel must be previously set J2PlateFibre and
+# shell elements as MembranePlateFiberSection.
+AISI304L= tm.defJ2PlateFibre(preprocessor=preprocessor, name='AISI304L', E=AISI_E, nu=0.3, fy=AISI_fy,alpha=AISI_alpha,rho=7850) 
 
 # Isotropic elastic section-material appropiate for plate and shell analysis
 deck_mat=tm.DeckMaterialData(name='deck_mat',thickness= datG.deckTh,material=concrProp)
@@ -21,6 +26,15 @@ wall_mat=tm.DeckMaterialData(name='wall_mat',thickness= datG.wallTh,material=con
 wall_mat.setupElasticSection(preprocessor=prep)   #creates the section-material
 foot_mat=tm.DeckMaterialData(name='foot_mat',thickness= datG.footTh,material=concrProp)
 foot_mat.setupElasticSection(preprocessor=prep)   #creates the section-material
+
+# Materials for analysis vonmises verification
+steelPlate_mat=tm.defMembranePlateFiberSection(prep,name='steelPlate_mat',h= datG.steelPlateThck,nDMaterial=strSteelPlate)
+'''for non-linear analysis. Steel must be previously set J2PlateFibre and
+shell elements as MembranePlateFiberSection.
+Ensure that in model_gen.py materials for non-linear analysis are 
+uncommented
+'''
+steelPlate_mat=tm.defMembranePlateFiberSection(prep,name='steelPlate_mat',h= datG.steelPlateThck,nDMaterial=datM.AISI304L)
 
 #Geometric sections
 #rectangular sections
@@ -55,12 +69,12 @@ columnZconcr_mat.defElasticShearSection3d(preprocessor=prep)
   #   name: name of the standard steel profile. Types: IPEShape, HEShape,
   #         UPNShape, AUShape, CHSShape
   #      (defined in materials.sections.structural_shapes.arcelor_metric_shapes)
-columnZsteel_mat= EC3_materials.HEShape(steel=datM.S235JR,name='HE_200_A')
+columnZsteel_mat= EC3_materials.HEShape(steel=datM.strSteel,name='HE_200_A')
 columnZsteel_mat.defElasticShearSection3d(prep)
 columnZsteel_mat.sectionClass=1
-beamXsteel_mat= EC3_materials.IPEShape(steel=datM.S235JR,name='IPE_A_300')
+beamXsteel_mat= EC3_materials.IPEShape(steel=datM.strSteel,name='IPE_A_300')
 beamXsteel_mat.defElasticShearSection3d(prep)
 beamXsteel_mat.sectionClass=1
 
 # X spring material
-Xspring_mat= typical_materials.defElasticMaterial(preprocessor, "kx",datM.KSpring)
+Xspring_mat= tm.defElasticMaterial(prep, "kx",datM.KXspring)

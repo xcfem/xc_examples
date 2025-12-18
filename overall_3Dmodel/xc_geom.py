@@ -16,7 +16,7 @@ out=xc_init.out ; modelSpace=xc_init.modelSpace ; prep=xc_init.prep
 # coordinates in global X,Y,Z axes for the grid generation
 xList=[0,datG.LbeamX/2.0,datG.LbeamX]; xList.sort(); xList=dsu.remove_duplicates_list(xList)
 yList=[-datG.Wfoot/2.,0,datG.Wfoot/2.,datG.LbeamY]; yList.sort(); yList=dsu.remove_duplicates_list(yList)
-zList=[0,datG.LcolumnZ/2.0,datG.LcolumnZ]; zList.sort(); zList=dsu.remove_duplicates_list(zList)
+zList=[0,datG.LcolumnZ/3,datG.LcolumnZ/2.0,datG.LcolumnZ*3/2.0,datG.LcolumnZ,datG.zSteelPlate]; zList.sort(); zList=dsu.remove_duplicates_list(zList)
 #auxiliary data
 lastXpos=len(xList)-1
 lastYpos=len(yList)-1
@@ -97,11 +97,18 @@ beamY=gridGeom.genLinMultiRegion(lstIJKRange=beamY_rg,setName='beamY')
 columnZconcr=gridGeom.genLinMultiRegion(lstIJKRange=columnZconcr_rg,setName='columnZconcr')
 columnZsteel=gridGeom.genLinMultiRegion(lstIJKRange=columnZsteel_rg,setName='columnZsteel')
 
-#out.displayBlocks()
 
 #Surfaces generation
 decklv1=gridGeom.genSurfMultiRegion(lstIJKRange=decklv1_rg,setName='decklv1')
+# Change local axes orientation
+import geom
+for s in decklv1.surfaces:
+    s.setIOrientation(geom.Vector3d(1,0,0))
+    
 decklv2=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.LcolumnZ),(datG.LbeamX/2.0,datG.LbeamY,datG.LcolumnZ)),setName='decklv2')
+steelPlate=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.zSteelPlate),(xList[-1],datG.LbeamY,datG.zSteelPlate)),setName='steelPlate')
+
 wall=gridGeom.genSurfOneXYZRegion(xyzRange=((0,0,0),(datG.LbeamX,0,datG.LcolumnZ)),setName='wall')
 foot=gridGeom.genSurfMultiRegion(lstIJKRange=foot_rg,setName='foot')
+
 

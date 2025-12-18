@@ -5,8 +5,8 @@ from materials.ec3 import EC3_materials
 #Materials data
 concrete=EHE_materials.HA30
 reinfSteel=EHE_materials.B500S
-S235JR= EC3_materials.S235JR
-S235JR.gammaM= 1.00
+strSteel= EC3_materials.S235JR
+strSteel.gammaM= 1.00
 
 deckCover=35e-3
 # Soil
@@ -15,3 +15,4 @@ cRoz=0.2 #  fraction of the Winkler modulus to apply for friction in the contact
 
 # Spring stiffness
 KXspring=11000e3 # [N/m] spring stiffness
+

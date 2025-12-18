@@ -1,4 +1,5 @@
 import math
+import geom
 
 # Loads data
 qdeck1=1e3  #N/m2

@@ -3,7 +3,6 @@ import xc
 import geom
 from scipy.constants import g
 from model.sets import sets_mng as setMng
-from model.geometry import geom_utils as gut
 from actions import loads
 from actions.earth_pressure import earth_pressure as ep
 
@@ -19,7 +18,6 @@ import xc_sets as xcS
 prep=xc_init.prep
 
 #Inertial load (density*acceleration) applied to the elements in a set
-grav=9.81 #Gravity acceleration (m/s2)
 #selfWeight=loads.InertialLoad(name='selfWeight', lstSets=[beamXconcr,beamY,columnZconcr,deck,wall,foot], vAccel=xc.Vector( [0.0,0.0,-g]))
 selfWeight=loads.InertialLoad(name='selfWeight', lstSets=[xcS.beamXconcrSet,xcS.beamYSet,xcS.columnZconcrSet,xcS.decklv1Set,xcS.decklv2Set], vAccel=xc.Vector( [0.0,0.0,-g]))
 
@@ -128,6 +126,7 @@ unifLoadLinDeck2=loads.UniformLoadOnLines(name='unifLoadLinDeck2',xcSet=xcS.deck
 #    refSystem:  reference system in which loadVector is defined:
 #                   'Local': element local coordinate system
 #                   'Global': global coordinate system (defaults to 'Global')
+from model.geometry import geom_utils as gut
 
 prBase=gut.rect2DPolygon(xCent=datG.LbeamX/2.,yCent=datG.LbeamY/2.,Lx=0.5,Ly=1.0)
 wheelDeck1=loads.PointLoadOverShellElems(name='wheelDeck1', xcSet=xcS.decklv1Set, loadVector=xc.Vector([0,0,-datL.Qwheel]),prismBase=prBase,prismAxis='Z',refSystem='Global')
@@ -151,5 +150,3 @@ truckLoad=lmb.VehicleDistrLoad(
 # Shrinkage
 shrinkage=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.epsShrinkage)
 
-# Heating
-heating=loads.StrainLoadOnShells(name='shrinkage',xcSet=xcS.decklv2Set,DOFstrain=[0,1],strain=datL.TempIncr*datM.)

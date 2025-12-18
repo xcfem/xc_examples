@@ -3,7 +3,6 @@ import math
 from postprocess.config import default_config
 from materials.sections.fiber_section import def_simple_RC_section as rcs
 from postprocess import element_section_map
-from postprocess.config import default_config
 from postprocess import RC_material_distribution
 from misc_utils import log_messages as lmsg
 
@@ -23,10 +22,8 @@ prep=xc_init.prep
 out=xc_init.out
 #
 
-plotSection=False # True if sections are depicted (in that case comment the dump line at the
-                 # end of the script)
-                 # False if sections are not depicted (in that case uncomment the dump line at the
-                 # end of the script)
+plotSection=False # True if sections are depicted (in that case sections are not dumped
+
 reinfConcreteSectionDistribution= RC_material_distribution.RCMaterialDistribution()
 sectContainer= reinfConcreteSectionDistribution.sectionDefinition #sectContainer container
 

@@ -13,3 +13,6 @@ deckTh=0.20
 wallTh=0.5
 footTh=0.7
 eSize= 0.35     #length of elements
+## Steel plate
+zSteelPlate=1.7
+steelPlateThck=10e-3 # steel plata thickness

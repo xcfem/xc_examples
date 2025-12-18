@@ -19,6 +19,8 @@ decklv1Set=xcG.decklv1 ; decklv1Set.description='Deck level 1' ; decklv1Set.colo
 
 decklv2Set=xcG.decklv2 ; decklv2Set.description='Deck level 2' ; decklv2Set.color=env.cfg.colors['blue01']
 
+steelPlateSet=xcG.steelPlate; steelPlateSet.description='Steel plate' ; steelPlateSet.color=env.cfg.colors['blue02']
+
 footSet=xcG.foot ; footSet.description='Foundation' ; footSet.color=env.cfg.colors['orange01']
 
 wallSet=xcG.wall ; wallSet.description='Wall' ; wallSet.color=env.cfg.colors['green01']
@@ -40,11 +42,11 @@ lstSets=[decklv1Set,decklv2Set,footSet,wallSet,beamXconcrSet,beamYSet,columnZcon
 
 decksSet=modelSpace.setSum('decksSet',[decklv1Set,decklv2Set]) ; decksSet.description='Decks' ; decksSet.color=env.cfg.colors['purple01'] ; decksSet.fillDownwards()
 
-allShellsSet=modelSpace.setSum('allShellsSet',[decklv1Set,decklv2Set,footSet,wallSet]) ; allShellsSet.description='Shell elements' ; allShellsSet.fillDownwards()
+allShellsSet=modelSpace.setSum('allShellsSet',[decklv1Set,decklv2Set,footSet,wallSet,steelPlateSet]) ; allShellsSet.description='Shell elements' ; allShellsSet.fillDownwards()
 
 allBeamsSet=modelSpace.setSum('allBeamsSet',[beamXconcrSet,beamXsteelSet,beamYSet,columnZconcrSet,columnZsteelSet]) ; allBeamsSet.description='Beams+columns' ; allBeamsSet.fillDownwards()
 
-overallSet=modelSpace.setSum('overallSet',[beamXconcrSet,beamXsteelSet,beamYSet,columnZconcrSet,columnZsteelSet,wallSet,footSet,decklv1Set,decklv2Set]) ; overallSet.description='overall set' ; overallSet.color=env.cfg.colors['purple01'] ; overallSet.fillDownwards()
+overallSet=modelSpace.setSum('overallSet',[beamXconcrSet,beamXsteelSet,beamYSet,columnZconcrSet,columnZsteelSet,wallSet,footSet,decklv1Set,decklv2Set,steelPlateSet]) ; overallSet.description='overall set' ; overallSet.color=env.cfg.colors['purple01'] ; overallSet.fillDownwards()
 
 allConcreteSet=modelSpace.setSum('allConcreteSet',[beamXconcrSet,beamYSet,columnZconcrSet,wallSet,footSet,decklv1Set,decklv2Set]) ; allConcreteSet.description='concrete elements'; allConcreteSet.fillDownwards()
 
@@ -52,7 +54,7 @@ beamXSet=modelSpace.setSum('beamXSet',[beamXconcrSet,beamXsteelSet]) ; beamXSet.
 
 columnZSet=modelSpace.setSum('columnZSet',[columnZconcrSet,columnZsteelSet]) ; columnZSet.description='columns' ; columnZSet.fillDownwards()
 
-allSteelSet=modelSpace.setSum('allSteelSet',[beamXsteelSet,columnZsteelSet]) ; allSteelSet.description='steel elements' ; allSteelSet.fillDownwards()
+allSteelSet=modelSpace.setSum('allSteelSet',[beamXsteelSet,columnZsteelSet,steelPlateSet]) ; allSteelSet.description='steel elements' ; allSteelSet.fillDownwards()
 
 mixSet=modelSpace.setSum('mixSet',[wallSet,columnZconcrSet]) ; mixSet.fillDownwards()
 #sets for displaying some results

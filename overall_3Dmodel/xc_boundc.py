@@ -1,6 +1,5 @@
 # Definition of boundary conditions
 import geom
-from model.boundary_cond import spring_bound_cond as sprbc
 
 # import local modules
 from postprocess.config import default_config
@@ -18,6 +17,8 @@ modelSpace=xc_init.modelSpace
 #       wModulus: Winkler modulus of the foundation (springs in Z direction)
 #       cRoz:     fraction of the Winkler modulus to apply for friction in
 #                 the contact plane (springs in X, Y directions)
+from model.boundary_cond import spring_bound_cond as sprbc
+
 foot_wink=sprbc.ElasticFoundation(wModulus=datM.wModulus,cRoz=datM.cRoz)
 foot_wink.generateSprings(xcSet=xcG.foot)
 #out.displayFEMesh()
@@ -38,3 +39,10 @@ modelSpace.fixNode('000_FFF',n_col2.tag)
 n_col3=nodes.getDomain.getMesh.getNearestNode(geom.Pos3d(datG.LbeamX/2.,datG.LbeamY,0))
 modelSpace.fixNode('FF0_000',n_col3.tag)
 #out.displayFEMesh()
+
+from model.sets import sets_mng as stmng
+lstNod=stmng.get_nodes_pos3D_wire(setBusq=datG.foot,lstPos3DWire=[geom.Pos3d(0,0,0),geom.Pos3d(1,1,0)],tol=0.01)
+'''
+out=xc_init.out
+out.displayFEMesh()
+'''

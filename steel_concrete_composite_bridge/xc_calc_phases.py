@@ -24,14 +24,19 @@ import precamber
 n_uz=precamber.nod_uz_precamber
 for pair in n_uz:
     ntag=pair[0]; deltaZ=pair[1]
-    n=xcS.beam.nodes.getNode(ntag)
+    n=xcS.beam.nodes.findTag(ntag)
     pos= n.getInitialPos3d
     pos.z+=deltaZ
     n.setPos(pos)
 for e in xcS.beam.elements:
     e.resetNodalCoordinates()
+'''
+zTopFlange=[n.getCoo[2] for n in xcS.topFlange.nodes]
+zMax=max(zTopFlange); zMin=min(zTopFlange); print('precamber (top flange)= ', round((zMax-zMin)*1e3,1),'mm')
+zBotFlange=[n.getCoo[2] for n in xcS.bottomFlange.nodes]
+zMax=max(zBotFlange); zMin=min(zBotFlange); print('precamber (bottom flange)= ', round((zMax-zMin)*1e3,1),'mm')
+'''
 # End precamber
-
 
 analysis=predefined_solutions.simple_static_linear(FEcase)
 '''
@@ -45,7 +50,8 @@ result= analysis.analyze(1)
 out.displayLoads()
 # out.displayDispRot('uX')
 # out.displayDispRot('uY')
-out.displayDispRot('uZ')
+out.displayDispRot('uZ',defFScale=100)
+zBotFlange=[n.getCoo[2] for n in xcS.bottomFlange.nodes]
 
 # Slab self-weight
 modelSpace.addLoadCaseToDomain(xcLCb.G2slabSW.name)
@@ -133,4 +139,10 @@ result= analysis.analyze(1)
 out.displayDispRot('uX')
 out.displayDispRot('uY')
 out.displayDispRot('uZ')
+
+# Display Von Mises
+modelSpace.calculateNodalReactions(includeInertia=False,reactionCheckTolerance=1e-02)
+for e in xcS.beam.elements:
+    e.getValuesAtNodes('max_von_mises_stress', False)
+out.displayVonMisesStresses(vMisesCode= 'max_von_mises_stress',setToDisplay=xcS.beam)
 

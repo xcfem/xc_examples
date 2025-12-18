@@ -39,7 +39,7 @@ zID=[datG.zBF_ID,datG.zTF_ID]#  Z-coordinate of the diaphragms flanges
 #
 xList=xSlab+xShrC+[xWeb]+xBFst1+xBFst2+xBFst3
 xList.sort(); xList=dsu.remove_duplicates_list(xList)
-yList=yAbut+yPier+ySC+yTS+zID
+yList=yAbut+yPier+ySC+yTS+yID
 for yl in datST1['yCoord']+datST2['yCoord']+datST3['yCoord']:
     yList+=yl
 yList.sort(); yList=dsu.remove_close_values(yList,tolerance=0.05)
