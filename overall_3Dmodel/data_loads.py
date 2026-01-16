@@ -8,8 +8,12 @@ Qbeam=3e3  #N/m
 qunifBeam=5e3
 qLinDeck2=30 #N/m
 Qwheel=5e3  #N
-firad=math.radians(31)  #internal friction angle (radians)                   
-KearthPress=(1-math.sin(firad))/(1+math.sin(firad))     #Active coefficient of p
+qBackfill=10e3 # N/m2
+firad=math.radians(31)  #internal friction angle (radians)
+Kactive=(1-math.sin(firad))/(1+math.sin(firad))
+Krest=1-math.sin(firad)
+Kpassive=(1+math.sin(firad))/(1-math.sin(firad))
+KearthPress=     #Active coefficient of p
 densSoil=800       #mass density of the soil (kg/m3)
 densWater=1000      #mass density of the water (kg/m3)
 # Vehicle concentrated loads

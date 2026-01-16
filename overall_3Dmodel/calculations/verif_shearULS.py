@@ -5,15 +5,22 @@ from solution import predefined_solutions
 from materials.ehe import EHE_limit_state_checking as lschck  
 #from materials.sia262 import SIA262_limit_state_checking as lschck  
 from postprocess.config import default_config
+from misc_utils import log_messages as lmsg
 # local modules
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 import xc_sets as xcS
 
+import RC_sections_def
+if  RC_sections_def.plotSection:
+    lmsg.error('You must disable RC-section plotting before running check')
+    quit()
+
 #   *** Verificacion of shear ULS for reinf. concrete elements ***
 
 lsd.LimitStateData.setEnvConfig(env.cfg)
-reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
+reinfConcreteSections= RC_sections_def.reinfConcreteSectionDistribution
+
 setCalc=xcS.mixSet
 
 class CustomSolver(predefined_solutions.PlainNewtonRaphsonMUMPS):

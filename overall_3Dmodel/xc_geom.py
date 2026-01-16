@@ -99,16 +99,16 @@ columnZsteel=gridGeom.genLinMultiRegion(lstIJKRange=columnZsteel_rg,setName='col
 
 
 #Surfaces generation
-decklv1=gridGeom.genSurfMultiRegion(lstIJKRange=decklv1_rg,setName='decklv1')
+decklv1=gridGeom.genSurfMultiRegion(lstIJKRange=decklv1_rg,setName='decklv1',orientI=[1,0,0])
 # Change local axes orientation
-import geom
-for s in decklv1.surfaces:
-    s.setIOrientation(geom.Vector3d(1,0,0))
+# import geom
+# for s in decklv1.surfaces:
+#     s.setIOrientation(geom.Vector3d(1,0,0))
     
-decklv2=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.LcolumnZ),(datG.LbeamX/2.0,datG.LbeamY,datG.LcolumnZ)),setName='decklv2')
+decklv2=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.LcolumnZ),(datG.LbeamX/2.0,datG.LbeamY,datG.LcolumnZ)),setName='decklv2',orientK=[0,0,1])
 steelPlate=gridGeom.genSurfOneXYZRegion(xyzRange=((0,datG.Wfoot/2.,datG.zSteelPlate),(xList[-1],datG.LbeamY,datG.zSteelPlate)),setName='steelPlate')
 
 wall=gridGeom.genSurfOneXYZRegion(xyzRange=((0,0,0),(datG.LbeamX,0,datG.LcolumnZ)),setName='wall')
-foot=gridGeom.genSurfMultiRegion(lstIJKRange=foot_rg,setName='foot')
+foot=gridGeom.genSurfMultiRegion(lstIJKRange=foot_rg,setName='foot',orientI=[1,0,0],orientK=[0,0,1])
 
 

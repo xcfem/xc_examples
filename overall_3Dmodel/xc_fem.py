@@ -44,3 +44,7 @@ out.displayFEMesh()
 # out.displayLocalAxes()
 # out.displayStrongWeakAxis(xcG.beams)
 
+#     *** Detection of floating points
+floatingNodes= modelSpace.getFloatingNodes()
+print('Floating nodes= ', floatingNodes)
+

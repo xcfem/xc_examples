@@ -137,10 +137,5 @@ columnZconcrSect.shReinf=rcs.ShearReinforcement(familyName= "sh",nShReinfBranche
 columnZconcrRCsects= element_section_map.RCMemberSection(name='columnZconcrRCsects',templateSections=[columnZconcrSect,columnZconcrSect])
 append2container(columnZconcrRCsects,sets2apply,plotSection)
 
-#
-if plotSection:
-    lmsg.warning('The RC sections have not been dumped. If you want to dump them, set plotSection=False and run the script again')
-else:
-    reinfConcreteSectionDistribution.dump()
 
 lstRCsects=[deckRCsects,footRCsects,wallRCsects,beamXRCsect,beamYRCsect,columnZconcrRCsects]

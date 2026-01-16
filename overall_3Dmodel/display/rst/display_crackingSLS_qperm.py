@@ -16,10 +16,10 @@ arguments=[ 'CF']     #Possible arguments: 'CF', 'N', 'My', 'Mz', 's_rmax', 'sig
 rgMinMax=(0,1.0)#None
 cameraParameters= vtk_graphic_base.CameraParameters('XYZPos')
 out.outputStyle.cameraParameters= cameraParameters
-modelSpace.readControlVars(inputFileName=env.cfg.projectDirTree.getVerifCrackFreqFile())
+modelSpace.readControlVars(inputFileName=env.cfg.projectDirTree.getVerifCrackQpermFile())
 for st in sets2Disp:
     for arg in arguments:
-        out.displayFieldDirs1and2(limitStateLabel=lsd.freqLoadsCrackControl.label,argument=arg,setToDisplay=st,component=None,fileName=None,defFScale=0.0,rgMinMax=rgMinMax) 
+        out.displayFieldDirs1and2(limitStateLabel=lsd.quasiPermanentLoadsCrackControl.label,argument=arg,setToDisplay=st,component=None,fileName=None,defFScale=0.0,rgMinMax=rgMinMax) 
 
 
 

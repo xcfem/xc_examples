@@ -61,7 +61,7 @@ unifLoadDeck2= loads.UniformLoadOnSurfaces(name= 'unifLoadDeck2',xcSet=xcS.deckl
 #                 qUnif: uniform load over the backfill surface (defaults to 0)
 #     vDir: unit xc vector defining pressures direction
 
-soil01=ep.EarthPressureModel( zGround=xcG.zList[-1]-3, zBottomSoils=[-10],KSoils=[datL.KearthPress],gammaSoils=[datL.densSoil*g], zWater=0, gammaWater=datL.densWater*g)
+soil01=ep.EarthPressureModel( zGround=xcG.zList[-1]-3, zBottomSoils=[-10],KSoils=[datL.KearthPress],gammaSoils=[datL.densSoil*g], zWater=0, gammaWater=datL.densWater*g,qUnif=datL.qBackfill)
 earthPressLoadWall= loads.EarthPressLoad(name= 'earthPressLoadWall', xcSet=xcG.wall,soilData=soil01, vDir=xc.Vector([0,1,0]))
 
 soil02=ep.EarthPressureModel(zGround=xcG.zList[-1],zBottomSoils=[-10],KSoils=[0.001],  gammaSoils=[datL.densSoil*g], zWater=0.05, gammaWater=datL.densWater*g)
