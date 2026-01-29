@@ -31,13 +31,6 @@ class CustomSolver(predefined_solutions.PlainNewtonRaphsonMUMPS):
 controller= lscheck.CrackController(limitStateLabel= limitState.label, solutionProcedureType= CustomSolver)
 lsd.quasiPermanentLoadsCrackControl.check(crossSections=reinfConcreteSections,setCalc=setCalc,appendToResFile='N',listFile='N',calcMeanCF='N', controller= controller)
 
-
-
-
-
-
-
-
 #Plan B
 '''
 limitStress= 350e6 #XXX 

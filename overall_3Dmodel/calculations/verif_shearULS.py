@@ -10,7 +10,8 @@ from misc_utils import log_messages as lmsg
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
 import env_config as env
 import xc_sets as xcS
-
+import shutil
+shutil.copyfile(env.cfg.projectDirTree.getInternalForcesResultsPath()+'intForce_ULS_normalStressesResistance.json', env.cfg.projectDirTree.getInternalForcesResultsPath()+'intForce_ULS_shearResistance.json')
 import RC_sections_def
 if  RC_sections_def.plotSection:
     lmsg.error('You must disable RC-section plotting before running check')
