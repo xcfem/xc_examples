@@ -37,7 +37,7 @@ activeSteelDiag=activeSteel.defDiagD(preprocessor, sigmaPinit_calc)
 passiveSteelDiag= passiveSteel.defDiagD(preprocessor)
 
 # Create RC section model.
-geomSecPret=gbeam.gmSecHP_viga_jabali(preprocessor, "prestressedConcretSectionGeom",concrete.nmbDiagD,passiveSteel.nmbDiagD,activeSteel.nmbDiagD,dat.concreteLstWidthHeight,dat.activeReinLayers,dat.passiveReinLayers,zStart=-1.5/2)
+geomSecPret=gbeam.gmSecHP_viga_jabali(preprocessor, "prestressedConcretSectionGeom",concrete.getDDiagName(),passiveSteel.getDDiagName(),activeSteel.getDDiagName(),dat.concreteLstWidthHeight,dat.activeReinLayers,dat.passiveReinLayers,zStart=-1.5/2)
 
 # 
 
