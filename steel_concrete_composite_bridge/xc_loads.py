@@ -28,6 +28,7 @@ slabSWpm=datG.slabTh*datG.slabW*datM.concrete.density()*g
 wTF=datG.sbeam_st1['tf_w']
 qUnif=slabSWpm/wTF # [N/m2]
 slabSWst1=loads.UniformLoadOnSurfaces(name= 'slabSWst1',xcSet=xcG.tfST1,loadVector=xc.Vector([0,0,-qUnif,0,0,0]),refSystem='Global')
+
 ## uniform load on top flange of section type 2
 wTF=datG.sbeam_st2['tf_w']
 qUnif=slabSWpm/wTF # [N/m2]
@@ -46,7 +47,7 @@ qDL=loads.UniformLoadOnSurfaces(name= 'qDL',xcSet=xcG.slab,loadVector=xc.Vector(
 # shrinkage t= 15 to infinite days
 shrink15_inf=loads.StrainLoadOnShells(name='shrink15',xcSet=xcG.slab,DOFstrain=[0,1],strain=datL.epsShrinkage_inf-datL.epsShrinkage_15)
 
-# traffic unif. load
+# uniform live load
 qUnifTrf=loads.UniformLoadOnSurfaces(name= 'qUnifTrf',xcSet=xcG.slab,loadVector=xc.Vector([0,0,-datL.qUnifTraffic,0,0,0]),refSystem='Global')
 
 # traffic concentrated load
@@ -56,12 +57,13 @@ yCentCV1=datG.Lbeam/2
 truckLoad=lmb.VehicleDistrLoad(
     name='truckLoad',
     xcSet=xcG.slab,
-    loadModel=datL.truck3axes,
+    loadModel=datL.truck,
     xCentr=xCentCV1,
     yCentr=yCentCV1,
     hDistr=0.1,
     slopeDistr=1,
     vehicleRot=0)
+
 # Thermal
 ## heating
 heating=loads.StrainLoadOnShells(name='heating',xcSet=xcS.beam,DOFstrain=[0,1,2],strain=datL.TempIncr*datM.strSteel.alpha)

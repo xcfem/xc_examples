@@ -32,3 +32,12 @@ for ls in [xcLC.QearthPressWall]:#,xcLC.QearthPWallStrL]:
     out.displayIntForc('M2',xcS.wallSet)
     out.displayIntForc('M12',xcS.wallSet)
     
+# Display Von Mises stresses
+modelSpace.calculateNodalReactions(includeInertia=False,reactionCheckTolerance=1e-07)
+for e in xcS.steelPlateSet.elements:
+     e.getValuesAtNodes('max_von_mises_stress', False)
+out.displayVonMisesStresses(vMisesCode= 'max_von_mises_stress',setToDisplay=xcS.steelPlateSet)
+for e in xcS.steelPlateSet.elements:
+     e.getValuesAtNodes('avg_von_mises_stress', False)
+out.displayVonMisesStresses(vMisesCode= 'avg_von_mises_stress',setToDisplay=xcS.steelPlateSet)
+

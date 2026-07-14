@@ -21,7 +21,14 @@ analysis=predefined_solutions.simple_static_linear(FEcase)
 # Beam self-weight
 modelSpace.addLoadCaseToDomain(xcLCb.G1beamSW.name)
 result= analysis.analyze(1)
-modelSpace.calculateNodalReactions()
+modelSpace.calculateNodalReactions(includeInertia=False,reactionCheckTolerance=1e-02)
 
-#for e xcS.
+#display Von Mises
+for e in xcS.beam.elements:
+    e.getValuesAtNodes('max_von_mises_stress', False)
+out.displayVonMisesStresses(vMisesCode= 'max_von_mises_stress',setToDisplay=xcS.beam)
+
+for e in xcS.beam.elements:
+    e.getValuesAtNodes('avg_von_mises_stress', False)
+out.displayVonMisesStresses(vMisesCode= 'avg_von_mises_stress',setToDisplay=xcS.beam)
 

@@ -16,7 +16,7 @@ w3=lmb.WheelLoad(pos=geom.Pos2d(-1,+0.6),ld=150e3,lx=0.4,ly=0.4)
 w4=lmb.WheelLoad(pos=geom.Pos2d(+1,+0.6),ld=150e3,lx=0.4,ly=0.4)
 w5=lmb.WheelLoad(pos=geom.Pos2d(+2,-0.6),ld=100e3,lx=0.4,ly=0.4)
 w6=lmb.WheelLoad(pos=geom.Pos2d(+2,+0.6),ld=100e3,lx=0.4,ly=0.4)
-truck3axes=lmb.LoadModel(wLoads=[w1,w2,w3,w4,w5,w6])
+truck=lmb.LoadModel(wLoads=[w1,w2,w3,w4,w5,w6])
 
 #QconcentrTraffic=800 # [kN]
 laneWidth=3 # [m] width of each lane

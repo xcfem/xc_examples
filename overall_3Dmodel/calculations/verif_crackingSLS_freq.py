@@ -5,10 +5,17 @@ from materials.ehe import EHE_limit_state_checking as lscheck
 #from materials.sia262 import SIA262_limit_state_checking as lscheck  
 from solution import predefined_solutions
 from postprocess.config import default_config
+from misc_utils import log_messages as lmsg
 # local modules
 workingDirectory= default_config.setWorkingDirectory() 
 import env_config as env
 import xc_sets as xcS
+
+import RC_sections_def
+if  RC_sections_def.plotSection:
+    lmsg.error('You must disable RC-section plotting before running check')
+    quit()
+
 
 # Verificacion of cracking SLS under frequent loads for reinf. concrete elements
 
@@ -20,7 +27,7 @@ limitState= lsd.freqLoadsCrackControl
 limitStress= 350e6 #XXX
 controller= lscheck.CrackControlSIA262PlanB(limitState.label,limitStress)
 '''
-reinfConcreteSections= RC_material_distribution.loadRCMaterialDistribution()
+reinfConcreteSections= RC_sections_def.reinfConcreteSectionDistribution
 
 class CustomSolver(predefined_solutions.PlainNewtonRaphsonMUMPS):
     def __init__(self, prb):

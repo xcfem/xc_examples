@@ -10,11 +10,14 @@ combContainer= cc.CombContainer()  #Container of load combinations
     # qp:          combination for a quasi-permanent design situation
     # earthquake:  combination for a seismic design situation
 #Characteristic combinations.
-combContainer.SLS.rare.add('ELSR01', '1.0*LS2')
+i=1
+combContainer.SLS.rare.add('ELSR'+str(i), '1.0*LS2');i+=1
 #Frequent combinations.
-combContainer.SLS.freq.add('ELSF01', '1.0*LS1')
+i=1
+combContainer.SLS.freq.add('ELSF'+str(i), '1.0*LS1');i+=1
 #Quasi permanent combinations.
-combContainer.SLS.qp.add('ELSQP01', '1.0*LS2')
+i=1
+combContainer.SLS.qp.add('ELSQP'+str(i), '1.0*LS2');i+=1
 
 # COMBINATIONS OF ACTIONS FOR ULTIMATE LIMIT STATES
     # name:        name to identify the combination
@@ -23,12 +26,14 @@ combContainer.SLS.qp.add('ELSQP01', '1.0*LS2')
     # fatigue:     combination for a fatigue design situation
     # earthquake:  combination for a seismic design situation
 #Persistent and transitory situations.
-combContainer.ULS.perm.add('ELU01', '1.2*LS1')
-combContainer.ULS.perm.add('ELU02', '1.0*LS2')
+i=1
+combContainer.ULS.perm.add('ELU'+str(i), '1.2*LS1');i+=1
+combContainer.ULS.perm.add('ELU'+str(i), '1.0*LS2');i+=1
 
 #Fatigue.
 # Combinations' names must be:
 #        - ELUF0: unloaded structure (permanent loads)
 #        - ELUF1: fatigue load in position 1.
-combContainer.ULS.fatigue.add('ELUF0','1.00*GselfWeight+1.0*Qdecks')
-combContainer.ULS.fatigue.add('ELUF1','1.00*GselfWeight+1.0*QearthPressWall')
+i=1
+combContainer.ULS.fatigue.add('ELUF'+str(i),'1.00*GselfWeight+1.0*Qdecks');i+=1
+combContainer.ULS.fatigue.add('ELUF'+str(i),'1.00*GselfWeight+1.0*QearthPressWall');i+=1
