@@ -18,8 +18,8 @@ def gmSecHP_viga_jabali(preprocessor, nmbGeomSecc,concrDiagName,reinfSteelDiagra
     for wh in concreteLstWidthHeight[1:]:
         endW=wh[0]
         horm= regions.newQuadRegion(concrDiagName)
-        horm.nDivIJ= 50
-        horm.nDivJK= 50
+        horm.nDivIJ= 35
+        horm.nDivJK= 35
         pt1= geom.Pos2d(-startW/2,zStart)
         pt2= geom.Pos2d(+startW/2,zStart)
         zStart=zStart+wh[1]

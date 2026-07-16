@@ -25,7 +25,7 @@ losses=0.20
 sigmaPinit_calc=(1-losses)*sigmaPinit # tensión pretensado incial a efectos de cálculo
 
 feProblem= xc.FEProblem()
-preprocessor=  feProblem.getPreprocessor
+preprocessor= feProblem.getPreprocessor
 concrete= EHE_materials.HP55
 activeSteel=EHE_materials.Y1860S7
 passiveSteel=EHE_materials.B500S
@@ -37,15 +37,11 @@ activeSteelDiag=activeSteel.defDiagD(preprocessor, sigmaPinit_calc)
 passiveSteelDiag= passiveSteel.defDiagD(preprocessor)
 
 # Create RC section model.
-geomSecPret=gbeam.gmSecHP_viga_jabali(preprocessor, "prestressedConcretSectionGeom",concrete.getDDiagName(),passiveSteel.getDDiagName(),activeSteel.getDDiagName(),dat.concreteLstWidthHeight,dat.activeReinLayers,dat.passiveReinLayers,zStart=-1.5/2)
+geomSecPret= gbeam.gmSecHP_viga_jabali(preprocessor, "prestressedConcretSectionGeom",concrete.getDDiagName(),passiveSteel.getDDiagName(),activeSteel.getDDiagName(),dat.concreteLstWidthHeight,dat.activeReinLayers,dat.passiveReinLayers,zStart=-1.5/2)
 
-# 
+# Create fiber section.
+secHP= geomSecPret.getFiberSection3d("secHP")
 
-materialHandler= preprocessor.getMaterialHandler
-secHP= materialHandler.newMaterial("fiber_section_3d","secHP")
-fiberSectionRepr= secHP.getFiberSectionRepr()
-fiberSectionRepr.setGeomNamed(geomSecPret.name)
-secHP.setupFibers()
 '''
 print('Area sección fibras= ', secHP.getArea())
 print('Iz= ',secHP.EIz()/EHE_materials.HP55.Ecm())
@@ -96,7 +92,7 @@ print('My=', round(esfMy*1e-3,0),' kNm')
 esfMz= sccEl1.getStressResultantComponent("Mz")
 defMz= sccEl1.getSectionDeformationByName("defMz")
 defN= sccEl1.getSectionDeformationByName("defN")
-concrFibers= fiber_sets.FiberSet(sccEl1,'concreteFiberSet',concrete.matTagD)
+concrFibers= fiber_sets.FiberSet(sccEl1,'concreteFiberSet',concrete.getMatTagD())
 fibraCEpsMin= concrFibers.getFiberWithMinStrain()
 epsCMin= fibraCEpsMin.getMaterial().getStrain() # Minimum concrete strain
 sigmaCMin=fibraCEpsMin.getMaterial().getStress() # Minimum concrete stress
@@ -106,25 +102,25 @@ fibraCEpsMax= concrFibers.getFiberWithMaxStrain()
 epsCMax= fibraCEpsMax.getMaterial().getStrain() # Maximum concrete strain.
 sigmaCMax=fibraCEpsMax.getMaterial().getStress()
 print('Pto. ',fibraCEpsMax.getPos(), '; -Maximum concrete strain=', round(epsCMax*1e3,1), ' por mil;  -Maximum concrete stress=', round(sigmaCMax*1e-6,2), ' MPa')
-activeReinfFibers= fiber_sets.FiberSet(sccEl1,"active reinforcement",activeSteel.matTagD)
+activeReinfFibers= fiber_sets.FiberSet(sccEl1,"active reinforcement",activeSteel.getMatTagD())
 fibraActSEpsMax= activeReinfFibers.getFiberWithMaxStrain()
 epsActSMax= fibraActSEpsMax.getMaterial().getStrain() # Maximum active steel strain
 sigmaActSMax= fibraActSEpsMax.getMaterial().getStress() # Maximum active steel strain
 print('Pto. ',fibraActSEpsMax.getPos(), '; -Maximum active-steel strain=', round(epsActSMax*1e3,1), ' por mil;  -Maximum active-steel stress=', round(sigmaActSMax*1e-6,2), ' MPa')
-activeReinfFibers= fiber_sets.FiberSet(sccEl1,"active reinforcement",activeSteel.matTagD)
+activeReinfFibers= fiber_sets.FiberSet(sccEl1,"active reinforcement",activeSteel.getMatTagD())
 fibraActSEpsMin= activeReinfFibers.getFiberWithMinStrain()
 epsActSMin= fibraActSEpsMin.getMaterial().getStrain() # Minimum active steel strain
 sigmaActSMin= fibraActSEpsMin.getMaterial().getStress() # Minimum active steel strain
 print('Pto. ',fibraActSEpsMin.getPos(), '; -Minimum active-steel strain=', round(epsActSMin*1e3,1), ' por mil;  -Minimum active-steel stress=', round(sigmaActSMin*1e-6,2), ' MPa')
 
-passiveReinfFibers= fiber_sets.FiberSet(sccEl1,"passive reinforcement",passiveSteel.matTagD)
+passiveReinfFibers= fiber_sets.FiberSet(sccEl1,"passive reinforcement",passiveSteel.getMatTagD())
 fibraPasSEpsMax= passiveReinfFibers.getFiberWithMaxStrain()
 epsPasSMax= fibraPasSEpsMax.getMaterial().getStrain() # Maximum passive steel strain
 sigmaPasSMax= fibraPasSEpsMax.getMaterial().getStress() # Maximum passive steel strain
 print('Pto. ',fibraPasSEpsMax.getPos(), '; -Maximum passive-steel strain=', round(epsPasSMax*1e3,1), ' por mil;  -Maximum passive-steel stress=', round(sigmaPasSMax*1e-6,2), ' MPa')
 
 
-passiveReinfFibers= fiber_sets.FiberSet(sccEl1,"passive reinforcement",passiveSteel.matTagD)
+passiveReinfFibers= fiber_sets.FiberSet(sccEl1,"passive reinforcement",passiveSteel.getMatTagD())
 fibraPasSEpsMin= passiveReinfFibers.getFiberWithMinStrain()
 epsPasSMin= fibraPasSEpsMin.getMaterial().getStrain() # Minimum passive steel strain
 sigmaPasSMin= fibraPasSEpsMin.getMaterial().getStress() # Minimum passive steel strain
