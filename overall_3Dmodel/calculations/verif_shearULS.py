@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from postprocess import limit_state_data as lsd
-from postprocess import RC_material_distribution
 from solution import predefined_solutions
-from materials.ehe import EHE_limit_state_checking as lschck  
-#from materials.sia262 import SIA262_limit_state_checking as lschck  
+#from materials.ehe import EHE_limit_state_checking as lschck  
+#from materials.sia262 import SIA262_limit_state_checking as lschck
+from materials.ec2 import EC2_limit_state_checking as lscheck
+
 from postprocess.config import default_config
 from misc_utils import log_messages as lmsg
 # local modules
@@ -12,6 +13,7 @@ import env_config as env
 import xc_sets as xcS
 import shutil
 shutil.copyfile(env.cfg.projectDirTree.getInternalForcesResultsPath()+'intForce_ULS_normalStressesResistance.json', env.cfg.projectDirTree.getInternalForcesResultsPath()+'intForce_ULS_shearResistance.json')
+
 import RC_sections_def
 if  RC_sections_def.plotSection:
     lmsg.error('You must disable RC-section plotting before running check')

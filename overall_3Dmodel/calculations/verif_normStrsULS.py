@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from postprocess import limit_state_data as lsd
-from postprocess import RC_material_distribution
 #from materials.sia262 import SIA262_limit_state_checking as lscheck
-from materials.ehe import EHE_limit_state_checking as lscheck
+#from materials.ehe import EHE_limit_state_checking as lscheck
+from materials.ec2 import EC2_limit_state_checking as lscheck
 from postprocess.config import default_config
 from misc_utils import log_messages as lmsg
 # local modules

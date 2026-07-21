@@ -17,7 +17,7 @@ concrProp=tm.MaterialData(name='concrProp',E=datM.concrete.Ecm(),nu=datM.concret
 strSteelPlate=tm.defElasticIsotropic3d(preprocessor=prep,name='strSteelPlate',E=datM.strSteel.E,nu=datM.strSteel.nu,rho=datM.strSteel.rho)
 # for Von mises Structural steel Non-linear analysis. Steel must be previously set J2PlateFibre and
 # shell elements as MembranePlateFiberSection.
-AISI304L= tm.defJ2PlateFibre(preprocessor=preprocessor, name='AISI304L', E=AISI_E, nu=0.3, fy=AISI_fy,alpha=AISI_alpha,rho=7850) 
+AISI304L= tm.defJ2PlateFibre(preprocessor=prep, name='AISI304L', E=AISI_E, nu=0.3, fy=AISI_fy,alpha=AISI_alpha,rho=7850) 
 
 # Isotropic elastic section-material appropiate for plate and shell analysis
 deck_mat=tm.DeckMaterialData(name='deck_mat',thickness= datG.deckTh,material=concrProp)

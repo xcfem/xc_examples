@@ -47,7 +47,7 @@ colshape=ASTM_materials.WShape(steelW,lb.getUSLabel('W200X26.6'))
 col_L=2  # lenght of beam to modelize
 col_vOrig=xc.Vector([-col_L/2,0,0]) # global coordinates of the start point in the beam axis 
 col_angX=0  # angle of the beam axis with the global XZ plane
-col_esize=0.02  # size of the elements
+col_esize=0.05  # size of the elements
 col_idName='col_' # id for naming sets
 
 #beam
