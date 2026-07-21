@@ -27,7 +27,7 @@ goundAccSeriesFile= './LOR_20110511_164726.acc' # file containinig the ground ac
 
 periodRange=[0.01,5] # minimum and max. period in seconds
 nPeriods=250 # number of periods to be processed
-damping= .05 # Damping 
+damping_ratio= .05 # Damping ratio. 
 
 ## Read de time-history file
 lorca_t= list()
@@ -77,6 +77,11 @@ for T in periods:
     
     modelSpace.fixNode0(n1.tag)
     omega=2*np.pi/T # angular frequency
+    c = 2*damping_ratio*omega # Damping
+    # Rayleigh damping factors.
+    n2.setRayleighDampingFactor(c)
+
+
     K= (omega**2)*mass # stiffness
     matElast= typical_materials.defElasticMaterial(preprocessor= prep, name= "matElast"+str(T), E= K)
     elements.defaultMaterial= matElast.name
