@@ -32,7 +32,7 @@ def analyze_SDOF(period, damping_ratio):
     matElast= typical_materials.defElasticMaterial(preprocessor, name= "matElast", E= k)
     modelSpace.setDefaultMaterial(matElast)
     modelSpace.setElementDimension(1)
-    modelSpace.newElement('ZeroLength', [n1.tag, n2.tag])
+    zl= modelSpace.newElement('ZeroLength', [n1.tag, n2.tag])
 
     # unit mass is assumed
     n2.mass= xc.Matrix([[1.0]])  # node mass matrix.
@@ -41,10 +41,14 @@ def analyze_SDOF(period, damping_ratio):
     alphaM= c # factor applied to elements or nodes mass matrix
     betaK= 0.0 # factor applied to elements current stiffness matrix.
     betaKinit= 0.0 # factor applied to elements initial stiffness matrix.
-    betaKcomm= 0.0 # factor applied to elements committed stiffness matrix. 
+    betaKcomm= 0.0 # factor applied to elements committed stiffness matrix.
     rayleigh= xc.RayleighDampingFactors(alphaM, betaK, betaKinit, betaKcomm)
     # print('damping factors: ', rayleigh)
-    preprocessor.getDomain.setRayleighDampingFactors(rayleigh)
+    # preprocessor.getDomain.setRayleighDampingFactors(rayleigh)
+    #zl.setRayleighDampingFactors(rayleigh)
+    #zl.setUseRayleighDampingFlag(1) # Compute the element damping matrix
+                                    # from its damping coefficients.
+    n2.setRayleighDampingFactor(alphaM)
 
     modelSpace.fixNode0(n1.tag)
 
