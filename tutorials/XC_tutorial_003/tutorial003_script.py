@@ -103,21 +103,12 @@ zTopL=depth/2.0-cover-0.012/2.0
 reinfTopLayer.p1= geom.Pos2d(-yTopL,zTopL) # center point position of the starting rebar
 reinfTopLayer.p2= geom.Pos2d(yTopL,zTopL) # center point position of the starting rebar
 
-#Section material 
-#it is a generic section created to be assigned to the elements specified
-#its stress and strain state is neutral (if we ask this section for stress or 
-#strain values the result is always 0)
-materialHandler= preprocessor.getMaterialHandler
-sctFibers= materialHandler.newMaterial("fiber_section_3d","sctFibers")
-
-fiberSectionRepr= sctFibers.getFiberSectionRepr()
-fiberSectionRepr.setGeomNamed(geomSectFibers.name)
-sctFibers.setupFibers()
-
+# Create fiber section.
+sctFibers= geomSectFibers.getFiberSection3d("sctFibers")
 
 # Elements definition
 elements= preprocessor.getElementHandler
-elements.defaultMaterial='sctFibers'
+elements.defaultMaterial= sctFibers.name
 ele1= elements.newElement("ZeroLengthSection",xc.ID([nodA.tag,nodB.tag]))
 
 # Constraints
