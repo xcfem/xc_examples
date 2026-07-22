@@ -4,6 +4,9 @@ Namadchi.
 
 See https://github.com/AmirHosseinNamadchi/OpenSeesPy-Examples/blob/master/Elastic%20Response%20Spectra.ipynb
 '''
+
+import sys
+import inspect
 import os
 import json
 import numpy as np
@@ -88,21 +91,18 @@ def analyze_SDOF(period, damping_ratio):
             'SV': np.max(np.abs(results['V'])),
             'SA': np.max(np.abs(results['A']))}
 
+silent= False
+# Check if silent execution has been requested.
+argv= sys.argv
+if(len(argv)>1):
+    if 'silent' in argv[1:]:
+        silent= True
+
 # Loading El Centro EQ data (North-south component)
-el_centro_raw= np.loadtxt('elCentro.txt')
+pth= os.path.dirname(inspect.getfile(inspect.currentframe()))
+inputFileName= pth+'/elCentro.txt'
+el_centro_raw= np.loadtxt(inputFileName)
 
-# Plot accelerogram.
-plt.figure(figsize=(15,3))
-plt.plot(el_centro_raw[:,0], el_centro_raw[:,1], color='k')
-
-plt.ylabel('$\ddot{d_g} (g)$', {'size':14})
-plt.xlabel('Time (sec)', {'fontstyle':'italic','size':13})
-
-plt.grid()
-plt.yticks(fontsize= 14)
-plt.xticks(fontsize= 14)
-plt.xlim([0.0, el_centro_raw[-1,0]]);
-plt.show()
 
 # Define a period range below
 T_min= 0.00001
@@ -134,61 +134,103 @@ for z in zeta_list:
     
     # Appending keys and values dynamically
     data_frame[z] = resp
-    print('Done with zeta= '+str(z)+'!')
+    if(not silent):
+        print('Done with zeta= '+str(z)+'!')
 
-# Save ouput as reference.
-outputPath= './'#'/tmp'
+refFilePath= pth
 fname= os.path.basename(__file__)
-jsonFileName= outputPath+'/'+fname.replace('.py', '.json')
-with open(jsonFileName, 'w') as f:
-    json.dump(data_frame, f)
-print('XXX continue here.')
-    
+jsonFileName= refFilePath+'/ref_'+fname.replace('.py', '.json')
+# # Save output as reference.
+# with open(jsonFileName, 'w') as f:
+#     json.dump(data_frame, f)
+
+# Check results.
+## Load reference values.
+with open(jsonFileName, 'r') as f:
+     ref_data_frame= json.load(f)
+## Compare results.
+err= 0.0
+tol= 1e-8
+for key in ref_data_frame:
+    ref_resp= ref_data_frame[key]
+    ref_z= float(key)
+    resp= data_frame[ref_z]
+    for key in ref_resp:
+        values= resp[key]
+        ref_values= ref_resp[key]
+        error= (len(values)-len(ref_values))**2
+        if(error<tol):
+            for v, rv in zip(values, ref_values):
+                error+=(v-rv)**2
+error= np.sqrt(error)
+
+# print(error)
+
+from misc_utils import log_messages as lmsg
+if error<tol:
+    print('test '+fname+': ok.')
+else:
+    lmsg.error(fname+' ERROR.')
+
 # Graphic output.
-## Displacment -----------
-plt.figure(figsize=(14,5))
+if(not silent):
+    ## Plot accelerogram.
+    plt.figure(figsize=(15,3))
+    plt.plot(el_centro_raw[:,0], el_centro_raw[:,1], color='k')
 
-[plt.plot(data_frame[z]['T'], data_frame[z]['SD'],
-          label=('$\zeta$ = '+str(z))) for z in zeta_list]
+    plt.ylabel('$\ddot{d_g} (g)$', {'size':14})
+    plt.xlabel('Time (sec)', {'fontstyle':'italic','size':13})
 
-plt.ylabel('Displacement (cm)', {'fontstyle':'italic','size':14})
-plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
-plt.legend()
-plt.grid()
-plt.yticks(fontsize = 14)
-plt.xticks(fontsize = 14)
-plt.title('Displacement Response Spectrum',
-          {'fontstyle':'italic','size':18});
-plt.show()
+    plt.grid()
+    plt.yticks(fontsize= 14)
+    plt.xticks(fontsize= 14)
+    plt.xlim([0.0, el_centro_raw[-1,0]]);
+    plt.show()
 
-# Velocity ------------
-plt.figure(figsize=(14,5))
+    ## Displacment -----------
+    plt.figure(figsize=(14,5))
 
-[plt.plot(data_frame[z]['T'], data_frame[z]['SV'],
-          label=('$\zeta$ = '+str(z))) for z in zeta_list]
+    [plt.plot(data_frame[z]['T'], data_frame[z]['SD'],
+              label=('$\zeta$ = '+str(z))) for z in zeta_list]
 
-plt.ylabel('Velocity (cm/sec)', {'fontstyle':'italic','size':14})
-plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
-plt.legend()
-plt.grid()
-plt.yticks(fontsize = 14)
-plt.xticks(fontsize = 14)
-plt.title('Veloctiy Response Spectrum', 
-          {'fontstyle':'italic','size':18});
-plt.show()
+    plt.ylabel('Displacement (cm)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.legend()
+    plt.grid()
+    plt.yticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.title('Displacement Response Spectrum',
+              {'fontstyle':'italic','size':18});
+    plt.show()
 
-# Acceleration ------------
-plt.figure(figsize=(14,5))
+    # Velocity ------------
+    plt.figure(figsize=(14,5))
 
-[plt.plot(data_frame[z]['T'], np.array(data_frame[z]['SA'])/g,
-          label=('$\zeta$ = '+str(z))) for z in zeta_list]
+    [plt.plot(data_frame[z]['T'], data_frame[z]['SV'],
+              label=('$\zeta$ = '+str(z))) for z in zeta_list]
 
-plt.ylabel('Acceleration (g)', {'fontstyle':'italic','size':14})
-plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
-plt.legend()
-plt.grid()
-plt.yticks(fontsize = 14)
-plt.xticks(fontsize = 14)
-plt.title('Acceleration Response Spectrum',
-          {'fontstyle':'italic','size':18});
-plt.show()
+    plt.ylabel('Velocity (cm/sec)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.legend()
+    plt.grid()
+    plt.yticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.title('Veloctiy Response Spectrum', 
+              {'fontstyle':'italic','size':18});
+    plt.show()
+
+    # Acceleration ------------
+    plt.figure(figsize=(14,5))
+
+    [plt.plot(data_frame[z]['T'], np.array(data_frame[z]['SA'])/g,
+              label=('$\zeta$ = '+str(z))) for z in zeta_list]
+
+    plt.ylabel('Acceleration (g)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.legend()
+    plt.grid()
+    plt.yticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.title('Acceleration Response Spectrum',
+              {'fontstyle':'italic','size':18});
+    plt.show()
