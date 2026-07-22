@@ -4,7 +4,8 @@ Namadchi.
 
 See https://github.com/AmirHosseinNamadchi/OpenSeesPy-Examples/blob/master/Elastic%20Response%20Spectra.ipynb
 '''
-
+import os
+import json
 import numpy as np
 import xc
 from model import predefined_spaces
@@ -133,9 +134,18 @@ for z in zeta_list:
     
     # Appending keys and values dynamically
     data_frame[z] = resp
-    print('Done with zeta=', z,'!')
+    print('Done with zeta= '+str(z)+'!')
+
+# Save ouput as reference.
+outputPath= './'#'/tmp'
+fname= os.path.basename(__file__)
+jsonFileName= outputPath+'/'+fname.replace('.py', '.json')
+with open(jsonFileName, 'w') as f:
+    json.dump(data_frame, f)
+print('XXX continue here.')
     
-# Displacment -----------
+# Graphic output.
+## Displacment -----------
 plt.figure(figsize=(14,5))
 
 [plt.plot(data_frame[z]['T'], data_frame[z]['SD'],
