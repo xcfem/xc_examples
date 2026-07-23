@@ -61,7 +61,7 @@ echo "$BLEU" "  Earth retaining simple structures." "$NORMAL"
 python ./simple_structures/earth_retaining/sheet_pile_example.py silent
 echo "$BLEU" "Analysis examples." "$NORMAL"
 python analysis/curved_arch_dynamic_snap_through.py silent
-
+python analysis/seismic_analysis/elastic_response_spectra/elastic_response_spectra.py silent
 
 END=$(date +%s.%N)
 DIFF=$(echo "$END - $START" | bc)
