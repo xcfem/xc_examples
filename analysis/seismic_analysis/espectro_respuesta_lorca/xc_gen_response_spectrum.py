@@ -69,24 +69,23 @@ elements=prep.getElementHandler
 elements.dimElem= 1
 loadHandler= prep.getLoadHandler
 # Create zero-length elements for all the periods and append to dictionary
+Klist=list()
 for T in periods:
     n1= modelSpace.newNodeX(0)
     n2= modelSpace.newNodeX(0)
     mass= 1 # mass
     n2.mass= xc.Matrix([[mass]])  # node mass matrix.
-    
     modelSpace.fixNode0(n1.tag)
     omega=2*np.pi/T # angular frequency
     c = 2*damping_ratio*omega # Damping
     # Rayleigh damping factors.
     n2.setRayleighDampingFactor(c)
-
-
     K= (omega**2)*mass # stiffness
     matElast= typical_materials.defElasticMaterial(preprocessor= prep, name= "matElast"+str(T), E= K)
     elements.defaultMaterial= matElast.name
     el=elements.newElement("ZeroLength",xc.ID([n1.tag,n2.tag]))
-    caseDct[T]={'elem':el,'n2Tag':n2.tag}
+    caseDct[T]={'elem':el,'n2Tag':n2.tag,'K':K}
+    Klist.append((T,K))
 
 # loads definition
 lPatterns= loadHandler.getLoadPatterns
@@ -127,15 +126,15 @@ if(solve):
     if(result!=0):
         lmsg.error('Dynamic analysis failed.')
         quit()
-
     for T in periods:
         max_acc=0
         nTag=caseDct[T]['n2Tag']
         resAcc=cAccel[nTag]
-        nodeAbsAcc=[abs(res[1]) for res in  resAcc]
+        # add ground acceleration to results
+        totalAcc=[resAcc[i][1]+grAccelVals[i] for i in range(len(resAcc))]
+        nodeAbsAcc=[abs(res) for res in  totalAcc]
         maxAccel= max(nodeAbsAcc)
         caseDct[T]['maxAccel']= maxAccel
-
     maxAccelPeriods=[caseDct[T]['maxAccel'] for T in periods]
 
 # 5. Visualización
@@ -145,7 +144,17 @@ plt.plot(timeVals, hist.accel.getPathList())
 plt.title('Accelerogram.')
 plt.xlabel('t(s)')
 plt.ylabel('Acceleration $(m/s^2)$')
-plt.xlim(10, 17)  # Zoom en el rango de tiempos de interés
+#plt.xlim(10, 17)  # Zoom en el rango de tiempos de interés
+plt.grid(True)
+plt.show()
+
+stiffElems=[caseDct[T]['K'] for T in periods]
+plt.figure(figsize=(20, 5))
+plt.plot(periods,stiffElems)
+plt.title('Stiffness.')
+plt.xlabel('T(s)')
+plt.ylabel('Stiffness')
+plt.xlim(0.02, 0.5)  # Zoom en el rango de tiempos de interés
 plt.grid(True)
 plt.show()
 
@@ -160,6 +169,28 @@ if(solve):
     plt.fill_between(periods,maxAccelPeriods,alpha=0.1)
     plt.grid(True)
     plt.show()
+'''
+    # Plot time-history accelerations for each period
+    for i in range(0,len(periods),10):
+        T=periods[i] # period for the graphic
+        nTag=caseDct[T]['n2Tag']
+        resAcc=cAccel[nTag]
+        nodeAbsAcc=[abs(res[1]) for res in  resAcc]
+        nodeAcc=[res[1] for res in  resAcc]
+        plt.figure(figsize=(20, 5))
+        plt.plot(timeVals, nodeAcc)
+        plt.title('Time-history accelerations for period T='+str(T)+' s')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Acceleration (g)')#$(m/s^2)$')
+        #plt.xlim(0,5) # Zoom en el rango de periodos de interés
+        plt.fill_between(timeVals,nodeAcc,alpha=0.1)
+        plt.grid(True)
+        plt.show()
+'''
+    
+
+
+    
 
 
 
