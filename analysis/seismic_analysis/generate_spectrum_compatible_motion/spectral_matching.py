@@ -44,6 +44,7 @@ __license__= "GPL"
 __version__= "3.0"
 __email__= "ana.Ortega@ciccp.es l.pereztato@ciccp.es"
 
+import os
 import sys
 import numpy as np
 from dataclasses import dataclass, field
@@ -262,12 +263,36 @@ def integrate(acc, dt):
 class MatchResult:
     t: np.ndarray
     acc: np.ndarray
+    vel: np.ndarray
+    disp: np.ndarray
     periods: np.ndarray
     target_Sa: np.ndarray
     final_Sa: np.ndarray
     seed_Sa: np.ndarray
     history_misfit: list = field(default_factory=list)
     achieved_misfit: float = float("nan")  # misfit of the RETURNED motion (best iterate)
+
+    def getPGA(self):
+        ''' Get peak ground acceleration.'''
+        return np.max(np.abs(self.acc))
+    
+    def getPGV(self):
+        ''' Get peak ground velocity.'''
+        return np.max(np.abs(self.vel))
+    
+    def getPGD(self):
+        ''' Get peak ground displacement.'''
+        return np.max(np.abs(self.disp))
+
+    def getFinalMisfit(self):
+        ''' Return the achieved misfit.
+
+        NOTE: sm.match_spectrum tracks and returns the BEST iterate seen 
+        (misfit is not strictly monotonic across iterations), so report that 
+        value -- not simply the last entry in the per-iteration history log 
+        below.
+        '''
+        return self.achieved_misfit
 
 
 def match_spectrum(
@@ -424,9 +449,12 @@ def match_spectrum(
     Sa_seed0, _, _ = sdof_response_spectrum(seed_acc, dt, T_targets, zeta=zeta)
 
     t = np.arange(len(acc)) * dt
+    vel, disp = integrate(acc, dt)
     return MatchResult(
         t=t,
         acc=acc,
+        vel= vel,
+        disp= disp,
         periods=T_targets,
         target_Sa=Sa_targets,
         final_Sa=Sa_final,
@@ -529,3 +557,196 @@ def get_seed_motion(T_target, Sa_target, timeStep= .005, duration= 30.0, randomS
         scale0 = np.max(Sa_target) / (np.max(Sa_seed_probe) + 1e-12)
         seedAcc = seedAcc * scale0
     return seedAcc, dt
+
+def write_result(result, timeStep:float, dampingRatio, tol, outputPrefix:str):
+    ''' Write computation result using the given prefix when naming the output
+        files.
+
+    :param result: spectrum compatible motion results.
+    :param timeStep: time step.
+    :param dampingRatio: Damping ratio.
+    :param tol: convergence tolerance on max relative spectral misfit (e.g. 
+                0.03= 3%).
+    :param outputPrefix: prefix to use when naming the output files.
+    '''
+    np.savetxt(f"{outputPrefix}_acc.csv",
+               np.column_stack([result.t, result.acc]),
+               delimiter=",", header="time_s,accel_g", comments="")
+    np.savetxt(f"{outputPrefix}_vel.csv",
+               np.column_stack([result.t, result.vel]),
+               delimiter=",", header="time_s,vel", comments="")
+    np.savetxt(f"{outputPrefix}_disp.csv",
+               np.column_stack([result.t, result.disp]),
+               delimiter=",", header="time_s,disp", comments="")
+
+    pga= result.getPGA()
+    pgv= result.getPGV()
+    pgd= result.getPGD()
+    final_misfit= result.getFinalMisfit()
+    with open(f"{outputPrefix}_summary.txt", "w") as f:
+        f.write("Spectrum-compatible synthetic ground motion - summary\n")
+        f.write("=" * 55 + "\n")
+        f.write(f"dt (s):                {timeStep}\n")
+        f.write(f"duration (s):          {result.t[-1]:.3f}\n")
+        f.write(f"damping used:          {dampingRatio}\n")
+        f.write(f"iterations run:        {len(result.history_misfit)}\n")
+        f.write(f"achieved max misfit:   {final_misfit:.4f}  (tol={tol})  "
+                f"[motion returned = best iterate found, not necessarily the last one run]\n")
+        f.write(f"PGA:                   {pga:.4f}\n")
+        f.write(f"PGV:                   {pgv:.4f}\n")
+        f.write(f"PGD:                   {pgd:.4f}\n")
+        f.write("\nMisfit per iteration (raw -- not necessarily monotonic; "
+                "see achieved_misfit above for what was actually returned):\n")
+        for i, m in enumerate(result.history_misfit, 1):
+            f.write(f"  iter {i:3d}: {m:.4f}\n")
+
+
+def plot_result(result, dampingRatio, outputPrefix:str):
+    ''' Write computation result using the given prefix when naming the output
+        files.
+
+    :param result: spectrum compatible motion results.
+    :param dampingRatio: Damping ratio.
+    :param outputPrefix: prefix to use when naming the output files.
+    '''
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, axes = plt.subplots(3, 1, figsize=(9, 9), sharex=True)
+    axes[0].plot(result.t, result.acc, lw=0.7)
+    axes[0].set_ylabel("Accel (g)")
+    axes[0].set_title("Spectrum-matched synthetic motion")
+    axes[1].plot(result.t, result.vel, lw=0.7, color="tab:orange")
+    axes[1].set_ylabel("Velocity")
+    axes[2].plot(result.t, result.disp, lw=0.7, color="tab:green")
+    axes[2].set_ylabel("Displacement")
+    axes[2].set_xlabel("Time (s)")
+    fig.tight_layout()
+    fig.savefig(f"{outputPrefix}_timehist.png", dpi=150)
+    plt.close(fig)
+
+    fig2, ax = plt.subplots(figsize=(7, 5))
+    ax.plot(result.periods, result.target_Sa, "k-", lw=2, label="Target")
+    ax.plot(result.periods, result.seed_Sa, "b--", lw=1, label="Seed (before matching)")
+    ax.plot(result.periods, result.final_Sa, "r-", lw=1.5, label="Matched")
+    ax.set_xscale("log")
+    ax.set_xlabel("Period (s)")
+    ax.set_ylabel(f"Pseudo-Sa (g), damping={dampingRatio}")
+    ax.set_title("Response spectrum matching result")
+    ax.legend()
+    ax.grid(True, which="both", alpha=0.3)
+    fig2.tight_layout()
+    fig2.savefig(f"{outputPrefix}_spectra.png", dpi=150)
+    plt.close(fig2)
+
+class SpectralMatching(object):
+    ''' Generate a synthetic ground-motion acceleration time history whose 
+        elastic response spectrum matches (or closely envelopes) a 
+        user-supplied target response spectrum.
+
+    :ivar demo: Run with a built-in demo ASCE7-like target spectrum and 
+                synthetic seed.
+    :ivar targetCSV: CSV file with header row, columns: period(s), Sa(g).
+    :ivar seedCSV: Optional CSV (single column) of a seed acceleration 
+                    time history, in g.
+    :ivar seedDt: Time step (s) of seedCSV, required if that option is used.
+    :ivar duration: Duration (s) of synthetic seed motion if no seedCSV 
+                    given. Longer duration gives finer FFT frequency 
+                    resolution (df=1/duration), which materially improves 
+                    matching accuracy at long periods -- don't go much below
+                    20-30s if your target spectrum extends past T~2s.
+    :ivar timeStep: Time step (s) of synthetic seed motion if no seedCSV given.
+    :ivar damping: Damping ratio for response spectrum matching (default 0.05).
+    :ivar maxIter: Maximum number of iterations (defaults to 150).
+    :ivar relaxation: Under-relaxation factor in (0,1] for the iterative 
+                      correction (default 0.65).
+                      Lower = more stable but slower convergence; 
+                      1.0 = full correction each pass (often oscillates instead 
+                            of converging).
+    :ivar tol: Convergence tolerance on max relative spectral misfit.
+    :ivar outPrefix: Path prefix for output files (directories created as 
+                     needed).
+
+    '''
+    def __init__(self, demo= True, targetCSV= None, seedCSV= None, seedDt= None, duration= 30, timeStep= .005, dampingRatio= .05, maxIter= 150, relaxation= 0.75, tol= .03, outputPrefix= 'output/motion'):
+        ''' Constructor.
+
+        :param demo: Run with a built-in demo ASCE7-like target spectrum and 
+                     synthetic seed.
+        :param targetCSV: CSV file with header row, columns: period(s), Sa(g).
+        :param seedCSV: Optional CSV (single column) of a seed acceleration 
+                        time history, in g.
+        :param seedDt: Time step (s) of seedCSV, required if that option is 
+                       used.
+        :param duration: Duration (s) of synthetic seed motion if no seedCSV 
+                        given. Longer duration gives finer FFT frequency 
+                        resolution (df=1/duration), which materially improves 
+                        matching accuracy at long periods -- don't go much below
+                        20-30s if your target spectrum extends past T~2s.
+        :param timeStep: Time step (s) of synthetic seed motion if no seedCSV 
+                         given.
+        :param dampingRatio: Damping ratio for response spectrum matching 
+                            (default 0.05).
+        :param maxIter: Maximum number of iterations (defaults to 150).
+        :param relaxation: Under-relaxation factor in (0,1] for the iterative 
+                          correction (default 0.65).
+                          Lower = more stable but slower convergence; 
+                          1.0 = full correction each pass (often oscillates 
+                          instead of converging).
+        :param tol: Convergence tolerance on max relative spectral misfit.
+        :param outputPrefix: Path prefix for output files (directories created
+                            as needed).
+        '''
+        self.demo= demo # Run with a built-in demo.
+        self.targetCSV= targetCSV # CSV file with header row, columns: period(s), Sa(g).
+        self.seedCSV= seedCSV # Optional CSV.
+        self.seedDt= seedDt # Time step (s).
+        self.duration= duration # Duration (s) of synthetic seed motion
+        self.timeStep= timeStep # Time step (s) of synthetic seed motion.
+        self.dampingRatio= dampingRatio # Damping ratio.
+        self.maxIter= maxIter # Maximum number of iterations
+        self.relaxation= relaxation # Under-relaxation factor.
+        self.tol= tol # Convergence tolerance.
+        self.outputPrefix= outputPrefix # Path prefix
+
+    def getSpectralMatchingMotion(self, randomSeed= 42):
+        ''' Return a synthetic spectral matching motion.
+
+        :param randomSeed: RNG seed for synthetic seed motion generation
+                           (reproducibility).
+        '''
+        import os
+        os.makedirs(os.path.dirname(self.outputPrefix) or ".", exist_ok=True)
+
+        # ---- 1. Target spectrum ----
+        if(self.targetCSV or self.demo):
+            T_target, Sa_target = get_target_spectrum(targetCSV= self.targetCSV)
+        else:
+            methodName= sys._getframe(0).f_code.co_name
+            msg= methodName+'; supply --target-csv <file> or use --demo.'
+            lmsg.error(msg)
+            sys.exit(1)
+
+        # ---- 2. Seed motion ----
+        seed_acc, dt= get_seed_motion(T_target= T_target, Sa_target= Sa_target, timeStep= self.timeStep, duration= self.duration, randomSeed= randomSeed, dampingRatio= self.dampingRatio, seedCSV= self.seedCSV, seedDt= self.seedDt)
+
+        # ---- 3. Spectral matching ----
+        result = match_spectrum(
+            seed_acc, dt, T_target, Sa_target,
+            zeta=self.dampingRatio, max_iter=self.maxIter, tol=self.tol,
+            relaxation=self.relaxation,
+        )
+
+        # ---- 4. Save outputs ----
+        write_result(result, timeStep= self.timeStep, dampingRatio= self.dampingRatio, tol= self.tol, outputPrefix= self.outputPrefix)
+
+        # ---- 5. Plots ----
+        try:
+            plot_result(result, dampingRatio= self.dampingRatio, outputPrefix= self.outputPrefix)
+        except ImportError:
+            methodName= sys._getframe(0).f_code.co_name
+            msg= methodName+'; matplotlib not available -- skipping plots, CSV/summary still written.'
+            lmsg.error(msg)
+        return result
+        
