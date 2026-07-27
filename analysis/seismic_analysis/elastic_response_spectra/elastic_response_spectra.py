@@ -67,6 +67,8 @@ def analyze_SDOF(period, damping_ratio):
     hist= mr.history
     timeValues= el_centro_raw[:,0]
     accelerationValues= list(el_centro_raw[:,1]*g)
+    #velocityValues=[acc/omega for acc in accelerationValues]
+
     accel= lPatterns.newTimeSeries("path_ts","accel")
     accel.path= xc.Vector(accelerationValues)
     accel.timeIncr= timeValues[1]-timeValues[0] 
@@ -80,16 +82,22 @@ def analyze_SDOF(period, damping_ratio):
     solProc.setup()
     analysis= solProc.getAnalysis()
     
-    results= {'D':[],'V':[], 'A':[]}
+    results= {'D':[],'V':[], 'A':[],'absA':[]}
     for i in range(len(timeValues)):
         analysis.analyze(1, dt)
         results['D'].append(n2.getDisp[0])
         results['V'].append(n2.getVel[0])
         results['A'].append(n2.getAccel[0])    
-        
+    # Maximum value of relative displacement ('SD') , velocity ('SV') and acceleration ('SA') for the considered period
+    # Maximum value of the absolute acceleration 'absSA', for which the ground acceleration is added to the time-history calculated accelerations for the oscillator correponding to the period.
+    results['absA']=[results['A'][i]+accelerationValues[i] for i in range(len(accelerationValues))]
     return {'SD': np.max(np.abs(results['D'])),
             'SV': np.max(np.abs(results['V'])),
-            'SA': np.max(np.abs(results['A']))}
+            'SA': np.max(np.abs(results['A'])),
+            'absSA': np.max(np.abs(results['absA'])),
+            
+            
+            }
 
 silent= False
 # Check if silent execution has been requested.
@@ -123,15 +131,15 @@ data_frame = dict()
 
 for z in zeta_list:    
     # re-initialization
-    resp = {'T':[0],'SD':[0], 'SV':[0], 'SA':[0]}
+    resp = {'T':[0],'SD':[0], 'SV':[0], 'SA':[0], 'absSA':[0]}
     
     for T in np.arange(T_min, T_max, dT):
         SR = analyze_SDOF(T, z)
         resp['SD'].append(SR['SD'])
         resp['SV'].append(SR['SV'])
         resp['SA'].append(SR['SA'])
+        resp['absSA'].append(SR['absSA'])
         resp['T'].append(T)
-    
     # Appending keys and values dynamically
     data_frame[z] = resp
     if(not silent):
@@ -193,7 +201,7 @@ if(not silent):
     [plt.plot(data_frame[z]['T'], data_frame[z]['SD'],
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
-    plt.ylabel('Displacement (cm)', {'fontstyle':'italic','size':14})
+    plt.ylabel('Relative displacement (cm)', {'fontstyle':'italic','size':14})
     plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()
@@ -209,7 +217,7 @@ if(not silent):
     [plt.plot(data_frame[z]['T'], data_frame[z]['SV'],
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
-    plt.ylabel('Velocity (cm/sec)', {'fontstyle':'italic','size':14})
+    plt.ylabel('Relative velocity (cm/sec)', {'fontstyle':'italic','size':14})
     plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()
@@ -222,10 +230,10 @@ if(not silent):
     # Acceleration ------------
     plt.figure(figsize=(14,5))
 
-    [plt.plot(data_frame[z]['T'], np.array(data_frame[z]['SA'])/g,
+    [plt.plot(data_frame[z]['T'], np.array(data_frame[z]['absSA'])/g,
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
-    plt.ylabel('Acceleration (g)', {'fontstyle':'italic','size':14})
+    plt.ylabel('Absolute acceleration (g)', {'fontstyle':'italic','size':14})
     plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()

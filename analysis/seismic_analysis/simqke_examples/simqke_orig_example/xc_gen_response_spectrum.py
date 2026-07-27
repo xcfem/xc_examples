@@ -3,12 +3,8 @@ This scipt calculates the maximum acceleration for a single-degree-of-freedom
 model with varying natural periods, forced into motion by the same dinamic 
 event, that is given as parameter as an earthquake's time-history recording.
 
-The file used in this example as time-history input is organized in the 
-following columns:
-   Time[s] Acceleration comp. N30W [g]  Acc. comp. E30W [g]  Acc. comp. V [g]
-
-The sprectrum calculated in this script corresponds to component N30W [g]
-Usually, the input consists in a succession of accelerations values for which time-step is known. 
+The sprectrum calculated in this script corresponds to the example included
+in the simqke manual
 
 # As a result, the response spectrum period-acceleration is plotted
 '''
@@ -23,17 +19,14 @@ from misc_utils import log_messages as lmsg
 
 solve= True
 # Data
-goundAccSeriesFile= './LOR_20110511_164726.acc' # file containinig the ground acceleration values. 
+dt= 0.010 # time increment
+groundAccSeriesFile= './simulated_ground_acceleration.txt' # file containinig the ground acceleration values. 
 
-periodRange=[0.01,5] # minimum and max. period in seconds
-nPeriods=250 # number of periods to be processed
-damping_ratio= .05 # Damping ratio. 
-
+periodRange=[0.02,3] # minimum and max. period in seconds
+nPeriods=200 # number of periods to be processed
+damping_ratio= .02 # Damping ratio. 
 ## Read de time-history file
-lorca_t= list()
-lorca_a_norte= list()
-lorca_a_este= list()
-lorca_a_vert= list()
+grAccelVals=list()
 def is_number(s):
     try:
         float(s)
@@ -41,23 +34,24 @@ def is_number(s):
         return False
     else:  # Succeeded
         return True
-with open(goundAccSeriesFile, 'r') as f:
+with open(groundAccSeriesFile, 'r') as f:
     for line in f:
-        fields= line.split(' ')
+        if not line.strip():
+            continue
+        fields= line.split()
         if(is_number(fields[0])):
-            lorca_t.append(float(fields[0]))
-            lorca_a_norte.append(float(fields[1]))#*g)
-            lorca_a_este.append(float(fields[2]))#*g)
-            lorca_a_vert.append(float(fields[3]))#*g)
+            for a in fields:
+                grAccelVals.append(float(a))
+
 ##   
-timeVals=[t for t in lorca_t]
-grAccelVals=[a for a in lorca_a_norte]
+timeVals=[i*dt for i in range(len(grAccelVals))]
+
 # End data.
-timeStep= timeVals[1]-timeVals[0]
+timeStep= dt
 
 # Compute the periods to consider in the spectrum.
 periods=np.linspace(periodRange[0],periodRange[1],num=nPeriods)
-periods=[round(T,3) for T in periods]
+periods=[round(T,5) for T in periods]
 caseDct=dict() # dictionary that stores for each period the element created and the maximum acceleration calculated
 
 feProblem= xc.FEProblem()
@@ -69,23 +63,24 @@ elements=prep.getElementHandler
 elements.dimElem= 1
 loadHandler= prep.getLoadHandler
 # Create zero-length elements for all the periods and append to dictionary
-Klist=list()
 for T in periods:
     n1= modelSpace.newNodeX(0)
     n2= modelSpace.newNodeX(0)
     mass= 1 # mass
     n2.mass= xc.Matrix([[mass]])  # node mass matrix.
+    
     modelSpace.fixNode0(n1.tag)
     omega=2*np.pi/T # angular frequency
     c = 2*damping_ratio*omega # Damping
     # Rayleigh damping factors.
     n2.setRayleighDampingFactor(c)
+
+
     K= (omega**2)*mass # stiffness
     matElast= typical_materials.defElasticMaterial(preprocessor= prep, name= "matElast"+str(T), E= K)
     elements.defaultMaterial= matElast.name
     el=elements.newElement("ZeroLength",xc.ID([n1.tag,n2.tag]))
-    caseDct[T]={'elem':el,'n2Tag':n2.tag,'K':K}
-    Klist.append((T,K))
+    caseDct[T]={'elem':el,'n2Tag':n2.tag}
 
 # loads definition
 lPatterns= loadHandler.getLoadPatterns
@@ -126,15 +121,17 @@ if(solve):
     if(result!=0):
         lmsg.error('Dynamic analysis failed.')
         quit()
+
     for T in periods:
         max_acc=0
         nTag=caseDct[T]['n2Tag']
         resAcc=cAccel[nTag]
-        # add ground acceleration to results to obtain the absolute acceleration
+        # add ground acceleration to results
         totalAcc=[resAcc[i][1]+grAccelVals[i] for i in range(len(resAcc))]
         nodeAbsAcc=[abs(res) for res in  totalAcc]
         maxAccel= max(nodeAbsAcc)
         caseDct[T]['maxAccel']= maxAccel
+
     maxAccelPeriods=[caseDct[T]['maxAccel'] for T in periods]
 
 # 5. Visualización
@@ -143,18 +140,8 @@ plt.figure(figsize=(100, 5))
 plt.plot(timeVals, hist.accel.getPathList())
 plt.title('Accelerogram.')
 plt.xlabel('t(s)')
-plt.ylabel('Acceleration $(m/s^2)$')
+plt.ylabel('Acceleration $(g)$')
 #plt.xlim(10, 17)  # Zoom en el rango de tiempos de interés
-plt.grid(True)
-plt.show()
-
-stiffElems=[caseDct[T]['K'] for T in periods]
-plt.figure(figsize=(20, 5))
-plt.plot(periods,stiffElems)
-plt.title('Stiffness.')
-plt.xlabel('T(s)')
-plt.ylabel('Stiffness')
-plt.xlim(0.02, 0.5)  # Zoom en el rango de tiempos de interés
 plt.grid(True)
 plt.show()
 
@@ -162,35 +149,13 @@ if(solve):
     # Plot period spectogram
     plt.figure(figsize=(10, 5))
     plt.plot(periods, maxAccelPeriods)
-    plt.title('Period spectrum of the accelerogram.')
+    plt.title('Period spectrum of the accelerogram. Damping='+str(round(damping_ratio*100,1))+'%')
     plt.xlabel('Period (s)')
-    plt.ylabel('Acceleration (g)')#$(m/s^2)$')
-    plt.xlim(0,5) # Zoom en el rango de periodos de interés
+    plt.ylabel('Acceleration (g)')
+    plt.xlim(0,3) # Zoom en el rango de periodos de interés
     plt.fill_between(periods,maxAccelPeriods,alpha=0.1)
     plt.grid(True)
     plt.show()
-'''
-    # Plot time-history accelerations for each period
-    for i in range(0,len(periods),10):
-        T=periods[i] # period for the graphic
-        nTag=caseDct[T]['n2Tag']
-        resAcc=cAccel[nTag]
-        nodeAbsAcc=[abs(res[1]) for res in  resAcc]
-        nodeAcc=[res[1] for res in  resAcc]
-        plt.figure(figsize=(20, 5))
-        plt.plot(timeVals, nodeAcc)
-        plt.title('Time-history accelerations for period T='+str(T)+' s')
-        plt.xlabel('Time (s)')
-        plt.ylabel('Acceleration (g)')#$(m/s^2)$')
-        #plt.xlim(0,5) # Zoom en el rango de periodos de interés
-        plt.fill_between(timeVals,nodeAcc,alpha=0.1)
-        plt.grid(True)
-        plt.show()
-'''
-    
-
-
-    
 
 
 
