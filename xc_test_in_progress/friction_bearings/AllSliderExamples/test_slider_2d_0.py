@@ -195,7 +195,7 @@ bearingRecorder2.setElements(xc.ID([bearing.tag]))
 callbackRecord= ""
 getTimeStr= "time= self.getDomain.getTimeTracker.getCurrentTime;\n"
 callbackRecord+= getTimeStr
-getForceStr= "force= self.getNodeResistingForceIncInertiaByTag("+str(n2.tag)+");\n"
+getForceStr= "self.getResistingForce(); force= self.getNodeResistingForceIncInertiaByTag("+str(n2.tag)+");\n"
 callbackRecord+= getForceStr
 appendForceStr= "bearingForces2.append((time,force));\n"
 callbackRecord+= appendForceStr
@@ -267,6 +267,28 @@ if(not silent):
     t, velocities= zip(*bearingVelocities)
     t, frictionForces= zip(*bearingFrictionForces)
     t, COFs= zip(*bearingCOFs)
+    magnitudes= [forces, deformations, velocities, normalForces, frictionForces, COFs]
+    titles= ['Bearing forces', 'Bearing deformations', 'Bearing velocities', 'Bearing normal forces', 'Bearing friction forces', 'Bearing COF']
+    colors= ["tab:red", "tab:green", "tab:blue"]
+    for values, title in zip(magnitudes, titles):
+        fig, axes = plt.subplots(3, 1, figsize=(9, 9), sharex=True)
+        if(isinstance(values[0], float)):
+            sz= 1
+        else:
+            sz= len(values[0])
+        for dof in range(0, sz):
+            if(sz==1):
+                values_dof= values
+            else:
+                values_dof= [v[dof] for v in values]
+            axes[dof].plot(t, values_dof, lw=0.7, color=colors[dof])
+            axes[dof].set_ylabel("DOF: "+str(dof))
+            if(dof==0):
+                axes[0].set_title(title)
+            axes[dof].set_xlabel("Time (s)")
+        fig.tight_layout()
+        plt.show()
+        
 
     
     # print(bearingVelocities)
