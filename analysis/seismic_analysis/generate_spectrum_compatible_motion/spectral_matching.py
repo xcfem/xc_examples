@@ -578,7 +578,10 @@ def write_result(result, timeStep:float, dampingRatio, tol, outputPrefix:str):
     np.savetxt(f"{outputPrefix}_disp.csv",
                np.column_stack([result.t, result.disp]),
                delimiter=",", header="time_s,disp", comments="")
-
+    np.savetxt(f"{outputPrefix}_spec.csv",
+               np.column_stack([result.periods, result.target_Sa]),
+               delimiter=",", header="time_s,Sa_g", comments="")
+    
     pga= result.getPGA()
     pgv= result.getPGV()
     pgd= result.getPGD()
