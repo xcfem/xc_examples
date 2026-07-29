@@ -1,0 +1,332 @@
+#!/usr/bin/env python
+''' Dummy FlatSiderSimple2d adapted from TestSlider2d_0.tcl
+
+Purpose: this file tests the 2D flatSliderBearing or the singleFPBearing 
+element. It models a rigid isolated mass and the bearing element has zero 
+length. It also tests the different friction models.
+
+Original Copyright:
+# Written: Andreas Schellenberg (andreas.schellenberg@gmail.com)
+# Created: 02/09
+'''
+
+import math
+import xc
+from materials import typical_materials
+from model import predefined_spaces
+from solution import predefined_solutions
+from model import friction_models as fm
+from materials import friction_bearings as fb
+import tabulate
+
+# Problem type
+# Model definition
+feProblem= xc.FEProblem()
+preprocessor=  feProblem.getPreprocessor
+nodeHandler= preprocessor.getNodeHandler
+modelSpace= predefined_spaces.StructuralMechanics2D(nodeHandler)
+
+
+# 1. Define geometry for model
+g= 32.174*12.0
+P= 18.0
+#set mass [expr $P/$g]
+mass= P/g
+
+# 2. Define nodes (zero-height bearing at coordinates x=0, y=0)
+n1= modelSpace.newNode(0,0)
+n2= modelSpace.newNode(0,0)
+n2.mass= xc.Matrix([[mass, 0.0, 0.0],[0.0, mass, 0.0], [0.0, 0.0, 0.0]])
+
+# 3. Constraints.
+modelSpace.fixNode('000', n1.tag)
+modelSpace.fixNode('FF0', n2.tag)
+
+# 4. Define materials.
+mv= 1.0*mass
+kv= 7500.0
+zetaVertical= 0.02
+cv= 2.0*zetaVertical*math.sqrt(kv*mv)
+## Vertical response.
+vertResp= typical_materials.defElasticMaterial(preprocessor, name= "vertResp", E= kv, eta= cv)
+## Rotational response.
+rotResp= typical_materials.defElasticMaterial(preprocessor, name= "rotResp", E= 0.0)
+
+# 4. Define friction model (coefficient of friction = 0.163)
+frictionModel= fm.def_coulomb_friction_model(preprocessor, name= "frictionModel", mu= .163)
+
+'''
+# frictionModel VelDependent tag muSlow muFast transRate
+frictionModel VelDependent 1 0.085 0.163 0.77
+
+# frictionModel VelPressureDep tag muSlow muFast0 A deltaMu alpha transRate
+frictionModel VelPressureDep 1 0.085 0.163 7.0686 0.05 0.08 0.77
+
+# frictionModel VelDepMultiLinear tag -vel velocityPoints -frn frictionPoints
+frictionModel VelDepMultiLinear 1  -vel 0.0 2.0 8.0 10.0  -frn 0.085 0.150 0.163 0.163
+'''
+
+# 5. Define elements
+bearing= fb.def_flat_slider_bearing_2d(modelSpace, n1= n1, n2= n2, frictionModel= frictionModel, vertResp= vertResp, rotResp= rotResp, kInit= 250.0, x= xc.Vector([0,1,0]), y= xc.Vector([-1,0,0]))
+
+'''
+# element singleFPBearing eleTag NodeI NodeJ frnMdlTag R kInit -P matTag -Mz matTag <-orient x1 x2 x3 y1 y2 y3> <-shearDist sDratio> <-doRayleigh> <-mass m> <-iter maxIter tol>
+element singleFPBearing 1 1 2 1 34.68 250.0 -P 1 -Mz 2 -orient 0 1 0 -1 0 0
+
+# element RJWatsonEqsBearing eleTag NodeI NodeJ frnMdlTag kInit k2 k3 mu -P matTag -Mz matTag <-orient x1 x2 x3 y1 y2 y3> <-shearDist sDratio> <-doRayleigh> <-mass m> <-iter maxIter tol>
+element RJWatsonEqsBearing 1 1 2 1 250.0 0.519 0.0 3.0 -P 1 -Mz 2 -orient 0 1 0 -1 0 0
+'''
+
+# 6. Define gravity loads
+## Create a Plain load pattern with a Linear TimeSeries
+lts= modelSpace.newTimeSeries(name= 'lts', tsType= 'linear_ts')
+glp= modelSpace.newLoadPattern(name= 'glp', setCurrent= True)
+## Create nodal loads at nodes 3 & 4
+glp.newNodalLoad(n2.tag, xc.Vector([0,-P,0]))
+modelSpace.addLoadCaseToDomain(glp.name)
+
+# 7. Solution procedure.
+numSteps= 10
+solProc= predefined_solutions.PlainNewtonRaphsonBandGen(feProblem, maxNumIter= 10, convergenceTestTol= 1e-12, printFlag= 0, numSteps= numSteps, numberingMethod= 'rcm', convTestType= 'norm_disp_incr_conv_test')
+solProc.setup()
+integrator= solProc.getIntegrator()
+integrator.dLambda1= .1
+analysis= solProc.getAnalysis()
+
+# 8. Define recorders.
+## Record n2 node displacements.
+domain= modelSpace.getDomain()
+n2Disp= list()
+recN2Disp= domain.newRecorder("node_prop_recorder",None)
+recN2Disp.setNodes(xc.ID([n2.tag]))
+recN2Disp.callbackRecord= "n2Disp.append((self.getDomain.getTimeTracker.getCurrentTime,self.getDisp))"
+## Record forces at the bearing.
+bearingForces= list()
+bearingRecorder= domain.newRecorder("element_prop_recorder",None)
+bearingRecorder.setElements(xc.ID([bearing.tag]))
+bearingRecorder.callbackRecord= "bearingForces.append((self.getDomain.getTimeTracker.getCurrentTime,self.getNodeResistingForceIncInertiaByTag("+str(n2.tag)+")))"
+
+# 9. Perform the gravity analysis.
+analysis.analyze(10)
+## Set the gravity loads to be constant & reset the time in the domain
+modelSpace.setLoadConstant(t= 0.0)
+print('Gravity analysis completed.')
+#remove recorders
+domain.removeRecorders()
+
+# 10. Perform an eigenvalue analysis-
+analysis= predefined_solutions.frequency_analysis(feProblem)
+analOk= analysis.analyze(2) # Compute 2 eigenvalues.
+eigenvalues= analysis.getEigenvalues()
+eigenvaluesTable= list([['Eigenvalues at start of transient'],
+                        ["lambda","omega","period","frequency"]])
+for lambdA in eigenvalues:
+    omega= math.sqrt(lambdA)
+    period= 2*math.pi/omega
+    freq= 1/period
+    eigenvaluesTable.append(["{:.3e}".format(lambdA), "{:.4f}".format(omega), "{:.4f}".format(period), "{:.4f}".format(freq)])
+print(tabulate.tabulate(eigenvaluesTable))
+    
+# 11. Define dynamic loads.
+## Read the excitation data.
+# pth= os.path.dirname(__file__)
+# if(not pth):
+#   pth= "."
+# horizAccelFilePath= pth+'/../../aux/load_patterns/ground_motions/SCS052.AT2'
+horizAccelFilePath= './SCS052.AT2'
+vertAccelFilePath= './SCSUP.AT2'
+
+horizAccelValues= list()
+with open(horizAccelFilePath, 'r') as f:
+    for line in f:
+        values= line.rstrip().split()
+        for v in values:
+            horizAccelValues.append(float(v))
+vertAccelValues= list()
+with open(vertAccelFilePath, 'r') as f:
+    for line in f:
+        values= line.rstrip().split()
+        for v in values:
+            vertAccelValues.append(float(v))
+            
+dt= .005 # Time step for the excitation sample.
+scale= 1.0 #.max.=(1.7)
+## Create horizontal acceleration load pattern.
+horizGM= modelSpace.newUniformExcitation(name= "horizGM", dof= 0, path= horizAccelValues, dt= dt, cod_ts= 'horizAccel', factor= g*scale, vel0= 0.0)
+modelSpace.addLoadCaseToDomain(horizGM.name)
+vertGM= modelSpace.newUniformExcitation(name= "vertGM", dof= 1, path= vertAccelValues, dt= dt, cod_ts= 'vertAccel', factor= g*scale, vel0= 0.0)
+modelSpace.addLoadCaseToDomain(vertGM.name)
+
+## Set the Rayleigh damping factors for nodes & elements.
+alphaM= 0.05 # mass proportional damping.
+betaK= 0.0 # current stiffness proportional damping.
+betaKinit= 0.0 # initial stiffness proportional damping.
+betaKcomm=  0.0 # commited stiffness proportional damping.
+rayleigh= xc.RayleighDampingFactors(alphaM, betaK, betaKinit, betaKcomm)
+domain.setRayleighDampingFactors(rayleigh)
+
+# 12. Define new recorders.
+## Record n2 node displacements, velocities and accelerations.
+domain= modelSpace.getDomain()
+n2Disp2= list()
+recN2Disp2= domain.newRecorder("node_prop_recorder", None)
+recN2Disp2.setNodes(xc.ID([n2.tag]))
+recN2Disp2.callbackRecord= "n2Disp2.append((self.getDomain.getTimeTracker.getCurrentTime,self.getDisp))"
+n2Vel2= list()
+recN2Vel2= domain.newRecorder("node_prop_recorder", None)
+recN2Vel2.setNodes(xc.ID([n2.tag]))
+recN2Vel2.callbackRecord= "n2Vel2.append((self.getDomain.getTimeTracker.getCurrentTime,self.getVel))"
+n2Accel2= list()
+recN2Accel2= domain.newRecorder("node_prop_recorder", None)
+recN2Accel2.setNodes(xc.ID([n2.tag]))
+recN2Accel2.callbackRecord= "n2Accel2.append((self.getDomain.getTimeTracker.getCurrentTime,self.getAccel))"
+## Record forces at the bearing.
+bearingForces2= list()
+basicDeformations= list()
+bearingNormalForces= list()
+bearingVelocities= list()
+bearingFrictionForces= list()
+bearingCOFs= list()
+bearingRecorder2= domain.newRecorder("element_prop_recorder",None)
+bearingRecorder2.setElements(xc.ID([bearing.tag]))
+callbackRecord= ""
+getTimeStr= "time= self.getDomain.getTimeTracker.getCurrentTime;\n"
+callbackRecord+= getTimeStr
+getForceStr= "force= self.getNodeResistingForceIncInertiaByTag("+str(n2.tag)+");\n"
+callbackRecord+= getForceStr
+appendForceStr= "bearingForces2.append((time,force));\n"
+callbackRecord+= appendForceStr
+# Get basic deformation.
+getBasicDeformationStr= "ub= self.ub;\n"
+callbackRecord+= getBasicDeformationStr
+appendUbStr= "basicDeformations.append((time,ub));\n"
+callbackRecord+= appendUbStr
+# Friction model.
+getFrictionModelStr= "fm= self.frictionModels[0];\n"
+callbackRecord+= getFrictionModelStr
+# Normal force.
+getNormalForceStr= "N= fm.trialN;\n" 
+callbackRecord+= getNormalForceStr
+appendNormalForceStr= "bearingNormalForces.append((time,N));\n"
+callbackRecord+= appendNormalForceStr
+# Velocity.
+getVelStr= "V= fm.trialVel;\n" 
+callbackRecord+= getVelStr
+appendVelocityStr= "bearingVelocities.append((time,V));\n"
+callbackRecord+= appendVelocityStr
+# Friction force.
+getFrictionForceStr= "ff= fm.frictionForce;\n"
+callbackRecord+= getFrictionForceStr
+appendFrictionForceStr= "bearingFrictionForces.append((time,ff));\n"
+callbackRecord+= appendFrictionForceStr
+# Coefficient of friction.
+getCOFStr= "COF= fm.mu;\n" 
+callbackRecord+= getCOFStr
+appendCOFStr= "bearingCOFs.append((time,COF));\n"
+callbackRecord+= appendCOFStr
+# print(callbackRecord)
+bearingRecorder2.callbackRecord= callbackRecord
+
+numberOfSteps= max(len(horizAccelValues), len(vertAccelValues))
+print(numberOfSteps)
+print(dt)
+transientSolProc= predefined_solutions.PlainNewmarkNewtonRaphson(feProblem, numSteps= numberOfSteps, timeStep= dt, gamma= 0.5, beta= 0.25, maxNumIter= 25, convergenceTestTol= 1e-12, printFlag= 1)
+if(transientSolProc.solve()!=0):
+    lmsg.error('Dynamic analysis failed.')
+    quit()
+
+print(bearingCOFs)
+'''
+
+
+
+# ------------------------------
+# Start of analysis generation
+# ------------------------------
+# ------------------------------
+# Finally perform the analysis
+# ------------------------------
+#logFile "TestSlider2d_0.log"
+logFile."TestSlider2d_0.log"#
+
+#set dtAna [expr $dt/1.0]
+dtAna= dt/1.0
+#set dtMin 1.0e-8
+dtMin= 1.0e-8
+#set dtMax $dtAna
+dtMax= dtAna()
+
+#
+
+#set ok 0;
+ok= 0
+#set tFinal [expr $npts * $dt]
+tFinal= npts*dt()
+
+#set tCurrent [getTime "%1.12E"]
+tCurrent= getTime."%1.12E"
+#
+
+#record
+record()
+#while {$ok == 0 && $tCurrent < $tFinal} {
+while.ok.==(0, &&.tCurrent.<.tFinal)
+#
+
+#set ok [analyze 1 $dtAna]
+ok= analyze(1, dtAna)
+
+#
+
+#if {$ok != 0} {
+if.ok.!=(0)
+#if {[expr $dtAna/2.0] >= $dtMin} {
+if.dtAna/2.0.>=.dtMin()
+#set dtAna [expr $dtAna/2.0]
+dtAna= dtAna/2.0
+#puts [format "\nREDUCING time step size (dtNew= %1.6e)" $dtAna]
+puts.format."\nREDUCING.time.step.size.(dtNew.=.%1.6e)".dtAna()
+#set ok 0
+ok= 0
+#}
+ 
+#} else {
+else()
+#set tCurrent [getTime "%1.12E"]
+tCurrent= getTime."%1.12E"
+#puts [format "t= %1.4f sec" $tCurrent]
+puts.format."t.=.%1.4f.sec".tCurrent()
+#if {[expr $dtAna*2.0] <= $dtMax} {
+if.dtAna*2.0.<=.dtMax()
+#set dtAna [expr $dtAna*2.0]
+dtAna= dtAna*2.0
+#puts [format "\nINCREASING time step size (dtNew= %1.6e)" $dtAna]
+puts.format."\nINCREASING.time.step.size.(dtNew.=.%1.6e)".dtAna()
+#}
+ 
+#}
+ 
+#}
+ 
+#
+
+#if {$ok != 0} {
+if.ok.!=(0)
+#puts [format "\nModel failed (time= %1.3e)" $tCurrent]
+puts.format."\nModel.failed.(time.=.%1.3e)".tCurrent()
+#} else {
+else()
+#puts [format "\nResponse-history analysis completed"]
+puts.format."\nResponse-history.analysis.completed"()
+#}
+ 
+#
+
+#wipe
+wipe()
+#exit
+exit()
+# --------------------------------
+# End of analysis
+# --------------------------------
+'''
