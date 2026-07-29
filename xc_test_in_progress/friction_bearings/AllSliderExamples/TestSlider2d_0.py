@@ -26,6 +26,7 @@ preprocessor=  feProblem.getPreprocessor
 nodeHandler= preprocessor.getNodeHandler
 modelSpace= predefined_spaces.StructuralMechanics2D(nodeHandler)
 
+silent= False
 
 # 1. Define geometry for model
 g= 32.174*12.0
@@ -110,7 +111,8 @@ bearingRecorder.callbackRecord= "bearingForces.append((self.getDomain.getTimeTra
 analysis.analyze(10)
 ## Set the gravity loads to be constant & reset the time in the domain
 modelSpace.setLoadConstant(t= 0.0)
-print('Gravity analysis completed.')
+if(not silent):
+    print('Gravity analysis completed.')
 #remove recorders
 domain.removeRecorders()
 
@@ -125,7 +127,8 @@ for lambdA in eigenvalues:
     period= 2*math.pi/omega
     freq= 1/period
     eigenvaluesTable.append(["{:.3e}".format(lambdA), "{:.4f}".format(omega), "{:.4f}".format(period), "{:.4f}".format(freq)])
-print(tabulate.tabulate(eigenvaluesTable))
+if(not silent):
+    print(tabulate.tabulate(eigenvaluesTable))
     
 # 11. Define dynamic loads.
 ## Read the excitation data.
@@ -182,7 +185,7 @@ recN2Accel2.setNodes(xc.ID([n2.tag]))
 recN2Accel2.callbackRecord= "n2Accel2.append((self.getDomain.getTimeTracker.getCurrentTime,self.getAccel))"
 ## Record forces at the bearing.
 bearingForces2= list()
-basicDeformations= list()
+bearingBasicDeformations= list()
 bearingNormalForces= list()
 bearingVelocities= list()
 bearingFrictionForces= list()
@@ -199,7 +202,7 @@ callbackRecord+= appendForceStr
 # Get basic deformation.
 getBasicDeformationStr= "ub= self.ub;\n"
 callbackRecord+= getBasicDeformationStr
-appendUbStr= "basicDeformations.append((time,ub));\n"
+appendUbStr= "bearingBasicDeformations.append((time,ub));\n"
 callbackRecord+= appendUbStr
 # Friction model.
 getFrictionModelStr= "fm= self.frictionModels[0];\n"
@@ -227,106 +230,45 @@ callbackRecord+= appendCOFStr
 # print(callbackRecord)
 bearingRecorder2.callbackRecord= callbackRecord
 
+
 numberOfSteps= max(len(horizAccelValues), len(vertAccelValues))
-print(numberOfSteps)
-print(dt)
-transientSolProc= predefined_solutions.PlainNewmarkNewtonRaphson(feProblem, numSteps= numberOfSteps, timeStep= dt, gamma= 0.5, beta= 0.25, maxNumIter= 25, convergenceTestTol= 1e-12, printFlag= 1)
+transientSolProc= predefined_solutions.PlainNewmarkNewtonRaphson(feProblem, numSteps= numberOfSteps, timeStep= dt, gamma= 0.5, beta= 0.25, maxNumIter= 25, convergenceTestTol= 1e-12, printFlag= 0)
 if(transientSolProc.solve()!=0):
     lmsg.error('Dynamic analysis failed.')
     quit()
 
-print(bearingCOFs)
-'''
+if(not silent):
+    import matplotlib
+    # matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    # Get node 2 motion.
+    t, accel= zip(*n2Accel2)
+    t, vel= zip(*n2Vel2)
+    t, disp= zip(*n2Disp2)
+    for dof in [0, 1, 2]:
+        accel_dof= [a[dof] for a in accel]
+        vel_dof= [v[dof] for v in vel]
+        disp_dof= [d[dof] for d in disp]
+        fig, axes = plt.subplots(3, 1, figsize=(9, 9), sharex=True)
+        axes[0].plot(t, accel_dof, lw=0.7, color="tab:blue")
+        axes[0].set_ylabel("Acceleration")
+        axes[0].set_title("Node 2 motion DOF: "+str(dof))
+        axes[1].plot(t, vel_dof, lw=0.7, color="tab:orange")
+        axes[1].set_ylabel("Velocity")
+        axes[2].plot(t, disp_dof, lw=0.7, color="tab:green")
+        axes[2].set_ylabel("Displacement")
+        axes[2].set_xlabel("Time (s)")
+        fig.tight_layout()
+        plt.show()
+    # Get bearing results.
+    t, forces= zip(*bearingForces2)
+    t, deformations= zip(*bearingBasicDeformations)
+    t, normalForces= zip(*bearingNormalForces)
+    t, velocities= zip(*bearingVelocities)
+    t, frictionForces= zip(*bearingFrictionForces)
+    t, COFs= zip(*bearingCOFs)
 
+    
+    # print(bearingVelocities)
 
-
-# ------------------------------
-# Start of analysis generation
-# ------------------------------
-# ------------------------------
-# Finally perform the analysis
-# ------------------------------
-#logFile "TestSlider2d_0.log"
-logFile."TestSlider2d_0.log"#
-
-#set dtAna [expr $dt/1.0]
-dtAna= dt/1.0
-#set dtMin 1.0e-8
-dtMin= 1.0e-8
-#set dtMax $dtAna
-dtMax= dtAna()
-
-#
-
-#set ok 0;
-ok= 0
-#set tFinal [expr $npts * $dt]
-tFinal= npts*dt()
-
-#set tCurrent [getTime "%1.12E"]
-tCurrent= getTime."%1.12E"
-#
-
-#record
-record()
-#while {$ok == 0 && $tCurrent < $tFinal} {
-while.ok.==(0, &&.tCurrent.<.tFinal)
-#
-
-#set ok [analyze 1 $dtAna]
-ok= analyze(1, dtAna)
-
-#
-
-#if {$ok != 0} {
-if.ok.!=(0)
-#if {[expr $dtAna/2.0] >= $dtMin} {
-if.dtAna/2.0.>=.dtMin()
-#set dtAna [expr $dtAna/2.0]
-dtAna= dtAna/2.0
-#puts [format "\nREDUCING time step size (dtNew= %1.6e)" $dtAna]
-puts.format."\nREDUCING.time.step.size.(dtNew.=.%1.6e)".dtAna()
-#set ok 0
-ok= 0
-#}
- 
-#} else {
-else()
-#set tCurrent [getTime "%1.12E"]
-tCurrent= getTime."%1.12E"
-#puts [format "t= %1.4f sec" $tCurrent]
-puts.format."t.=.%1.4f.sec".tCurrent()
-#if {[expr $dtAna*2.0] <= $dtMax} {
-if.dtAna*2.0.<=.dtMax()
-#set dtAna [expr $dtAna*2.0]
-dtAna= dtAna*2.0
-#puts [format "\nINCREASING time step size (dtNew= %1.6e)" $dtAna]
-puts.format."\nINCREASING.time.step.size.(dtNew.=.%1.6e)".dtAna()
-#}
- 
-#}
- 
-#}
- 
-#
-
-#if {$ok != 0} {
-if.ok.!=(0)
-#puts [format "\nModel failed (time= %1.3e)" $tCurrent]
-puts.format."\nModel.failed.(time.=.%1.3e)".tCurrent()
-#} else {
-else()
-#puts [format "\nResponse-history analysis completed"]
-puts.format."\nResponse-history.analysis.completed"()
-#}
- 
-#
-
-#wipe
-wipe()
-#exit
-exit()
-# --------------------------------
-# End of analysis
-# --------------------------------
-'''
+    
