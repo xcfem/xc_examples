@@ -153,3 +153,14 @@ TAGS
 *.mtc*
 *.toc
 *.maf
+
+# Emacs
+\#*#
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
