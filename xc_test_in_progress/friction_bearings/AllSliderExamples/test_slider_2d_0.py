@@ -10,6 +10,8 @@ Original Copyright:
 # Created: 02/09
 '''
 
+import os
+import json
 import math
 import xc
 from materials import typical_materials
@@ -26,12 +28,11 @@ preprocessor=  feProblem.getPreprocessor
 nodeHandler= preprocessor.getNodeHandler
 modelSpace= predefined_spaces.StructuralMechanics2D(nodeHandler)
 
-silent= False
+silent= True # True
 
 # 1. Define geometry for model
-g= 32.174*12.0
+g= 32.174*12.0 # 12*ft/s^2= in/s^2
 P= 18.0
-#set mass [expr $P/$g]
 mass= P/g
 
 # 2. Define nodes (zero-height bearing at coordinates x=0, y=0)
@@ -55,6 +56,7 @@ rotResp= typical_materials.defElasticMaterial(preprocessor, name= "rotResp", E= 
 
 # 4. Define friction model (coefficient of friction = 0.163)
 frictionModel= fm.def_coulomb_friction_model(preprocessor, name= "frictionModel", mu= .163)
+
 
 '''
 # frictionModel VelDependent tag muSlow muFast transRate
@@ -184,6 +186,7 @@ recN2Accel2= domain.newRecorder("node_prop_recorder", None)
 recN2Accel2.setNodes(xc.ID([n2.tag]))
 recN2Accel2.callbackRecord= "n2Accel2.append((self.getDomain.getTimeTracker.getCurrentTime,self.getAccel))"
 ## Record forces at the bearing.
+ti= list()
 bearingForces2= list()
 bearingBasicDeformations= list()
 bearingNormalForces= list()
@@ -192,50 +195,76 @@ bearingFrictionForces= list()
 bearingCOFs= list()
 bearingRecorder2= domain.newRecorder("element_prop_recorder",None)
 bearingRecorder2.setElements(xc.ID([bearing.tag]))
-callbackRecord= ""
-getTimeStr= "time= self.getDomain.getTimeTracker.getCurrentTime;\n"
-callbackRecord+= getTimeStr
-getForceStr= "self.getResistingForce(); force= self.getNodeResistingForceIncInertiaByTag("+str(n2.tag)+");\n"
-callbackRecord+= getForceStr
-appendForceStr= "bearingForces2.append((time,force));\n"
-callbackRecord+= appendForceStr
-# Get basic deformation.
-getBasicDeformationStr= "ub= self.ub;\n"
-callbackRecord+= getBasicDeformationStr
-appendUbStr= "bearingBasicDeformations.append((time,ub));\n"
-callbackRecord+= appendUbStr
-# Friction model.
-getFrictionModelStr= "fm= self.frictionModels[0];\n"
-callbackRecord+= getFrictionModelStr
-# Normal force.
-getNormalForceStr= "N= fm.trialN;\n" 
-callbackRecord+= getNormalForceStr
-appendNormalForceStr= "bearingNormalForces.append((time,N));\n"
-callbackRecord+= appendNormalForceStr
-# Velocity.
-getVelStr= "V= fm.trialVel;\n" 
-callbackRecord+= getVelStr
-appendVelocityStr= "bearingVelocities.append((time,V));\n"
-callbackRecord+= appendVelocityStr
-# Friction force.
-getFrictionForceStr= "ff= fm.frictionForce;\n"
-callbackRecord+= getFrictionForceStr
-appendFrictionForceStr= "bearingFrictionForces.append((time,ff));\n"
-callbackRecord+= appendFrictionForceStr
-# Coefficient of friction.
-getCOFStr= "COF= fm.mu;\n" 
-callbackRecord+= getCOFStr
-appendCOFStr= "bearingCOFs.append((time,COF));\n"
-callbackRecord+= appendCOFStr
-# print(callbackRecord)
+callbackRecord= '''
+time= self.getDomain.getTimeTracker.getCurrentTime
+ti.append(time)
+self.getResistingForce(); force= self.getNodeResistingForceIncInertiaByTag(1).getList()
+bearingForces2.append(force)
+ub= self.ub.getList()
+bearingBasicDeformations.append(ub)
+fm= self.frictionModels[0]
+N= fm.trialN
+bearingNormalForces.append(N)
+V= fm.trialVel
+bearingVelocities.append(V)
+ff= fm.frictionForce
+bearingFrictionForces.append(ff)
+COF= fm.mu
+bearingCOFs.append(COF)
+'''
 bearingRecorder2.callbackRecord= callbackRecord
-
 
 numberOfSteps= max(len(horizAccelValues), len(vertAccelValues))
 transientSolProc= predefined_solutions.PlainNewmarkNewtonRaphson(feProblem, numSteps= numberOfSteps, timeStep= dt, gamma= 0.5, beta= 0.25, maxNumIter= 25, convergenceTestTol= 1e-12, printFlag= 0)
 if(transientSolProc.solve()!=0):
     lmsg.error('Dynamic analysis failed.')
     quit()
+
+
+# 13. Store bearing results in a dictionary.
+results= {'t': ti,
+          'forces': bearingForces2,
+          'deformations': bearingBasicDeformations,
+          'normalForces': bearingNormalForces,
+          'velocities': bearingVelocities,
+          'frictionForces': bearingFrictionForces,
+          'COFs': bearingCOFs}
+refFilePath= './' # pth+"/../../aux/reference_files/"
+fname= os.path.basename(__file__)
+jsonFileName= refFilePath+'/ref_'+fname.replace('.py', '.json')
+# # Save output as reference.
+# with open(jsonFileName, 'w') as f:
+#     json.dump(results, f)
+
+# Check results.
+## Load reference values.
+with open(jsonFileName, 'r') as f:
+     ref_results= json.load(f)
+     
+## 14. Compare results.
+err= 0.0
+tol= 1e-8
+for key in ref_results:
+    ref_values= ref_results[key]
+    values= results[key]
+    error= (len(values)-len(ref_values))**2
+    if(error<tol):
+        for v, v_ref in zip(values, ref_values):
+            if(isinstance(v, float)):
+                error+=(v-v_ref)**2
+            else:
+                for vi, vi_ref in zip(v, v_ref):
+                    error+=(vi-vi_ref)**2
+error= math.sqrt(error)
+
+if(not silent):
+    print('error= ', error)
+
+from misc_utils import log_messages as lmsg
+if error<tol:
+    print('test '+fname+': ok.')
+else:
+    lmsg.error(fname+' ERROR.')
 
 if(not silent):
     import matplotlib
@@ -261,19 +290,23 @@ if(not silent):
         fig.tight_layout()
         plt.show()
     # Get bearing results.
-    t, forces= zip(*bearingForces2)
-    t, deformations= zip(*bearingBasicDeformations)
-    t, normalForces= zip(*bearingNormalForces)
-    t, velocities= zip(*bearingVelocities)
-    t, frictionForces= zip(*bearingFrictionForces)
-    t, COFs= zip(*bearingCOFs)
-    magnitudes= [forces, deformations, velocities, normalForces, frictionForces, COFs]
-    titles= ['Bearing forces', 'Bearing deformations', 'Bearing velocities', 'Bearing normal forces', 'Bearing friction forces', 'Bearing COF']
+    t= ti
+    forces= bearingForces2
+    deformations= bearingBasicDeformations
+    normalForces= bearingNormalForces
+    velocities= bearingVelocities
+    frictionForces= bearingFrictionForces
+    COFs= bearingCOFs
     colors= ["tab:red", "tab:green", "tab:blue"]
+    magnitudes= [forces, deformations]
+    titles= ['Bearing forces', 'Bearing deformations']
+    units= ['ozf', '']
     for values, title in zip(magnitudes, titles):
         fig, axes = plt.subplots(3, 1, figsize=(9, 9), sharex=True)
         if(isinstance(values[0], float)):
             sz= 1
+            print(title, 'does not belong here')
+            continue
         else:
             sz= len(values[0])
         for dof in range(0, sz):
@@ -288,9 +321,19 @@ if(not silent):
             axes[dof].set_xlabel("Time (s)")
         fig.tight_layout()
         plt.show()
-        
-
-    
-    # print(bearingVelocities)
+    magnitudes= [velocities, normalForces, frictionForces, COFs]
+    titles= ['Bearing velocities', 'Bearing normal forces', 'Bearing friction forces', 'Bearing COF']
+    units= ['in/s', 'ozf', 'ozf', '']
+    for values, title, unit in zip(magnitudes, titles, units):
+        plt.figure(figsize=(15,3))
+        plt.plot(t, values)
+        plt.title(title)
+        plt.ylabel(unit, {'size':14})
+        plt.xlabel('Time (s)', {'fontstyle':'italic','size':13})
+        plt.grid()
+        plt.yticks(fontsize= 14)
+        plt.xticks(fontsize= 14)
+        #plt.xlim([0.0, values[-1]]);
+        plt.show()
 
     
