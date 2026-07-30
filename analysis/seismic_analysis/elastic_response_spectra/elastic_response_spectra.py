@@ -187,7 +187,7 @@ if(not silent):
     plt.plot(el_centro_raw[:,0], el_centro_raw[:,1], color='k')
 
     plt.ylabel('$\\ddot{d_g} (g)$', {'size':14})
-    plt.xlabel('Time (sec)', {'fontstyle':'italic','size':13})
+    plt.xlabel('Time (s)', {'fontstyle':'italic','size':13})
 
     plt.grid()
     plt.yticks(fontsize= 14)
@@ -202,7 +202,7 @@ if(not silent):
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
     plt.ylabel('Relative displacement (cm)', {'fontstyle':'italic','size':14})
-    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (s)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()
     plt.yticks(fontsize = 14)
@@ -217,8 +217,8 @@ if(not silent):
     [plt.plot(data_frame[z]['T'], data_frame[z]['SV'],
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
-    plt.ylabel('Relative velocity (cm/sec)', {'fontstyle':'italic','size':14})
-    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.ylabel('Relative velocity (cm/s)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (s)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()
     plt.yticks(fontsize = 14)
@@ -234,7 +234,7 @@ if(not silent):
               label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
     plt.ylabel('Absolute acceleration (g)', {'fontstyle':'italic','size':14})
-    plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+    plt.xlabel('Period (s)', {'fontstyle':'italic','size':14})
     plt.legend()
     plt.grid()
     plt.yticks(fontsize = 14)
