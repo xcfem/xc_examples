@@ -122,9 +122,9 @@ zeta_list= np.array([0.02, 0.03, 0.05])
 
 # Base units
 cm= 1.0
-sec= 1.0
+s= 1.0
 # Gravitational constant
-g= 981*cm/sec**2
+g= 981*cm/s**2
 
 # Use nested loops to analyse the system for various damping ratios and periods.
 data_frame = dict()
