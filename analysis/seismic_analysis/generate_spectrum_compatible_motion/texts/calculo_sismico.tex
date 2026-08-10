@@ -1,0 +1,51 @@
+\documentclass[spanish, a4paper,twoside]{xc_report}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{pdfpages}
+\usepackage[font=small]{caption}
+\usepackage{multicol}
+\usepackage{subcaption}
+
+\author{XC ingeniería estructural}
+\date{\today}
+\renewcommand{\revision}{0.0}
+\title{Cálculo sísmico}
+\setcounter{tocdepth}{3}
+\begin{document}
+
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+  
+Se emplean, como en el proyecto base, acelerogramas generados artificialmente, que resultan compatibles con el espectro definido en UNE-EN 1998-1\S3.3.1.4.2 en el emplazamiento de la estructura, para un amortiguamiento del 5\%.
+
+El procediemiento empleado es el siguiente:
+\begin{enumerate}
+\item Obtención espectro de respuesta elástico acorde al anejo nacional de UNE EN 1998-1
+\item Conforme a UNE-EN 1998-2\S3.2.3(1)P se generan artificialmente tres pares de acelerogramas de cada tipo; en el apéndice \ref{scc:accel_spectr_horiz} se pueden consultar los correspondientes a la aceleración horizontal y en el \ref{scc:accel_spectr_vert} los de la vertical.
+\item Para garantizar la consistencia de estos acelerogramas con el espectro de respuesta elásticos se escala la amplitud del movimiento empleando el siguiente procedimiento:
+  \begin{enumerate}
+    \item Para cada par de acelerogramas se determina el espectro que corresponde a cada uno de ellos y el espectro SRSS del par tomando, como aceleración de éste, la raíz cuadrada de la suma de los cuadrados (SRSS) de las aceleraciones del espectro de cada componente (ver apéndice \ref{scc:spect_SRSS})
+    
+  \end{enumerate}
+  
+
+\end{enumerate}
+
+%\portadilla{Apéndices.}
+\clearpage
+\appendix
+
+\section{Acelerogramas sintéticos y espectros de respuesta horizontal}\label{scc:accel_spectr_horiz}
+\input{figs_horizontal_motion.tex}
+\clearpage
+\section{Acelerogramas sintéticos y espectros de respuesta vertical}\label{scc:accel_spectr_vert}
+\input{figs_vertical_motion.tex}
+\clearpage
+\begin{multicols}{2}
+  \section{Espectros SRSS}\label{scc:spect_SRSS}
+  \input{figs_horiz_spectra_SRSS}
+\end{multicols}
+\end{document}
+
