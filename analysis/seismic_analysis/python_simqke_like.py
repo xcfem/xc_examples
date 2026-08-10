@@ -75,7 +75,7 @@ plt.figure(figsize=(15,3))
 plt.plot(t, aceleracion, color='k')
 
 plt.ylabel('$\\ddot{d_g} (g)$', {'size':14})
-plt.xlabel('Time (sec)', {'fontstyle':'italic','size':13})
+plt.xlabel('Time (s)', {'fontstyle':'italic','size':13})
 
 plt.grid()
 plt.yticks(fontsize= 14)
@@ -122,7 +122,7 @@ plt.figure(figsize=(14,5))
           label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
 plt.ylabel('Relative acceleration (g)', {'fontstyle':'italic','size':14})
-plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+plt.xlabel('Period (s)', {'fontstyle':'italic','size':14})
 plt.legend()
 plt.grid()
 plt.yticks(fontsize = 14)
@@ -138,7 +138,7 @@ plt.figure(figsize=(14,5))
           label=('$\\zeta$ = '+str(z))) for z in zeta_list]
 
 plt.ylabel('True acceleration (g)', {'fontstyle':'italic','size':14})
-plt.xlabel('Period (sec)', {'fontstyle':'italic','size':14})
+plt.xlabel('Period (s)', {'fontstyle':'italic','size':14})
 plt.legend()
 plt.grid()
 plt.yticks(fontsize = 14)
