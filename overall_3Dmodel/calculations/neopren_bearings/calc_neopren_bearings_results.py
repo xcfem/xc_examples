@@ -63,7 +63,7 @@ f.close()
 # Cálculo
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis
+analysis= solProc.getAnalysis()
 #for ky in LCdef.LCG_perm+LCdef.LCG_reol:
 #for  ky in LCdef.LCG_vert:
 #for  ky in LCdef.LCG_fren:

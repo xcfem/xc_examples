@@ -26,7 +26,7 @@ textfl=open(reportFile,'w')  #tex file to be generated
 st=xcS.columnZconcrSet
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis # do not define analysis more than once
+analysis= solProc.getAnalysis() # do not define analysis more than once
 for ky in dictLCG.keys():
     lcg=dictLCG[ky]
     lcName=lcg['LCname']

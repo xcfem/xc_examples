@@ -21,7 +21,7 @@ reportPath=env.cfg.projectDirTree.getFullTextReportPath() # absolute path to pla
 reportFile= reportPath+'report_displacements.tex'  #laTex file where to include the graphics
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis # do not define analysis more than one
+analysis= solProc.getAnalysis() # do not define analysis more than once
 textfl=open(reportFile,'w')  #tex file to be generated
 for ky in dictLCG.keys():
     lcg=dictLCG[ky]

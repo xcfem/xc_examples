@@ -1,4 +1,6 @@
 # Functions to calculate the scaling factor to be applied to all induvidual seismic motion components accordinng to EN 1998-2:2005, ap. 3.2.3
+# Used by calc_scaled_accelerograms/gen_scaled_horizontal_accelerograms.py and calc_scaled_accelerograms/gen_scaled_vertical_accelerograms.py for scaling accelerograms
+
 import numpy as np
 from misc_utils import log_messages as lmsg
 import bisect

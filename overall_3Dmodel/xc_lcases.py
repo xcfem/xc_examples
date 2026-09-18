@@ -96,7 +96,7 @@ for lc in [LS1,LS2]:
 from solution import predefined_solutions
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis
+analysis= solProc.getAnalysis()
 for lc in [LS1,LS2]:
     modelSpace.removeAllLoadPatternsFromDomain()
     modelSpace.addLoadCaseToDomain(lc.name)
