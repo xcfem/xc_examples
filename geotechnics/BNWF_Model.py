@@ -125,7 +125,7 @@ rigidDummySpring= typical_materials.defElastNoTensMaterial(preprocessor, "rigidD
 
 # P-Y Springs Left Side of Beam
 
-#### User-Defined --- Imported from LPile Program --- Must start from 2001 (ground surface) ---- Number of elements should be the same as "Num_Springs"
+#### User-Defined --- Imported from LPile Program --- Must start from 1001 (ground surface) ---- Number of elements should be the same as "Num_Springs"
 #### At the ground surface, do not use 0.0 force values. Use very small number such as 0.0001 lbf instead.
 #### For example "uniaxialMaterial MultiLinear	1001	0.02	0.0001	0.04	0.0001	0.08	0.0001	0.25	0.0001"
 leftSpringsMaterials= dict()

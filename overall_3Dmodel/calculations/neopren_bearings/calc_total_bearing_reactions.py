@@ -17,7 +17,7 @@ dictLCG=yaml.safe_load(Path(workingDirectory+'LC_graph.yaml').read_text())
 f = open('result_total_bearing_reactions_1.tex','w')
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis
+analysis= solProc.getAnalysis()
 for ky in LCdef.listLCs_1:
     lcg=dictLCG[ky]
     model.modelSpace.removeAllLoadPatternsFromDomain()

@@ -1,3 +1,5 @@
+# Writes in a csv file either the horizontal target spectrum or the vertical target spectrum (commet out any lines of code that aren't appropriate for the case)
+
 import numpy as np
 from actions.quake import ec8_seismic as accsis
 import matplotlib.pyplot as plt

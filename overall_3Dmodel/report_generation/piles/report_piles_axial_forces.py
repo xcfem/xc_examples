@@ -36,7 +36,7 @@ for n in reactNod.keys():
     
 solProc= predefined_solutions.SimpleStaticLinear(FEcase)
 solProc.setup()
-analysis= solProc.analysis
+analysis= solProc.getAnalysis()
 for cmb in combs.keys():
     cmbExpr=combs[cmb].expr
     modelSpace.addNewLoadCaseToDomain(cmb,cmbExpr)
