@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import xc
 from model import predefined_spaces
 from materials import typical_materials
-from solution import predefined_solutions
+from solution import transient
 from misc_utils import log_messages as lmsg
 
 solve= True
@@ -115,7 +115,7 @@ recAccel.callbackRecord= "cAccel[self.tag].append((self.getDomain.getTimeTracker
 
 
 prep.getDomain.setTime(timeVals[0])
-solProc= predefined_solutions.PlainNewmarkNewtonRaphson(feProblem, numSteps= len(timeVals), timeStep= timeStep, convergenceTestTol= 1e-6, maxNumIter= 10, printFlag= 0)
+solProc= transient.PlainNewmarkNewtonRaphson(feProblem, numSteps= len(timeVals), timeStep= timeStep, convergenceTestTol= 1e-6, maxNumIter= 10, printFlag= 0)
 if(solve):
     result= solProc.solve()
     if(result!=0):
