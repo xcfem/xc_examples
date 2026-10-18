@@ -19,7 +19,7 @@ from model import predefined_spaces
 from materials.ec2 import EC2_materials
 from materials.sections.fiber_section import def_simple_RC_section
 from postprocess import RC_material_distribution
-from model.boundary_cond import spring_bound_cond as springs
+from model.boundary_cond import shallow_elastic_foundation as sef
 from actions import load_cases as lcm
 from scipy.constants import g
 from geotechnics import earth_pressure as ep
@@ -106,7 +106,7 @@ for l in [l1, l2, l3]:
 ## Set the soil parameters.
 wModulus= 10e6 # N/m3 Winkler modulus.
 cRoz= 2/3.0*math.tan(math.radians(25)) # Foundation base-soil friction coefficient
-elasticFoundation= springs.ElasticFoundation(wModulus= 10e6, cRoz= cRoz,noTensionZ=True)
+elasticFoundation= sef.ShallowElasticFoundation(wModulus= 10e6, cRoz= cRoz,noTensionZ=True)
 ## Generate springs.
 elasticFoundation.generateSprings(l2)
 

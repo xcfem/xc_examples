@@ -9,7 +9,7 @@ import math
 from model import predefined_spaces
 from model.geometry import grid_model as gm
 from model.mesh import finit_el_model as fem
-from model.boundary_cond import spring_bound_cond as sprbc
+from model.boundary_cond import spring_bound_cond as sbc
 from model.sets import sets_mng as sets
 from materials import typical_materials as tm
 from model.geometry import geom_utils as gut
@@ -368,7 +368,7 @@ for ang in dat.angPlaten1:
 # Springs
 nodBase=prep.getSets.defSet('nodBase')
 tagIni=prep.getNodeHandler.defaultTag
-from model.boundary_cond import spring_bound_cond as sbc
+from model.boundary_cond import shallow_elastic_foundation as sef
 kv=1e10
 kh=1e9
 springAnchor=sbc.SpringBC(name='springAnchor',modelSpace=modelSpace,Kx=kh,Ky=kh,Kz=kv)

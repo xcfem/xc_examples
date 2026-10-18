@@ -1,7 +1,7 @@
 # Definition of boundary conditions
 import xc
 import geom
-from model.boundary_cond import spring_bound_cond as sprbc
+from model.boundary_cond import spring_bound_cond as sbc
 # import local modules
 from postprocess.config import default_config
 workingDirectory= default_config.setWorkingDirectory() # search env_config.py
@@ -38,7 +38,7 @@ lstNod_BF_ID=list()
 for y in yDiaphragms:
     n=xcS.web.nodes.getNearestNode(geom.Pos3d(0,y,zBF))
     lstNod_BF_ID.append(n)
-BF_ID_spring=sprbc.SpringBC(name='BF_ID_spring',modelSpace=modelSpace,Kx=datM.K_BF_ID,Ky=0,Kz=0)
+BF_ID_spring= sbc.SpringBC(name='BF_ID_spring',modelSpace=modelSpace,Kx=datM.K_BF_ID,Ky=0,Kz=0)
 BF_ID_spring.applyOnNodesLst(lstNod_BF_ID)
 
 ## diaphragms top flange
@@ -46,7 +46,7 @@ lstNod_TF_ID=list()
 for y in yDiaphragms:
     n=xcS.web.nodes.getNearestNode(geom.Pos3d(0,y,zTF))
     lstNod_TF_ID.append(n)
-TF_ID_spring=sprbc.SpringBC(name='TF_ID_spring',modelSpace=modelSpace,Kx=datM.K_TF_ID,Ky=0,Kz=0)
+TF_ID_spring= sbc.SpringBC(name='TF_ID_spring',modelSpace=modelSpace,Kx=datM.K_TF_ID,Ky=0,Kz=0)
 TF_ID_spring.applyOnNodesLst(lstNod_TF_ID)
 
 #out.displayFEMesh()

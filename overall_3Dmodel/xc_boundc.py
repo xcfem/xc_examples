@@ -1,5 +1,7 @@
 # Definition of boundary conditions
 import geom
+from model.boundary_cond import spring_bound_cond as sbc
+from model.boundary_cond import shallow_elastic_foundation as sef
 
 # import local modules
 from postprocess.config import default_config
@@ -17,16 +19,15 @@ modelSpace=xc_init.modelSpace
 #       wModulus: Winkler modulus of the foundation (springs in Z direction)
 #       cRoz:     fraction of the Winkler modulus to apply for friction in
 #                 the contact plane (springs in X, Y directions)
-from model.boundary_cond import spring_bound_cond as sprbc
 
-foot_wink=sprbc.ElasticFoundation(wModulus=datM.wModulus,cRoz=datM.cRoz)
+foot_wink=sef.ShallowElasticFoundation(wModulus=datM.wModulus,cRoz=datM.cRoz)
 foot_wink.generateSprings(xcSet=xcG.foot)
 #out.displayFEMesh()
 
 # Springs (defined by Kx,Ky,Kz) to apply on nodes, points, 3Dpos, ...
 # Default values for Kx, Ky, Kz are 0, which means that no spring is
 # created in the corresponding direction
-spring_col=sprbc.SpringBC(name='spring_col',modelSpace=modelSpace,Kx=10e3,Ky=50e3,Kz=30e3)
+spring_col= sbc.SpringBC(name='spring_col',modelSpace=modelSpace,Kx=10e3,Ky=50e3,Kz=30e3)
 a=spring_col.applyOnNodesIn3Dpos(lst3DPos=[geom.Pos3d(0,datG.LbeamY,0)])
 
 #fixed DOF (ux:'0FF_FFF', uy:'F0F_FFF', uz:'FF0_FFF',
