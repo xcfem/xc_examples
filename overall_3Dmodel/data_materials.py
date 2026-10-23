@@ -11,7 +11,8 @@ strSteel.gammaM= 1.00
 deckCover=35e-3
 # Soil
 wModulus=20e7 # Winkler modulus of the foundation (springs in Z direction)
-cRoz=0.2 #  fraction of the Winkler modulus to apply for friction in the contact plane (springs in X, Y directions)
+hModulusFraction=0.2 # fraction of the Winkler modulus to apply as stiffness
+                     # in the contact plane (springs in X, Y directions).
 
 # Spring stiffness
 KXspring=11000e3 # [N/m] spring stiffness

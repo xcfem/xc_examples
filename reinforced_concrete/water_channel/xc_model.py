@@ -105,8 +105,8 @@ for l in [l1, l2, l3]:
 # Elastic foundation.
 ## Set the soil parameters.
 wModulus= 10e6 # N/m3 Winkler modulus.
-cRoz= 2/3.0*math.tan(math.radians(25)) # Foundation base-soil friction coefficient
-elasticFoundation= sef.ShallowElasticFoundation(wModulus= 10e6, cRoz= cRoz,noTensionZ=True)
+hModulusFraction= 2/3.0*math.tan(math.radians(25)) # Foundation base-soil friction coefficient
+elasticFoundation= sef.ShallowElasticFoundation(wModulus= 10e6, hModulusFraction= hModulusFraction,noTensionZ=True)
 ## Generate springs.
 elasticFoundation.generateSprings(l2)
 

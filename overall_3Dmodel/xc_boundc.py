@@ -17,10 +17,10 @@ modelSpace=xc_init.modelSpace
 #                       ***BOUNDARY CONDITIONS***
 # Regions resting on springs (Winkler elastic foundation)
 #       wModulus: Winkler modulus of the foundation (springs in Z direction)
-#       cRoz:     fraction of the Winkler modulus to apply for friction in
-#                 the contact plane (springs in X, Y directions)
+#       hModulusFraction: fraction of the Winkler modulus to apply as stiffness
+#                         in the contact plane (springs in X and Y directions).
 
-foot_wink=sef.ShallowElasticFoundation(wModulus=datM.wModulus,cRoz=datM.cRoz)
+foot_wink=sef.ShallowElasticFoundation(wModulus=datM.wModulus,hModulusFraction=datM.hModulusFraction)
 foot_wink.generateSprings(xcSet=xcG.foot)
 #out.displayFEMesh()
 
