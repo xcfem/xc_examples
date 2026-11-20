@@ -1,6 +1,6 @@
 # Definition of boundary conditions
 import geom
-from model.boundary_cond import spring_bound_cond as sprbc
+from model.boundary_cond import shallow_elastic_foundation as sef
 
 # import local modules
 from postprocess.config import default_config
