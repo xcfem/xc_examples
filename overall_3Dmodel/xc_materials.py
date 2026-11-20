@@ -77,4 +77,4 @@ beamXsteel_mat.defElasticShearSection3d(prep)
 beamXsteel_mat.sectionClass=1
 
 # X spring material
-Xspring_mat= tm.defElasticMaterial(prep, "kx",datM.KXspring)
+Xspring_mat= tm.defElasticMaterial(prep,name= "kx",E=datM.KXspring)

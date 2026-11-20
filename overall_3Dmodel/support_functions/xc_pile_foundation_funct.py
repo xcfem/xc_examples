@@ -6,6 +6,7 @@ from materials import typical_materials
 from model.mesh import finit_el_model as fem
 from geotechnics.foundations import guia_cimentaciones_oc as guia
 
+# NOTA: Los pilotes se deben generar de uno en uno
 # Deep foundation model. Strut and tie model of the pilecap and pile model according to «guía de cimentaciones»
 def gen_fict_beam(modelSpace,nodCol,nodPile,fictBmLenght,fictBmSectMat,fictBeamSet):
     ''' Generate an horizontal fictitious beam contained in the vertical plane
@@ -84,7 +85,8 @@ def gen_tie(modelSpace,nodPile1,nodPile2,tieArea,tieMat,tieSet):
     elems.defaultMaterial=tieMat.name
     tie=elems.newElement("Truss",xc.ID([nodPile1.tag,nodPile2.tag])) ;tie.sectionArea=tieArea ; tieSet.elements.append(tie)
     return
-    
+
+
 def gen_pile(modelSpace,topNodPile,pileDiam,pileLenght,pileMat,eSize,pileType,bearingCapPile,groundLevel,soils,pileSet,alphaK=[1,1,1]):
     '''Generate a pile, append its elements to pileSet and return its bottom
     node and the pile boundary conditions (springs).
